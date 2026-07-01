@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RocksDb.Net" Version="11.0.4.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Neo.Configuration\Neo.Configuration.csproj" />
+    <ProjectReference Include="..\Neo.Core\Neo.Core.csproj" />
+    <ProjectReference Include="..\Neo.IO\Neo.IO.csproj" />
+  </ItemGroup>
+
+</Project>

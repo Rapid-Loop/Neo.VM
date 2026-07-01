@@ -6,6 +6,7 @@
     <Project Path="src/Neo.Localization/Neo.Localization.csproj" Id="cf344ed8-cbf9-4f00-a5d4-d0c7bac43145" />
     <Project Path="src/Neo.Platform.CLI/Neo.Platform.CLI.csproj" Id="febe8581-30b0-4de6-8a3e-92dbad252849" />
     <Project Path="src/Neo.Platform.Hosting/Neo.Platform.Hosting.csproj" Id="de3bb911-e4a4-40e5-ab44-667ac6f8fe5e" />
+    <Project Path="src/Neo.Platform.Storage/Neo.Platform.Storage.csproj" Id="3966bf95-57d3-428b-9a68-e06a09516578" />
     <Project Path="src/Neo.VM/Neo.VM.csproj" Id="e38e01be-d9e4-4c1d-a0bc-b9a37250d446" />
     <Project Path="src/Neo.Wallet/Neo.Wallet.csproj" Id="49b273b6-b9a6-402e-8ea6-db4e23a3fe40" />
   </Folder>
@@ -13,6 +14,7 @@
     <Project Path="tests/Neo.Configuration.Tests/Neo.Configuration.Tests.csproj" Id="7217a313-c582-473a-9630-eb961137e665" />
     <Project Path="tests/Neo.Core.Tests/Neo.Core.Tests.csproj" />
     <Project Path="tests/Neo.IO.Tests/Neo.IO.Tests.csproj" Id="1941ba4a-93ce-432f-a9a7-e285846ebab7" />
+    <Project Path="tests/Neo.Platform.Storage.Tests/Neo.Platform.Storage.Tests.csproj" Id="2f88a159-541f-4c67-b9ac-fd3e62c20ae1" />
     <Project Path="tests/Neo.VM.Tests/Neo.VM.Tests.csproj" Id="47c53794-838b-4c3c-bc6c-e216708dd709" />
     <Project Path="tests/Neo.Wallet.Tests/Neo.Wallet.Tests.csproj" Id="86f0d22b-f832-4cc5-844f-eb7aeb8b7dfb" />
   </Folder>
