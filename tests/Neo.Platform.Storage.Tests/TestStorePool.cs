@@ -20,31 +20,43 @@
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 // SERVICES
 
+using Microsoft.Extensions.Options;
+using Neo.Configuration;
+using System.Collections.Concurrent;
+using System.IO;
+
 namespace Neo.Platform.Storage.Tests
 {
-    [TestClass]
-    public sealed class UT_BlockchainStore
+    internal sealed class TestStorePool
     {
-        [TestMethod]
-        public void TestColumnFamilyNames()
+        public static TestStorePool Shared => s_storePool;
+
+        private static readonly TestStorePool s_storePool = new();
+
+        private readonly ConcurrentDictionary<string, BlockchainStore> _store = [];
+
+        public BlockchainStore Rent()
         {
-            var store = TestStorePool.Shared.Rent();
+            var storeOptions = Options.Create(new BlockchainStoreOptions()
+            {
+                DatabasePath = Path.Combine(Path.GetRandomFileName()),
+            });
 
-            store.Put([0xff, 0x00, 0x00], [0x00]);
-            store.Put([0xff, 0x00, 0x01], [0x01], ColumnFamilyNames.Blocks);
+            var store = new BlockchainStore(storeOptions);
 
-            var actualBytes = store.Get([0xff, 0x00, 0x01]);
+            _store.TryAdd(storeOptions.Value.DatabasePath, store);
 
-            Assert.IsFalse(store.ContainsKey([0xff, 0x00, 0x01]));
-            Assert.IsNull(actualBytes);
+            return store;
+        }
 
-            actualBytes = store.Get([0xff, 0x00, 0x01], ColumnFamilyNames.Blocks);
-
-            Assert.IsNotNull(actualBytes);
-            Assert.AreEqual(1, actualBytes?.Length);
-            Assert.AreEqual<byte?>(0x01, actualBytes?[0]);
-
-            TestStorePool.Shared.Return(store);
+        public void Return(BlockchainStore store)
+        {
+            if (_store.TryRemove(store.Options.DatabasePath, out var value))
+            {
+                value.Dispose();
+                new DirectoryInfo(store.Options.DatabasePath)
+                    .Delete(true);
+            }
         }
     }
 }

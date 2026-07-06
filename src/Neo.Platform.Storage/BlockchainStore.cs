@@ -44,17 +44,20 @@ namespace Neo.Platform.Storage
             new(ColumnFamilyNames.Transactions),
         ];
 
+        public BlockchainStoreOptions Options => _options;
+
         private readonly Cache _blockSharedCache;
         private readonly FilterPolicy _bloomFilter;
         private readonly RocksDb _db;
+        private readonly BlockchainStoreOptions _options;
 
         public BlockchainStore(
             IOptions<BlockchainStoreOptions> options,
             ILogger<BlockchainStore>? logger = default)
         {
-            var configuration = options.Value;
+            _options = options.Value;
 
-            var dirInfo = new DirectoryInfo(configuration.DatabasePath);
+            var dirInfo = new DirectoryInfo(_options.DatabasePath);
 
             if (dirInfo.Exists == false)
                 dirInfo.Create();
@@ -67,7 +70,7 @@ namespace Neo.Platform.Storage
 
             var dbOptions = new DbOptions()
             {
-                CreateIfMissing = configuration.CreateIfMissing,
+                CreateIfMissing = _options.CreateIfMissing,
                 CreateMissingColumnFamilies = true,
 
                 // Compression
@@ -111,7 +114,7 @@ namespace Neo.Platform.Storage
 
             dbOptions.OptimizeForPointLookup(64); // 64MB
 
-            _db = RocksDb.Open(dbOptions, configuration.DatabasePath, s_columnFamilies);
+            _db = RocksDb.Open(dbOptions, _options.DatabasePath, s_columnFamilies);
         }
 
         public void Dispose()
