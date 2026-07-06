@@ -33,7 +33,7 @@ using System.IO;
 
 namespace Neo.Platform.Storage
 {
-    public sealed class BlockchainStore : IEnumerable<(byte[] Key, byte[] Value)>, IEnumerable, IStore, IDisposable
+    public sealed class BlockchainStore : IEnumerable<(byte[] Key, byte[] Value)>, IEnumerable, IStore
     {
         public BlockchainStoreOptions Options => _options;
 
@@ -129,30 +129,30 @@ namespace Neo.Platform.Storage
             throw new NotImplementedException();
         }
 
-        public void Put(in ReadOnlySpan<byte> key, in ReadOnlySpan<byte> value, string? columnFamilyName = default) =>
+        public void Put(ReadOnlySpan<byte> key, ReadOnlySpan<byte> value, string? columnFamilyName = default) =>
             _db.Put(key, value, GetColumnFamilyHandle(columnFamilyName));
 
-        public void Delete(in ReadOnlySpan<byte> key, string? columnFamilyName = default)
+        public void Delete(ReadOnlySpan<byte> key, string? columnFamilyName = default)
         {
             //if (_db.KeyMayExist(key, GetColumnFamilyHandle(columnFamilyName)))
             _db.Delete(key, GetColumnFamilyHandle(columnFamilyName));
         }
 
-        public bool ContainsKey(in ReadOnlySpan<byte> key, string? columnFamilyName = default)
+        public bool ContainsKey(ReadOnlySpan<byte> key, string? columnFamilyName = default)
         {
             //if (_db.KeyMayExist(key, GetColumnFamilyHandle(columnFamilyName)))
             return TryGet(key, out _, columnFamilyName);
             //return false;
         }
 
-        public byte[]? Get(in ReadOnlySpan<byte> key, string? columnFamilyName = default)
+        public byte[]? Get(ReadOnlySpan<byte> key, string? columnFamilyName = default)
         {
             //if (_db.KeyMayExist(key, GetColumnFamilyHandle(columnFamilyName)))
             return _db.Get(key, GetColumnFamilyHandle(columnFamilyName));
             //return default;
         }
 
-        public bool TryGet(in ReadOnlySpan<byte> key, [NotNullWhen(true)] out byte[]? value, string? columnFamilyName = default)
+        public bool TryGet(ReadOnlySpan<byte> key, [NotNullWhen(true)] out byte[]? value, string? columnFamilyName = default)
         {
             //if (_db.KeyMayExist(key, GetColumnFamilyHandle(columnFamilyName)))
             //{

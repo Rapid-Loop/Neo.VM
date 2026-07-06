@@ -28,8 +28,8 @@ namespace Neo.Platform.Storage.Interface
     {
         IStoreSnapshot CreateSnapshot();
 
-        void Put(in ReadOnlySpan<byte> key, in ReadOnlySpan<byte> value, string? columnFamilyName = default);
+        void Put(ReadOnlySpan<byte> key, ReadOnlySpan<byte> value, string? columnFamilyName = default);
 
-        void Delete(in ReadOnlySpan<byte> key, string? columnFamilyName = default);
+        void Delete(ReadOnlySpan<byte> key, string? columnFamilyName = default);
     }
 }

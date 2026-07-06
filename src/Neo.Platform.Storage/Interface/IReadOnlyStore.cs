@@ -26,13 +26,13 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Neo.Platform.Storage.Interface
 {
-    public interface IReadOnlyStore
+    public interface IReadOnlyStore : IDisposable
     {
-        bool ContainsKey(in ReadOnlySpan<byte> key, string? columnFamilyName = default);
+        bool ContainsKey(ReadOnlySpan<byte> key, string? columnFamilyName = default);
 
-        byte[]? Get(in ReadOnlySpan<byte> key, string? columnFamilyName = default);
+        byte[]? Get(ReadOnlySpan<byte> key, string? columnFamilyName = default);
 
-        bool TryGet(in ReadOnlySpan<byte> key, [NotNullWhen(true)] out byte[]? value, string? columnFamilyName = default);
+        bool TryGet(ReadOnlySpan<byte> key, [NotNullWhen(true)] out byte[]? value, string? columnFamilyName = default);
 
         IEnumerable<(byte[] Key, byte[] Value)> Seek(ReadOnlyMemory<byte> keyOrPrefix, bool seekFromEnd = false, string? columnFamilyName = default);
     }
