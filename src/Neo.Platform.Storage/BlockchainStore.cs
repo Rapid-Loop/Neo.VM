@@ -23,13 +23,17 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Neo.Configuration;
+using Neo.Platform.Storage.Interface;
 using RocksDbNet;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Neo.Platform.Storage
 {
-    public sealed class BlockchainStore : IDisposable
+    public sealed class BlockchainStore : IEnumerable<(byte[] Key, byte[] Value)>, IEnumerable, IStore, IDisposable
     {
         private static readonly ColumnFamilyDescriptor[] s_columnFamilies =
         [
@@ -117,14 +121,76 @@ namespace Neo.Platform.Storage
             _bloomFilter.Dispose();
         }
 
-        public ReadOnlySpan<byte> Get(ReadOnlySpan<byte> key, string? columnFamilyName = default) =>
-            _db.Get(key, GetColumnFamilyHandle(columnFamilyName));
+        public IStoreSnapshot CreateSnapshot()
+        {
+            throw new NotImplementedException();
+        }
 
-        public void Put(ReadOnlySpan<byte> key, ReadOnlySpan<byte> value, string? columnFamilyName = default) =>
+        public void Put(in ReadOnlySpan<byte> key, in ReadOnlySpan<byte> value, string? columnFamilyName = default) =>
             _db.Put(key, value, GetColumnFamilyHandle(columnFamilyName));
 
+        public void Delete(in ReadOnlySpan<byte> key, string? columnFamilyName = default)
+        {
+            //if (_db.KeyMayExist(key, GetColumnFamilyHandle(columnFamilyName)))
+            _db.Delete(key, GetColumnFamilyHandle(columnFamilyName));
+        }
+
+        public bool ContainsKey(in ReadOnlySpan<byte> key, string? columnFamilyName = default)
+        {
+            //if (_db.KeyMayExist(key, GetColumnFamilyHandle(columnFamilyName)))
+            return TryGet(key, out _, columnFamilyName);
+            //return false;
+        }
+
+        public byte[]? Get(in ReadOnlySpan<byte> key, string? columnFamilyName = default)
+        {
+            //if (_db.KeyMayExist(key, GetColumnFamilyHandle(columnFamilyName)))
+            return _db.Get(key, GetColumnFamilyHandle(columnFamilyName));
+            //return default;
+        }
+
+        public bool TryGet(in ReadOnlySpan<byte> key, [NotNullWhen(true)] out byte[]? value, string? columnFamilyName = default)
+        {
+            //if (_db.KeyMayExist(key, GetColumnFamilyHandle(columnFamilyName)))
+            //{
+            var data = _db.Get(key, GetColumnFamilyHandle(columnFamilyName));
+            if (data is not null)
+            {
+                value = data;
+                return true;
+            }
+            //}
+
+            value = null;
+            return false;
+        }
+
+        public IEnumerable<(byte[] Key, byte[] Value)> Seek(ReadOnlyMemory<byte> keyOrPrefix, bool seekFromEnd = false, string? columnFamilyName = default)
+        {
+            using var iter = _db.NewIterator(GetColumnFamilyHandle(columnFamilyName));
+
+            for (iter.SeekForPrev(keyOrPrefix.Span); iter.IsValid();)
+            {
+                yield return new(iter.KeyToArray(), iter.ValueToArray());
+                if (seekFromEnd)
+                    iter.Prev();
+                else
+                    iter.Next();
+            }
+        }
+
+        public IEnumerator GetEnumerator() =>
+            GetEnumerator();
+
+        IEnumerator<(byte[] Key, byte[] Value)> IEnumerable<(byte[] Key, byte[] Value)>.GetEnumerator()
+        {
+            using var iter = _db.NewIterator();
+            for (iter.SeekToFirst(); iter.IsValid(); iter.Next())
+                yield return new(iter.KeyToArray(), iter.ValueToArray());
+        }
+
         private ColumnFamilyHandle GetColumnFamilyHandle(string? columnFamilyName = default) =>
-            string.IsNullOrEmpty(columnFamilyName) ?
+            string.IsNullOrWhiteSpace(columnFamilyName) ?
                 _db.GetDefaultColumnFamily() :
                 _db.GetColumnFamily(columnFamilyName);
 

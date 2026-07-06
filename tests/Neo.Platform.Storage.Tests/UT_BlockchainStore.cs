@@ -32,7 +32,11 @@ namespace Neo.Platform.Storage.Tests
         [TestMethod]
         public void TestColumnFamilyNames()
         {
-            var options = Options.Create(new BlockchainStoreOptions());
+            var options = Options.Create(new BlockchainStoreOptions()
+            {
+                DatabasePath = Path.Combine(Path.GetRandomFileName()),
+            });
+
             var store = new BlockchainStore(options);
 
             store.Put([0xff, 0x00, 0x00], [0x00]);
@@ -40,14 +44,14 @@ namespace Neo.Platform.Storage.Tests
 
             var actualBytes = store.Get([0xff, 0x00, 0x01]);
 
-            Assert.IsTrue(actualBytes.IsEmpty);
-            Assert.AreEqual(0, actualBytes.Length);
+            Assert.IsFalse(store.ContainsKey([0xff, 0x00, 0x01]));
+            Assert.IsNull(actualBytes);
 
             actualBytes = store.Get([0xff, 0x00, 0x01], ColumnFamilyNames.Blocks);
 
-            Assert.IsFalse(actualBytes.IsEmpty);
-            Assert.AreEqual(1, actualBytes.Length);
-            Assert.AreEqual(1, actualBytes[0]);
+            Assert.IsNotNull(actualBytes);
+            Assert.AreEqual(1, actualBytes?.Length);
+            Assert.AreEqual<byte?>(0x01, actualBytes?[0]);
 
             store.Dispose();
 
