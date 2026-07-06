@@ -35,6 +35,8 @@ namespace Neo.Platform.Storage
 {
     public sealed class BlockchainStore : IEnumerable<(byte[] Key, byte[] Value)>, IEnumerable, IStore, IDisposable
     {
+        public BlockchainStoreOptions Options => _options;
+
         private static readonly ColumnFamilyDescriptor[] s_columnFamilies =
         [
             new(ColumnFamilyNames.Default),
@@ -43,8 +45,6 @@ namespace Neo.Platform.Storage
             new(ColumnFamilyNames.Blocks),
             new(ColumnFamilyNames.Transactions),
         ];
-
-        public BlockchainStoreOptions Options => _options;
 
         private readonly Cache _blockSharedCache;
         private readonly FilterPolicy _bloomFilter;
