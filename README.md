@@ -100,7 +100,7 @@ dotnet test
 
 ## 🤝 Contributing
 
-We welcome contributions! See our [Contributing Guidelines](.github/CONTRIBUTING.md) (create this file if needed).
+We welcome contributions! See our [Contributing Guidelines](CONTRIBUTING.md) (create this file if needed).
 
 ---
 
