@@ -32,7 +32,7 @@ namespace Neo.IO.Tests.Hashing
         private const uint DefaultTestSeed = 123u;
 
         [TestMethod]
-        public void TestHashToUInt64()
+        public void TestHash()
         {
             var arrayData = Encoding.ASCII.GetBytes("hello");
             var actualHash = Murmur128.Hash(arrayData, DefaultTestSeed);
@@ -51,6 +51,32 @@ namespace Neo.IO.Tests.Hashing
             actualHashString = Convert.ToHexStringLower(actualHash);
 
             Assert.AreEqual("e0a0632d4f51302c55e3b3e48d28795d", actualHashString);
+        }
+
+        [TestMethod]
+        public void TestMoreThan16Characters()
+        {
+            var arrayData = Encoding.ASCII.GetBytes("Testing more than 16 characters.");
+            var actualHash = Murmur128.Hash(arrayData, DefaultTestSeed);
+            var actualHashString = Convert.ToHexStringLower(actualHash);
+
+            Assert.AreEqual("6903e6d3d2fe781787819c89b2c11aa9", actualHashString);
+
+            arrayData = Encoding.ASCII.GetBytes
+            (
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Sed do eiusmod tempor incididunt ut labore et dolore magna " +
+                "aliqua. Ut enim ad minim veniam, quis nostrud exercitation " +
+                "ullamco laboris nisi ut aliquip ex ea commodo consequat. " +
+                "Duis aute irure dolor in reprehenderit in voluptate velit " +
+                "esse cillum dolore eu fugiat nulla pariatur. Excepteur sint " +
+                "occaecat cupidatat non proident, sunt in culpa qui officia " +
+                "deserunt mollit anim id est laborum."
+            );
+            actualHash = Murmur128.Hash(arrayData, DefaultTestSeed);
+            actualHashString = Convert.ToHexStringLower(actualHash);
+
+            Assert.AreEqual("dacfff46c267a7be8dbb73489c1d2678", actualHashString);
         }
     }
 }

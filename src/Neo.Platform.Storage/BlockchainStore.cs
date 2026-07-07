@@ -33,7 +33,7 @@ using System.IO;
 
 namespace Neo.Platform.Storage
 {
-    public sealed class BlockchainStore : IEnumerable<(byte[] Key, byte[] Value)>, IEnumerable, IStore
+    public sealed class BlockchainStore : IEnumerable<(byte[] Key, byte[] Value)>, IStore
     {
         public BlockchainStoreOptions Options => _options;
 

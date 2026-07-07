@@ -43,10 +43,8 @@ namespace Neo.IO.Hashing
 
         private Murmur128(uint seed = DefaultSeed) : base(16)
         {
-            Reset();
-
             _seed = seed;
-            _h1 = _h2 = _seed;
+            Reset();
         }
 
         public static byte[] Hash(byte[] data, uint seed = DefaultSeed) =>
@@ -65,22 +63,22 @@ namespace Neo.IO.Hashing
             return Hash(bytes, seed);
         }
 
-        public static ulong HashToUInt64(byte[] data, uint seed = DefaultSeed) =>
-            HashToUInt64(data.AsSpan(), seed);
+        public static UInt128 HashToUInt128(byte[] data, uint seed = DefaultSeed) =>
+            HashToUInt128(data.AsSpan(), seed);
 
-        public static ulong HashToUInt64(ReadOnlySpan<byte> data, uint seed = DefaultSeed) =>
-            BitConverter.ToUInt64(Hash(data, seed), 0);
+        public static UInt128 HashToUInt128(ReadOnlySpan<byte> data, uint seed = DefaultSeed) =>
+            BitConverter.ToUInt128(Hash(data, seed), 0);
 
-        public static ulong HashToUInt64(string text, uint seed = DefaultSeed)
+        public static UInt128 HashToUInt128(string text, uint seed = DefaultSeed)
         {
             var bytes = Encoding.UTF8.GetBytes(text);
-            return HashToUInt64(bytes, seed);
+            return HashToUInt128(bytes, seed);
         }
 
         public override void Reset()
         {
-            _h1 = 0;
-            _h2 = 0;
+            _h1 = _seed;
+            _h2 = _seed;
             _length = 0;
         }
 
@@ -91,20 +89,12 @@ namespace Neo.IO.Hashing
             var index = 0;
             var bytesRemaining = source.Length;
 
-            while (bytesRemaining >= 16)
+            for (; bytesRemaining >= 16; index += 16, bytesRemaining -= 16)
             {
-                unsafe
-                {
-                    fixed (byte* ptr = &source[index])
-                    {
-                        var k1 = Unsafe.ReadUnaligned<ulong>(ptr);
-                        var k2 = Unsafe.ReadUnaligned<ulong>(ptr + 8);
+                var k1 = Unsafe.ReadUnaligned<ulong>(in source[index]);
+                var k2 = Unsafe.ReadUnaligned<ulong>(in source[index + 8]);
 
-                        ProcessBlock(k1, k2);
-                    }
-                }
-                index += 16;
-                bytesRemaining -= 16;
+                ProcessBlock(k1, k2);
             }
 
             // Process leftover bytes if the source isn't an exact multiple of 16 bytes
@@ -150,40 +140,13 @@ namespace Neo.IO.Hashing
             _h1 += _h2;
             _h2 += _h1;
 
-            unsafe
-            {
-                fixed (byte* destPtr = destination)
-                {
-                    Unsafe.WriteUnaligned(destPtr, _h1);
-                    Unsafe.WriteUnaligned(destPtr + 8, _h2);
-                }
-            }
+            Unsafe.WriteUnaligned(ref destination[0], _h1);
+            Unsafe.WriteUnaligned(ref destination[8], _h2);
         }
 
         protected override void GetHashAndResetCore(Span<byte> destination)
         {
-            // Finalization
-            _h1 ^= _length;
-            _h2 ^= _length;
-
-            _h1 += _h2;
-            _h2 += _h1;
-
-            _h1 = MixFinal(_h1);
-            _h2 = MixFinal(_h2);
-
-            _h1 += _h2;
-            _h2 += _h1;
-
-            unsafe
-            {
-                fixed (byte* destPtr = destination)
-                {
-                    Unsafe.WriteUnaligned(destPtr, _h1);
-                    Unsafe.WriteUnaligned(destPtr + 8, _h2);
-                }
-            }
-
+            GetCurrentHashCore(destination);
             Reset(); // Reset after reading
         }
 
@@ -227,9 +190,9 @@ namespace Neo.IO.Hashing
         private static ulong MixFinal(ulong k)
         {
             k ^= k >> 33;
-            k *= 0xff51afd7ed558ccdUL;
+            k *= 0xff51afd7ed558ccdul;
             k ^= k >> 33;
-            k *= 0xc4ceb9fe1a85ec53UL;
+            k *= 0xc4ceb9fe1a85ec53ul;
             k ^= k >> 33;
             return k;
         }
