@@ -46,5 +46,42 @@ namespace Neo.Platform.Storage.Tests
 
             TestStorePool.Shared.Return(store);
         }
+
+        [TestMethod]
+        public void TestSnapshot()
+        {
+            var store = TestStorePool.Shared.Rent();
+
+            store.Put([0xff, 0x00, 0x00], [0x00]);
+
+            using (var snapshot = store.CreateSnapshot())
+            {
+                var actualBytes = snapshot.Get([0xff, 0x00, 0x00]);
+
+                Assert.IsTrue(snapshot.ContainsKey([0xff, 0x00, 0x00]));
+                Assert.IsNotNull(actualBytes);
+                Assert.AreEqual(1, actualBytes?.Length);
+                Assert.AreEqual<byte?>(0x00, actualBytes?[0]);
+
+                actualBytes = store.Get([0xff, 0x00, 0x00]);
+
+                Assert.IsTrue(store.ContainsKey([0xff, 0x00, 0x00]));
+                Assert.IsNotNull(actualBytes);
+                Assert.AreEqual(1, actualBytes?.Length);
+                Assert.AreEqual<byte?>(0x00, actualBytes?[0]);
+
+                snapshot.Put([0xff, 0x00, 0x00], [0x01]);
+                snapshot.Commit();
+
+                actualBytes = store.Get([0xff, 0x00, 0x00]);
+
+                Assert.IsTrue(store.ContainsKey([0xff, 0x00, 0x00]));
+                Assert.IsNotNull(actualBytes);
+                Assert.AreEqual(1, actualBytes?.Length);
+                Assert.AreEqual<byte?>(0x01, actualBytes?[0]);
+            }
+
+            TestStorePool.Shared.Return(store);
+        }
     }
 }

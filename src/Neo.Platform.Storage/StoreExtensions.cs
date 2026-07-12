@@ -20,20 +20,35 @@
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 // SERVICES
 
+using Neo.Core.Extensions;
+using Neo.Core.Serialization;
+using Neo.Platform.Storage.Interface;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Neo.Platform.Storage.Interface
+namespace Neo.Platform.Storage
 {
-    public interface IReadOnlyStore : IDisposable
+    public static class StoreExtensions
     {
-        bool ContainsKey(ReadOnlySpan<byte> key, string? columnFamilyName = default);
+        public static void Put<T>(this IStore store, ReadOnlySpan<byte> key, T value)
+            where T : INeoSerializable =>
+            store.Put(key, value.ToArray());
 
-        byte[]? Get(ReadOnlySpan<byte> key, string? columnFamilyName = default);
+        public static TResult? Get<TResult>(this IReadOnlyStore store, ReadOnlySpan<byte> key)
+            where TResult : class?, INeoSerializable =>
+            store.Get(key)?.AsSerializable<TResult>();
 
-        bool TryGet(ReadOnlySpan<byte> key, [NotNullWhen(true)] out byte[]? value, string? columnFamilyName = default);
+        public static bool TryGet<T>(this IReadOnlyStore store, ReadOnlySpan<byte> key, [NotNullWhen(true)] out T? value)
+            where T : class?, INeoSerializable
+        {
+            value = default;
+            if (store.TryGet(key, out var valueBytes))
+            {
+                value = valueBytes.AsSerializable<T>();
+                return true;
+            }
 
-        IEnumerable<KeyValuePair<byte[], byte[]>> Seek(ReadOnlyMemory<byte> keyOrPrefix, bool seekFromEnd = false, string? columnFamilyName = default);
+            return false;
+        }
     }
 }

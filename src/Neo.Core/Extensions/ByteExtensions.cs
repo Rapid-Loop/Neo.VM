@@ -73,7 +73,7 @@ namespace Neo.Core.Extensions
         /// <param name="data">The byte array to be converted.</param>
         /// <param name="startIndex">The offset into the byte array from which to begin using data.</param>
         /// <returns>The converted <see cref="INeoSerializable"/> object.</returns>
-        public static T? AsSerializable<T>(this byte[] data, int startIndex = 0)
+        public static T AsSerializable<T>(this byte[] data, int startIndex = 0)
             where T : class?, INeoSerializable?
         {
             using var ms = new MemoryStream(data, false);

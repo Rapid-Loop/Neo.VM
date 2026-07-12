@@ -33,7 +33,7 @@ using System.IO;
 
 namespace Neo.Platform.Storage
 {
-    public sealed class BlockchainStore : IEnumerable<(byte[] Key, byte[] Value)>, IStore
+    public sealed class BlockchainStore : IEnumerable<KeyValuePair<byte[], byte[]>>, IStore
     {
         public BlockchainStoreOptions Options => _options;
 
@@ -124,10 +124,8 @@ namespace Neo.Platform.Storage
             _bloomFilter.Dispose();
         }
 
-        public IStoreSnapshot CreateSnapshot()
-        {
-            throw new NotImplementedException();
-        }
+        public IStoreSnapshot CreateSnapshot() =>
+            new BlockchainStoreSnapshot(this, _db);
 
         public void Put(ReadOnlySpan<byte> key, ReadOnlySpan<byte> value, string? columnFamilyName = default) =>
             _db.Put(key, value, GetColumnFamilyHandle(columnFamilyName));
@@ -164,11 +162,11 @@ namespace Neo.Platform.Storage
             }
             //}
 
-            value = null;
+            value = default;
             return false;
         }
 
-        public IEnumerable<(byte[] Key, byte[] Value)> Seek(ReadOnlyMemory<byte> keyOrPrefix, bool seekFromEnd = false, string? columnFamilyName = default)
+        public IEnumerable<KeyValuePair<byte[], byte[]>> Seek(ReadOnlyMemory<byte> keyOrPrefix, bool seekFromEnd = false, string? columnFamilyName = default)
         {
             using var iter = _db.NewIterator(GetColumnFamilyHandle(columnFamilyName));
 
@@ -185,7 +183,7 @@ namespace Neo.Platform.Storage
         public IEnumerator GetEnumerator() =>
             GetEnumerator();
 
-        IEnumerator<(byte[] Key, byte[] Value)> IEnumerable<(byte[] Key, byte[] Value)>.GetEnumerator()
+        IEnumerator<KeyValuePair<byte[], byte[]>> IEnumerable<KeyValuePair<byte[], byte[]>>.GetEnumerator()
         {
             using var iter = _db.NewIterator();
             for (iter.SeekToFirst(); iter.IsValid(); iter.Next())

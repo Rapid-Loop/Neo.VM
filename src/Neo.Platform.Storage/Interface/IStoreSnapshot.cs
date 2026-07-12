@@ -26,6 +26,8 @@ namespace Neo.Platform.Storage.Interface
 {
     public interface IStoreSnapshot : IStore, IDisposable
     {
+        IStore Store { get; }
+
         void Commit();
     }
 }

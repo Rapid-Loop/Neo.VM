@@ -46,7 +46,7 @@ namespace Neo.IO.Tests.Data
         }
 
         [TestMethod]
-        public void TestBloomFIlterConstructorGetMTweak()
+        public void TestBloomFilterConstructorGetMTweak()
         {
             var expectedElements = 7;
             var nTweak = 123456u;
