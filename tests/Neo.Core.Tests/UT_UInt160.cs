@@ -20,7 +20,6 @@
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 // SERVICES
 
-#pragma warning disable CS1718 // Comparison made to same variable
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
 
 using System;

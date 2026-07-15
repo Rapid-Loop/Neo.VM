@@ -41,7 +41,7 @@ namespace Neo.Wallet.Tests
 
             var actualKeyBytes = ChainWallet.GetKeyFromWifString("L3tgppXLgdaeqSGSFw1Go3skBiy8vQAM7YMXvTHsKQtE16PBncSU");
 
-            CollectionAssert.AreEqual(expectedKeyBytes, actualKeyBytes);
+            Assert.AreSequenceEqual(expectedKeyBytes, actualKeyBytes);
         }
 
         [TestMethod]
@@ -53,7 +53,7 @@ namespace Neo.Wallet.Tests
             var actualNep2String = ChainWallet.ToNep2String(expectedPrivateKeyBytes, "pwd", defaultSCryptParameters);
             var actualPrivateKeyBytes = ChainWallet.GetKeyFromNep2String(actualNep2String, "pwd", defaultSCryptParameters);
 
-            CollectionAssert.AreEqual(expectedPrivateKeyBytes, actualPrivateKeyBytes);
+            Assert.AreSequenceEqual(expectedPrivateKeyBytes, actualPrivateKeyBytes);
         }
     }
 }

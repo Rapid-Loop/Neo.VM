@@ -74,7 +74,7 @@ namespace Neo.Core.Tests.Text
                 var actualDecodeBytes = Base58.Decode(entry.Value);
 
                 Assert.AreEqual(entry.Value, actualEncodeBytes);
-                CollectionAssert.AreEqual(keyBytes, actualDecodeBytes);
+                Assert.AreSequenceEqual(keyBytes, actualDecodeBytes);
             }
 
             var invalidBase58 = new string[] { "0", "O", "I", "l", "+", "/" };

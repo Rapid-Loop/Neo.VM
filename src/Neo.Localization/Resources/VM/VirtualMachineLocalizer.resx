@@ -121,9 +121,9 @@
     <value>L{0:D4} {1,-11:G}{2}</value>
   </data>
   <data name="ExecuteStartupMessage" xml:space="preserve">
-    <value>Starting execution | HardFork: {0:G} | GasLimit: {1:N0}</value>
+    <value>Starting execution | HardFork: {0:G} | GasLimit: {1:N8}</value>
   </data>
   <data name="ExecuteSuccessfullyMessage" xml:space="preserve">
-    <value>Execution completed successfully | GasConsumed: {0:N0} | GasLeft: {1:N0} | State: {2:G}</value>
+    <value>Execution completed successfully | GasConsumed: {0:N8} | GasLeft: {1:N8} | State: {2:G}</value>
   </data>
 </root>

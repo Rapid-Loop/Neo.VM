@@ -21,9 +21,11 @@
 // SERVICES
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Neo.Configuration;
 using Neo.Platform.Storage.Interface;
+using Neo.Platform.Storage.Logging;
 using RocksDbNet;
 using System;
 using System.Collections;
@@ -40,22 +42,26 @@ namespace Neo.Platform.Storage
         private static readonly ColumnFamilyDescriptor[] s_columnFamilies =
         [
             new(ColumnFamilyNames.Default),
-            new(ColumnFamilyNames.Meta),
-            new(ColumnFamilyNames.Indexes),
-            new(ColumnFamilyNames.Blocks),
-            new(ColumnFamilyNames.Transactions),
+            new(ColumnFamilyNames.Checkpoints),
+            new(ColumnFamilyNames.Backups),
         ];
 
         private readonly Cache _blockSharedCache;
         private readonly FilterPolicy _bloomFilter;
         private readonly RocksDb _db;
+
         private readonly BlockchainStoreOptions _options;
+
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger _logger;
 
         public BlockchainStore(
             IOptions<BlockchainStoreOptions> options,
-            ILogger<BlockchainStore>? logger = default)
+            ILoggerFactory? loggerFactory = default)
         {
             _options = options.Value;
+            _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
+            _logger = _loggerFactory.CreateLogger<BlockchainStore>();
 
             var dirInfo = new DirectoryInfo(_options.DatabasePath);
 
@@ -124,55 +130,102 @@ namespace Neo.Platform.Storage
             _bloomFilter.Dispose();
         }
 
-        public IStoreSnapshot CreateSnapshot() =>
-            new BlockchainStoreSnapshot(this, _db);
-
-        public void Put(ReadOnlySpan<byte> key, ReadOnlySpan<byte> value, string? columnFamilyName = default) =>
-            _db.Put(key, value, GetColumnFamilyHandle(columnFamilyName));
-
-        public void Delete(ReadOnlySpan<byte> key, string? columnFamilyName = default)
+        public IStoreSnapshot CreateSnapshot()
         {
-            //if (_db.KeyMayExist(key, GetColumnFamilyHandle(columnFamilyName)))
-            _db.Delete(key, GetColumnFamilyHandle(columnFamilyName));
+            var logLevel = LogLevel.Debug;
+
+            if (_logger.IsEnabled(logLevel))
+                _logger.LogCreateSnapshotMessage(logLevel, "Creating snapshot of the store.");
+
+            return new BlockchainStoreSnapshot(this, _db, _loggerFactory);
         }
 
-        public bool ContainsKey(ReadOnlySpan<byte> key, string? columnFamilyName = default)
+        public void Put(ReadOnlySpan<byte> key, ReadOnlySpan<byte> value)
         {
-            //if (_db.KeyMayExist(key, GetColumnFamilyHandle(columnFamilyName)))
-            return TryGet(key, out _, columnFamilyName);
-            //return false;
+            _db.Put(key, value);
+
+            var logLevel = LogLevel.Debug;
+
+            if (_logger.IsEnabled(logLevel))
+                _logger.LogWriteMessage(logLevel, $"Put key: {Convert.ToHexStringLower(key)} value: {Convert.ToHexStringLower(value)}");
         }
 
-        public byte[]? Get(ReadOnlySpan<byte> key, string? columnFamilyName = default)
+        public void Delete(ReadOnlySpan<byte> key)
         {
-            //if (_db.KeyMayExist(key, GetColumnFamilyHandle(columnFamilyName)))
-            return _db.Get(key, GetColumnFamilyHandle(columnFamilyName));
-            //return default;
-        }
-
-        public bool TryGet(ReadOnlySpan<byte> key, [NotNullWhen(true)] out byte[]? value, string? columnFamilyName = default)
-        {
-            //if (_db.KeyMayExist(key, GetColumnFamilyHandle(columnFamilyName)))
-            //{
-            var data = _db.Get(key, GetColumnFamilyHandle(columnFamilyName));
-            if (data is not null)
+            if (_db.KeyMayExist(key))
             {
-                value = data;
-                return true;
+                _db.Delete(key);
+
+                var logLevel = LogLevel.Debug;
+
+                if (_logger.IsEnabled(logLevel))
+                    _logger.LogDeleteMessage(logLevel, $"Deleted key: {Convert.ToHexStringLower(key)}");
             }
-            //}
+        }
+
+        public bool ContainsKey(ReadOnlySpan<byte> key)
+        {
+            if (_db.KeyMayExist(key))
+                return TryGet(key, out _);
+            return false;
+        }
+
+        public byte[]? Get(ReadOnlySpan<byte> key)
+        {
+            if (_db.KeyMayExist(key))
+            {
+                var data = _db.Get(key);
+                if (data is not null)
+                {
+                    var logLevel = LogLevel.Debug;
+
+                    if (_logger.IsEnabled(logLevel))
+                        _logger.LogReadMessage(logLevel, $"Get key: {Convert.ToHexStringLower(key)} value: {Convert.ToHexStringLower(data)}");
+
+                    return data;
+                }
+            }
+            return default;
+        }
+
+        public bool TryGet(ReadOnlySpan<byte> key, [NotNullWhen(true)] out byte[]? value)
+        {
+            if (_db.KeyMayExist(key))
+            {
+                var data = _db.Get(key);
+                if (data is not null)
+                {
+                    value = data;
+
+                    var logLevel = LogLevel.Debug;
+
+                    if (_logger.IsEnabled(logLevel))
+                        _logger.LogReadMessage(logLevel, $"TryGet key: {Convert.ToHexStringLower(key)} value: {Convert.ToHexStringLower(data)}");
+
+                    return true;
+                }
+            }
 
             value = default;
             return false;
         }
 
-        public IEnumerable<KeyValuePair<byte[], byte[]>> Seek(ReadOnlyMemory<byte> keyOrPrefix, bool seekFromEnd = false, string? columnFamilyName = default)
+        public IEnumerable<KeyValuePair<byte[], byte[]>> Seek(ReadOnlyMemory<byte> keyOrPrefix, bool seekFromEnd = false)
         {
-            using var iter = _db.NewIterator(GetColumnFamilyHandle(columnFamilyName));
+            using var iter = _db.NewIterator();
 
             for (iter.SeekForPrev(keyOrPrefix.Span); iter.IsValid();)
             {
-                yield return new(iter.KeyToArray(), iter.ValueToArray());
+                var key = iter.KeyToArray();
+                var value = iter.ValueToArray();
+
+                yield return new(key, value);
+
+                var logLevel = LogLevel.Debug;
+
+                if (_logger.IsEnabled(logLevel))
+                    _logger.LogReadMessage(logLevel, $"Seek key: {Convert.ToHexStringLower(key)} value: {Convert.ToHexStringLower(value)}");
+
                 if (seekFromEnd)
                     iter.Prev();
                 else
@@ -189,11 +242,6 @@ namespace Neo.Platform.Storage
             for (iter.SeekToFirst(); iter.IsValid(); iter.Next())
                 yield return new(iter.KeyToArray(), iter.ValueToArray());
         }
-
-        private ColumnFamilyHandle GetColumnFamilyHandle(string? columnFamilyName = default) =>
-            string.IsNullOrWhiteSpace(columnFamilyName) ?
-                _db.GetDefaultColumnFamily() :
-                _db.GetColumnFamily(columnFamilyName);
 
         private BlockBasedTableOptions CreateBlockTableOptions()
         {

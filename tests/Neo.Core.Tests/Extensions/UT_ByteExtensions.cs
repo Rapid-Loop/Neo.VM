@@ -46,13 +46,13 @@ namespace Neo.Core.Tests.Extensions
             var actualXorByte3 = expectedBytes3.Xor(new byte[ushort.MaxValue]);
 
             Assert.HasCount(3, actualXorByte1);
-            CollectionAssert.AreEqual(expectedBytes1, actualXorByte1);
+            Assert.AreSequenceEqual(expectedBytes1, actualXorByte1);
 
             Assert.HasCount(3, actualXorByte2);
-            CollectionAssert.AreEqual(expectedBytes2, actualXorByte2);
+            Assert.AreSequenceEqual(expectedBytes2, actualXorByte2);
 
             Assert.HasCount(ushort.MaxValue, actualXorByte3);
-            CollectionAssert.AreEqual(expectedBytes3, actualXorByte3);
+            Assert.AreSequenceEqual(expectedBytes3, actualXorByte3);
 
             Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new byte[0].Xor(new byte[ushort.MaxValue]));
         }

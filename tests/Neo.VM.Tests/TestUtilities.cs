@@ -34,7 +34,7 @@ namespace Neo.VM.Tests
         private static readonly ServiceProvider s_serviceProvider;
         public static IServiceProvider Services => s_serviceProvider;
 
-        public static readonly ILoggerFactory TraceLoggerFactory = LoggerFactory.Create(logging =>
+        public static ILoggerFactory TraceLoggerFactory => LoggerFactory.Create(logging =>
         {
             var manger = new ConfigurationManager();
             logging.AddConfiguration(manger);
@@ -48,8 +48,8 @@ namespace Neo.VM.Tests
             var services = new ServiceCollection();
 
             services
-                .AddEngineDebugger()
-                .AddExecuteLogger()
+                .AddEngineMiddlewareDebugger()
+                .AddEngineMiddlewareLogger()
                 .AddExecutionEngine()
                 .AddScoped<TestEngine>()
                 .AddLogging(

@@ -20,4 +20,15 @@
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 // SERVICES
 
-[assembly: Parallelize(Scope = ExecutionScope.MethodLevel)]
+namespace Neo.Platform.Storage.Logging
+{
+    internal static class StoreEventId
+    {
+        public const int Fault = 100;
+        public const int Read = 200;
+        public const int Write = 300;
+        public const int Delete = 400;
+        public const int CreateSnapshot = 500;
+        public const int Commit = 600;
+    }
+}

@@ -51,7 +51,7 @@ namespace Neo.VM.Tests.Middleware
                     var script = OpCodeAssembler.Assemble(jsonTest.Script);
 
                     using var scope = TestUtilities.Services.CreateScope();
-                    var vm = scope.ServiceProvider.GetRequiredService<TestEngine>();
+                    using var vm = scope.ServiceProvider.GetRequiredService<TestEngine>();
 
                     vm.LoadScript(script);
 
@@ -78,7 +78,7 @@ namespace Neo.VM.Tests.Middleware
             var script = sb.ToArray();
 
             using var scope = TestUtilities.Services.CreateScope();
-            var vm = scope.ServiceProvider.GetRequiredService<VirtualMachineEngine>();
+            using var vm = scope.ServiceProvider.GetRequiredService<VirtualMachineEngine>();
             vm.LoadScript(script);
 
             // Get the debugger that is inside the VM

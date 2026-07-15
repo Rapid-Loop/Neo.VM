@@ -280,7 +280,7 @@ namespace Neo.VM.Tests.Types
             item = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09 };
 
             Assert.IsInstanceOfType<VMByteArray>(item);
-            CollectionAssert.AreEqual(new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09 }, item.AsSpan().ToArray());
+            Assert.AreSequenceEqual(new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09 }, item.AsSpan().ToArray());
         }
 
         [TestMethod]
@@ -301,7 +301,7 @@ namespace Neo.VM.Tests.Types
 
             var aa = (VMArray)a.Clone();
 
-            Assert.AreEqual(a, aa);
+            Assert.AreSequenceEqual(a, aa);
             Assert.AreNotSame(a, aa);
             Assert.IsTrue(a[^2].Equals(aa[^2]));
             Assert.IsTrue(a.HasCircularReference());

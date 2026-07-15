@@ -73,9 +73,9 @@ namespace Neo.Core.Tests.Blockchain
             Assert.AreEqual(expectedBlockHeader.Index, actualBlockHeader.Index);
             Assert.AreEqual(expectedBlockHeader.NextConsensus, actualBlockHeader.NextConsensus);
 
-            CollectionAssert.AreEqual(expectedBlockHeader.Witness.InvocationScript, actualBlockHeader.Witness.InvocationScript);
-            CollectionAssert.AreEqual(expectedBlockHeader.Witness.VerificationScript, actualBlockHeader.Witness.VerificationScript);
-            CollectionAssert.AreEqual(Convert.FromHexString(s_blockHeaderHexString), actualBlockHeaderBytes);
+            Assert.AreSequenceEqual(expectedBlockHeader.Witness.InvocationScript, actualBlockHeader.Witness.InvocationScript);
+            Assert.AreSequenceEqual(expectedBlockHeader.Witness.VerificationScript, actualBlockHeader.Witness.VerificationScript);
+            Assert.AreSequenceEqual(Convert.FromHexString(s_blockHeaderHexString), actualBlockHeaderBytes);
         }
 
         [TestMethod]

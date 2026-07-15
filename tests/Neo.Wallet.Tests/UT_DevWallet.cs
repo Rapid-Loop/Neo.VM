@@ -51,9 +51,9 @@ namespace Neo.Wallet.Tests
                 Assert.AreEqual(expectedAccount.IsLocked, actualAccount.IsLocked);
                 Assert.AreEqual(expectedAccount.Contract.ScriptHash, actualAccount.Contract.ScriptHash);
 
-                CollectionAssert.AreEqual(expectedAccount.Contract.Script, actualAccount.Contract.Script);
-                CollectionAssert.AreEqual(expectedAccount.Contract.ParameterList, actualAccount.Contract.ParameterList);
-                CollectionAssert.AreEqual(expectedAccount.GetPrivateKey(), actualAccount.GetPrivateKey());
+                Assert.AreSequenceEqual(expectedAccount.Contract.Script, actualAccount.Contract.Script);
+                Assert.AreSequenceEqual(expectedAccount.Contract.ParameterList, actualAccount.Contract.ParameterList);
+                Assert.AreSequenceEqual(expectedAccount.GetPrivateKey(), actualAccount.GetPrivateKey());
             }
         }
     }

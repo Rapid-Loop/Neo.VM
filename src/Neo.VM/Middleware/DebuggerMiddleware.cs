@@ -36,6 +36,8 @@ namespace Neo.VM.Middleware
 
         public bool StepMode { get; set; }
 
+        private static readonly decimal s_factor = 1_00000000m;
+
         private VirtualMachineEngine Engine => sp.GetRequiredService<VirtualMachineEngine>();
 
         private readonly HashSet<int> _breakpoints = []; // script offset breakpoints
@@ -87,8 +89,9 @@ namespace Neo.VM.Middleware
 
                 if (logger.IsEnabled(LogLevel.Debug))
                 {
-                    var gasLeft = Engine.GasLimit - context.GasConsumed;
-                    var message = $"Breakpoint hit | GasConsumed: {context.GasConsumed:N0} | GasLeft: {gasLeft:N0}";
+                    var gasLeft = (Engine.GasLimit - context.GasConsumed) / s_factor;
+                    var gasConsumed = context.GasConsumed / s_factor;
+                    var message = $"Breakpoint hit | GasConsumed: {gasConsumed:N8} | GasLeft: {gasLeft:N8}";
 
                     logger.LogBreakMessage(LogLevel.Debug, message);
                 }

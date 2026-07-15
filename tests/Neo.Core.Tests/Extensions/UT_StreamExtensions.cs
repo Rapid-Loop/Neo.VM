@@ -50,7 +50,7 @@ namespace Neo.Core.Tests.Extensions
 
             var actualData = ms.ToArray();
 
-            CollectionAssert.AreEqual(expectedData, actualData);
+            Assert.AreSequenceEqual(expectedData, actualData);
         }
 
         [TestMethod]
@@ -77,7 +77,7 @@ namespace Neo.Core.Tests.Extensions
             var actualArrayData = ms.ReadDynamic<uint>();
 
             Assert.HasCount(1, actualArrayData);
-            CollectionAssert.AreEqual(expectedArrayData, actualArrayData);
+            Assert.AreSequenceEqual(expectedArrayData, actualArrayData);
         }
     }
 }

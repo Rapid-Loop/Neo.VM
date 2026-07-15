@@ -28,12 +28,12 @@ namespace Neo.Platform.Storage.Interface
 {
     public interface IReadOnlyStore : IDisposable
     {
-        bool ContainsKey(ReadOnlySpan<byte> key, string? columnFamilyName = default);
+        bool ContainsKey(ReadOnlySpan<byte> key);
 
-        byte[]? Get(ReadOnlySpan<byte> key, string? columnFamilyName = default);
+        byte[]? Get(ReadOnlySpan<byte> key);
 
-        bool TryGet(ReadOnlySpan<byte> key, [NotNullWhen(true)] out byte[]? value, string? columnFamilyName = default);
+        bool TryGet(ReadOnlySpan<byte> key, [NotNullWhen(true)] out byte[]? value);
 
-        IEnumerable<KeyValuePair<byte[], byte[]>> Seek(ReadOnlyMemory<byte> keyOrPrefix, bool seekFromEnd = false, string? columnFamilyName = default);
+        IEnumerable<KeyValuePair<byte[], byte[]>> Seek(ReadOnlyMemory<byte> keyOrPrefix, bool seekFromEnd = false);
     }
 }

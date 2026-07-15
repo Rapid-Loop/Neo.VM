@@ -25,9 +25,7 @@ namespace Neo.Platform.Storage
     public static class ColumnFamilyNames
     {
         public static readonly string Default = "default";
-        public static readonly string Meta = "meta";
-        public static readonly string Indexes = "indexes";
-        public static readonly string Blocks = "blocks";
-        public static readonly string Transactions = "transactions";
+        public static readonly string Checkpoints = "checkpoints";
+        public static readonly string Backups = "backups";
     }
 }

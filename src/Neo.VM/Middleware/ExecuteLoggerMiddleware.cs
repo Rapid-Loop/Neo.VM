@@ -31,6 +31,8 @@ namespace Neo.VM.Middleware
 {
     public sealed class ExecuteLoggerMiddleware(IServiceProvider sp, ILogger<VirtualMachineEngine> logger) : IEngineMiddleware
     {
+        private static readonly decimal s_factor = 1_00000000m;
+
         private VirtualMachineEngine Engine => sp.GetRequiredService<VirtualMachineEngine>();
 
         public void PostExecute(ExecutionContext? context, ExecuteDelegate next)
@@ -47,7 +49,7 @@ namespace Neo.VM.Middleware
                 var message = VirtualMachineLocalizer.GetMessage(
                     VirtualMachineMessageNames.ExecuteStartup,
                     Engine.ActiveFork,
-                    Engine.GasLimit
+                    Engine.GasLimit / s_factor
                 );
 
                 logger.LogExecuteMessage(logLevel, message);
@@ -87,8 +89,8 @@ namespace Neo.VM.Middleware
             {
                 var message = VirtualMachineLocalizer.GetMessage(
                     VirtualMachineMessageNames.ExecuteSuccessfully,
-                    Engine.GasConsumed,
-                    Engine.GasLeft,
+                    Engine.GasConsumed / s_factor,
+                    Engine.GasLeft / s_factor,
                     Engine.State
                 );
 

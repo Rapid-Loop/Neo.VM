@@ -20,43 +20,21 @@
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 // SERVICES
 
-using Microsoft.Extensions.Options;
-using Neo.Configuration;
-using System.Collections.Concurrent;
-using System.IO;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Neo.Platform.Storage.Tests
 {
-    internal sealed class TestStorePool
+    internal class TestUtilities
     {
-        public static TestStorePool Shared => s_storePool;
-
-        private static readonly TestStorePool s_storePool = new();
-
-        private readonly ConcurrentDictionary<string, BlockchainStore> _store = [];
-
-        public BlockchainStore Rent()
+        public static ILoggerFactory TraceLoggerFactory => LoggerFactory.Create(logging =>
         {
-            var storeOptions = Options.Create(new BlockchainStoreOptions()
-            {
-                DatabasePath = Path.Combine(Path.GetRandomFileName()),
-            });
-
-            var store = new BlockchainStore(storeOptions, TestUtilities.TraceLoggerFactory);
-
-            _store.TryAdd(storeOptions.Value.DatabasePath, store);
-
-            return store;
-        }
-
-        public void Return(BlockchainStore store)
-        {
-            if (_store.TryRemove(store.Options.DatabasePath, out var value))
-            {
-                value.Dispose();
-                new DirectoryInfo(store.Options.DatabasePath)
-                    .Delete(true);
-            }
-        }
+            var manger = new ConfigurationManager();
+            logging.AddConfiguration(manger);
+            logging.ClearProviders();
+            logging.AddSimpleConsole(options => options.SingleLine = true);
+            logging.AddDebug();
+            logging.SetMinimumLevel(LogLevel.Trace);
+        });
     }
 }
