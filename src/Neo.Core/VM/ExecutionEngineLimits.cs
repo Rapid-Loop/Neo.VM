@@ -20,12 +20,9 @@
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 // SERVICES
 
-using Neo.Core.VM;
-using Neo.VM.Types;
 using System;
-using System.Runtime.CompilerServices;
 
-namespace Neo.VM
+namespace Neo.Core.VM
 {
     /// <summary>
     /// Represents the restrictions on the VM.
@@ -37,7 +34,17 @@ namespace Neo.VM
         /// <summary>
         /// The default strategy.
         /// </summary>
-        public static readonly ExecutionEngineLimits Default = new();
+        public static ExecutionEngineLimits Default => new();
+
+        /// <summary>
+        /// The maximum size of storage keys.
+        /// </summary>
+        public int MaxStorageKeySize { get; init; } = 64;
+
+        /// <summary>
+        /// The maximum size of storage values.
+        /// </summary>
+        public int MaxStorageValueSize { get; init; } = ushort.MaxValue;
 
         /// <summary>
         /// The maximum number of bits that <see cref="OpCode.SHL"/> and <see cref="OpCode.SHR"/> can shift.
@@ -56,8 +63,6 @@ namespace Neo.VM
 
         /// <summary>
         /// The largest comparable size.
-        /// If a <see cref="VMByteArray"/> or <see cref="VMStruct"/> exceeds this size,
-        /// comparison operations on it cannot be performed in the VM.
         /// </summary>
         public uint MaxComparableSize { get; init; } = 65536;
 
@@ -80,26 +85,20 @@ namespace Neo.VM
         /// Assert that the size of the item meets the limit.
         /// </summary>
         /// <param name="size">The size to be checked.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AssertMaxItemSize(int size)
         {
             if (size < 0 || size > MaxItemSize)
-            {
                 throw new InvalidOperationException($"MaxItemSize exceed: {size}/{MaxItemSize}");
-            }
         }
 
         /// <summary>
         /// Assert that the number of bits shifted meets the limit.
         /// </summary>
         /// <param name="shift">The number of bits shifted.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AssertShift(int shift)
         {
             if (shift > MaxShift || shift < 0)
-            {
                 throw new InvalidOperationException($"Invalid shift value: {shift}/{MaxShift}");
-            }
         }
     }
 }

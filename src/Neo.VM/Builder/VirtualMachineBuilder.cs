@@ -22,6 +22,7 @@
 
 using Neo.Core;
 using Neo.Core.Blockchain;
+using Neo.Core.VM;
 using Neo.VM.Core;
 using Neo.VM.Pipeline;
 using System;
