@@ -152,5 +152,165 @@ namespace Neo.Platform.Storage.Tests
 
             Assert.AreSequenceEqual(expectedKeyBytes, actualKeyBytes);
         }
+
+        [TestMethod]
+        public void TestAppendSByte()
+        {
+            var expectedAppendedSByte = sbyte.MinValue;
+            byte[] expectedKeyBytes =
+                [
+                    0xde, 0xc0, 0xad, 0x0b,     // ID
+                    ExpectedPrefix,             // Prefix
+                    (byte)expectedAppendedSByte, // Appended sbyte
+                ];
+
+            using var expectedKeyBuilder = StorageKeyBuilder
+                .Create(ExpectedId, ExpectedPrefix)
+                .Append(expectedAppendedSByte);
+
+            var actualKeyBytes = expectedKeyBuilder.ToArray();
+
+            Assert.AreSequenceEqual(expectedKeyBytes, actualKeyBytes);
+        }
+
+        [TestMethod]
+        public void TestAppendInt16()
+        {
+            var expectedAppendedInt16 = (short)0x0bad;
+            byte[] expectedKeyBytes =
+                [
+                    0xde, 0xc0, 0xad, 0x0b, // ID
+                    ExpectedPrefix,         // Prefix
+                    0xad, 0x0b,             // Appended int16
+                ];
+
+            using var expectedKeyBuilder = StorageKeyBuilder
+                .Create(ExpectedId, ExpectedPrefix)
+                .Append(expectedAppendedInt16);
+
+            var actualKeyBytes = expectedKeyBuilder.ToArray();
+
+            Assert.AreSequenceEqual(expectedKeyBytes, actualKeyBytes);
+        }
+
+        [TestMethod]
+        public void TestAppendUInt16()
+        {
+            var expectedAppendedUInt16 = (ushort)0xdead;
+            byte[] expectedKeyBytes =
+                [
+                    0xde, 0xc0, 0xad, 0x0b, // ID
+                    ExpectedPrefix,         // Prefix
+                    0xad, 0xde,             // Appended uint16
+                ];
+
+            using var expectedKeyBuilder = StorageKeyBuilder
+                .Create(ExpectedId, ExpectedPrefix)
+                .Append(expectedAppendedUInt16);
+
+            var actualKeyBytes = expectedKeyBuilder.ToArray();
+
+            Assert.AreSequenceEqual(expectedKeyBytes, actualKeyBytes);
+        }
+
+        [TestMethod]
+        public void TestAppendInt32()
+        {
+            var expectedAppendedInt32 = 0xc0dea55;
+            byte[] expectedKeyBytes =
+                [
+                    0xde, 0xc0, 0xad, 0x0b, // ID
+                    ExpectedPrefix,         // Prefix
+                    0x55, 0xea, 0x0d, 0x0c, // Appended int32
+                ];
+
+            using var expectedKeyBuilder = StorageKeyBuilder
+                .Create(ExpectedId, ExpectedPrefix)
+                .Append(expectedAppendedInt32);
+
+            var actualKeyBytes = expectedKeyBuilder.ToArray();
+
+            Assert.AreSequenceEqual(expectedKeyBytes, actualKeyBytes);
+        }
+
+        [TestMethod]
+        public void TestAppendUInt32()
+        {
+            var expectedAppendedUInt32 = 0xc0dea55u;
+            byte[] expectedKeyBytes =
+                [
+                    0xde, 0xc0, 0xad, 0x0b, // ID
+                    ExpectedPrefix,         // Prefix
+                    0x55, 0xea, 0x0d, 0x0c, // Appended uint32
+                ];
+
+            using var expectedKeyBuilder = StorageKeyBuilder
+                .Create(ExpectedId, ExpectedPrefix)
+                .Append(expectedAppendedUInt32);
+
+            var actualKeyBytes = expectedKeyBuilder.ToArray();
+
+            Assert.AreSequenceEqual(expectedKeyBytes, actualKeyBytes);
+        }
+
+        [TestMethod]
+        public void TestAppendInt64()
+        {
+            var expectedAppendedInt64 = 0x000d0dec0debad12;
+            byte[] expectedKeyBytes =
+                [
+                    0xde, 0xc0, 0xad, 0x0b, // ID
+                    ExpectedPrefix,         // Prefix
+                    0x12, 0xad, 0xeb, 0x0d, 0xec, 0x0d, 0x0d, 0x00, // Appended int64
+                ];
+
+            using var expectedKeyBuilder = StorageKeyBuilder
+                .Create(ExpectedId, ExpectedPrefix)
+                .Append(expectedAppendedInt64);
+
+            var actualKeyBytes = expectedKeyBuilder.ToArray();
+
+            Assert.AreSequenceEqual(expectedKeyBytes, actualKeyBytes);
+        }
+
+        [TestMethod]
+        public void TestAppendUInt64()
+        {
+            var expectedAppendedUInt64 = 0x000d0dec0debad12u;
+            byte[] expectedKeyBytes =
+                [
+                    0xde, 0xc0, 0xad, 0x0b, // ID
+                    ExpectedPrefix,         // Prefix
+                    0x12, 0xad, 0xeb, 0x0d, 0xec, 0x0d, 0x0d, 0x00, // Appended uint64
+                ];
+
+            using var expectedKeyBuilder = StorageKeyBuilder
+                .Create(ExpectedId, ExpectedPrefix)
+                .Append(expectedAppendedUInt64);
+
+            var actualKeyBytes = expectedKeyBuilder.ToArray();
+
+            Assert.AreSequenceEqual(expectedKeyBytes, actualKeyBytes);
+        }
+
+        [TestMethod]
+        public void TestAppendBoolean()
+        {
+            var expectedAppendedBoolean = true;
+            byte[] expectedKeyBytes =
+                [
+                    0xde, 0xc0, 0xad, 0x0b, // ID
+                    ExpectedPrefix,         // Prefix
+                    0x01,                   // Appended boolean
+                ];
+
+            using var expectedKeyBuilder = StorageKeyBuilder
+                .Create(ExpectedId, ExpectedPrefix)
+                .Append(expectedAppendedBoolean);
+
+            var actualKeyBytes = expectedKeyBuilder.ToArray();
+
+            Assert.AreSequenceEqual(expectedKeyBytes, actualKeyBytes);
+        }
     }
 }

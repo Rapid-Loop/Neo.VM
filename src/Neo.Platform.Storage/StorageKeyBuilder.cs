@@ -30,7 +30,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Numerics;
 using System.Text;
 
 namespace Neo.Platform.Storage
@@ -148,9 +148,9 @@ namespace Neo.Platform.Storage
             return this;
         }
 
-        public StorageKeyBuilder Append(short data, bool asBigEndian = false)
+        public StorageKeyBuilder Append(short data, bool isBigEndian = false)
         {
-            if (asBigEndian)
+            if (isBigEndian)
                 BinaryPrimitives.WriteInt16BigEndian(_memoryOwner.Memory.Span[_byteCount..], data);
             else
                 BinaryPrimitives.WriteInt16LittleEndian(_memoryOwner.Memory.Span[_byteCount..], data);
@@ -158,9 +158,9 @@ namespace Neo.Platform.Storage
             return this;
         }
 
-        public StorageKeyBuilder Append(ushort data, bool asBigEndian = false)
+        public StorageKeyBuilder Append(ushort data, bool isBigEndian = false)
         {
-            if (asBigEndian)
+            if (isBigEndian)
                 BinaryPrimitives.WriteUInt16BigEndian(_memoryOwner.Memory.Span[_byteCount..], data);
             else
                 BinaryPrimitives.WriteUInt16LittleEndian(_memoryOwner.Memory.Span[_byteCount..], data);
@@ -168,9 +168,9 @@ namespace Neo.Platform.Storage
             return this;
         }
 
-        public StorageKeyBuilder Append(int data, bool asBigEndian = false)
+        public StorageKeyBuilder Append(int data, bool isBigEndian = false)
         {
-            if (asBigEndian)
+            if (isBigEndian)
                 BinaryPrimitives.WriteInt32BigEndian(_memoryOwner.Memory.Span[_byteCount..], data);
             else
                 BinaryPrimitives.WriteInt32LittleEndian(_memoryOwner.Memory.Span[_byteCount..], data);
@@ -178,9 +178,9 @@ namespace Neo.Platform.Storage
             return this;
         }
 
-        public StorageKeyBuilder Append(uint data, bool asBigEndian = false)
+        public StorageKeyBuilder Append(uint data, bool isBigEndian = false)
         {
-            if (asBigEndian)
+            if (isBigEndian)
                 BinaryPrimitives.WriteUInt32BigEndian(_memoryOwner.Memory.Span[_byteCount..], data);
             else
                 BinaryPrimitives.WriteUInt32LittleEndian(_memoryOwner.Memory.Span[_byteCount..], data);
@@ -188,9 +188,9 @@ namespace Neo.Platform.Storage
             return this;
         }
 
-        public StorageKeyBuilder Append(long data, bool asBigEndian = false)
+        public StorageKeyBuilder Append(long data, bool isBigEndian = false)
         {
-            if (asBigEndian)
+            if (isBigEndian)
                 BinaryPrimitives.WriteInt64BigEndian(_memoryOwner.Memory.Span[_byteCount..], data);
             else
                 BinaryPrimitives.WriteInt64LittleEndian(_memoryOwner.Memory.Span[_byteCount..], data);
@@ -198,9 +198,9 @@ namespace Neo.Platform.Storage
             return this;
         }
 
-        public StorageKeyBuilder Append(ulong data, bool asBigEndian = false)
+        public StorageKeyBuilder Append(ulong data, bool isBigEndian = false)
         {
-            if (asBigEndian)
+            if (isBigEndian)
                 BinaryPrimitives.WriteUInt64BigEndian(_memoryOwner.Memory.Span[_byteCount..], data);
             else
                 BinaryPrimitives.WriteUInt64LittleEndian(_memoryOwner.Memory.Span[_byteCount..], data);
@@ -208,19 +208,19 @@ namespace Neo.Platform.Storage
             return this;
         }
 
-        public StorageKeyBuilder Append(Int128 data, bool asBigEndian = false)
+        public StorageKeyBuilder Append(Int128 data, bool isBigEndian = false)
         {
-            if (asBigEndian)
+            if (isBigEndian)
                 BinaryPrimitives.WriteInt128BigEndian(_memoryOwner.Memory.Span[_byteCount..], data);
             else
                 BinaryPrimitives.WriteInt128LittleEndian(_memoryOwner.Memory.Span[_byteCount..], data);
-            _byteCount += sizeof(ulong) * 2;
+            _byteCount += sizeof(long) * 2;
             return this;
         }
 
-        public StorageKeyBuilder Append(UInt128 data, bool asBigEndian = false)
+        public StorageKeyBuilder Append(UInt128 data, bool isBigEndian = false)
         {
-            if (asBigEndian)
+            if (isBigEndian)
                 BinaryPrimitives.WriteUInt128BigEndian(_memoryOwner.Memory.Span[_byteCount..], data);
             else
                 BinaryPrimitives.WriteUInt128LittleEndian(_memoryOwner.Memory.Span[_byteCount..], data);
@@ -228,9 +228,9 @@ namespace Neo.Platform.Storage
             return this;
         }
 
-        public StorageKeyBuilder Append(double data, bool asBigEndian = false)
+        public StorageKeyBuilder Append(double data, bool isBigEndian = false)
         {
-            if (asBigEndian)
+            if (isBigEndian)
                 BinaryPrimitives.WriteDoubleBigEndian(_memoryOwner.Memory.Span[_byteCount..], data);
             else
                 BinaryPrimitives.WriteDoubleLittleEndian(_memoryOwner.Memory.Span[_byteCount..], data);
@@ -238,9 +238,9 @@ namespace Neo.Platform.Storage
             return this;
         }
 
-        public StorageKeyBuilder Append(float data, bool asBigEndian = false)
+        public StorageKeyBuilder Append(float data, bool isBigEndian = false)
         {
-            if (asBigEndian)
+            if (isBigEndian)
                 BinaryPrimitives.WriteSingleBigEndian(_memoryOwner.Memory.Span[_byteCount..], data);
             else
                 BinaryPrimitives.WriteSingleLittleEndian(_memoryOwner.Memory.Span[_byteCount..], data);
@@ -248,9 +248,9 @@ namespace Neo.Platform.Storage
             return this;
         }
 
-        public StorageKeyBuilder Append(Half data, bool asBigEndian = false)
+        public StorageKeyBuilder Append(Half data, bool isBigEndian = false)
         {
-            if (asBigEndian)
+            if (isBigEndian)
                 BinaryPrimitives.WriteHalfBigEndian(_memoryOwner.Memory.Span[_byteCount..], data);
             else
                 BinaryPrimitives.WriteHalfLittleEndian(_memoryOwner.Memory.Span[_byteCount..], data);
@@ -258,25 +258,8 @@ namespace Neo.Platform.Storage
             return this;
         }
 
-        public StorageKeyBuilder Append(nint data, bool asBigEndian = false)
-        {
-            if (asBigEndian)
-                BinaryPrimitives.WriteIntPtrBigEndian(_memoryOwner.Memory.Span[_byteCount..], data);
-            else
-                BinaryPrimitives.WriteIntPtrLittleEndian(_memoryOwner.Memory.Span[_byteCount..], data);
-            _byteCount += Unsafe.SizeOf<nint>();
-            return this;
-        }
-
-        public StorageKeyBuilder Append(nuint data, bool asBigEndian = false)
-        {
-            if (asBigEndian)
-                BinaryPrimitives.WriteUIntPtrBigEndian(_memoryOwner.Memory.Span[_byteCount..], data);
-            else
-                BinaryPrimitives.WriteUIntPtrLittleEndian(_memoryOwner.Memory.Span[_byteCount..], data);
-            _byteCount += Unsafe.SizeOf<nuint>();
-            return this;
-        }
+        public StorageKeyBuilder Append(BigInteger data, bool isBigEndian = false) =>
+            Append(data.ToByteArray(true, isBigEndian));
 
         public StorageKeyBuilder Append(ReadOnlySpan<byte> data)
         {
@@ -285,7 +268,7 @@ namespace Neo.Platform.Storage
             return this;
         }
 
-        public StorageKeyBuilder Append(decimal data, bool asBigEndian = false)
+        public StorageKeyBuilder Append(decimal data, bool isBigEndian = false)
         {
             Span<int> span = stackalloc int[4];
 
@@ -297,8 +280,8 @@ namespace Neo.Platform.Storage
             return this;
         }
 
-        public StorageKeyBuilder Append(Guid data, bool asBigEndian = false) =>
-            Append(data.ToByteArray(asBigEndian));
+        public StorageKeyBuilder Append(Guid data, bool isBigEndian = false) =>
+            Append(data.ToByteArray(isBigEndian));
 
         public StorageKeyBuilder Append(ReadOnlySequence<byte> data) =>
             Append(data.ToArray());
@@ -306,11 +289,11 @@ namespace Neo.Platform.Storage
         public StorageKeyBuilder Append(ArraySegment<byte> data) =>
             Append(data.AsSpan());
 
-        public StorageKeyBuilder Append(DateTime stamp, TimeSpan utcOffset = default) =>
-            Append((ulong)CoreUtilities.ToUnixTimeMilliseconds(stamp, utcOffset));
+        public StorageKeyBuilder Append(DateTime stamp, TimeSpan offset = default) =>
+            Append((ulong)CoreUtilities.ToUnixTimeMilliseconds(stamp, offset));
 
-        public StorageKeyBuilder Append(TimeSpan span, TimeSpan utcOffset = default) =>
-            Append((ulong)CoreUtilities.ToUnixTimeMilliseconds(span, utcOffset));
+        public StorageKeyBuilder Append(TimeSpan span, TimeSpan offset = default) =>
+            Append((ulong)CoreUtilities.ToUnixTimeMilliseconds(span, offset));
 
         public StorageKeyBuilder Append(DateTimeOffset stamp) =>
             Append((ulong)stamp.ToUnixTimeMilliseconds());
@@ -321,22 +304,22 @@ namespace Neo.Platform.Storage
         public StorageKeyBuilder Append(DateOnly date, TimeOnly time = default) =>
             Append(date.ToDateTime(time));
 
-        public StorageKeyBuilder Append(ReadOnlySequence<char> data, bool asStrictUtf8 = true) =>
-            Append(data.ToArray(), asStrictUtf8);
+        public StorageKeyBuilder Append(ReadOnlySequence<char> data, bool isStrictUtf8 = true) =>
+            Append(data.ToArray(), isStrictUtf8);
 
-        public StorageKeyBuilder Append(ReadOnlyMemory<char> data, bool asStrictUtf8 = true) =>
-            Append(data.ToArray(), asStrictUtf8);
+        public StorageKeyBuilder Append(ReadOnlyMemory<char> data, bool isStrictUtf8 = true) =>
+            Append(data.ToArray(), isStrictUtf8);
 
-        public StorageKeyBuilder Append(ReadOnlySpan<char> data, bool asStrictUtf8 = true) =>
-            Append(data.ToArray(), asStrictUtf8);
+        public StorageKeyBuilder Append(ReadOnlySpan<char> data, bool isStrictUtf8 = true) =>
+            Append(data.ToArray(), isStrictUtf8);
 
-        public StorageKeyBuilder Append(char[] data, bool asStrictUtf8 = true) =>
-            asStrictUtf8 ?
+        public StorageKeyBuilder Append(char[] data, bool isStrictUtf8 = true) =>
+            isStrictUtf8 ?
                 Append(CoreUtilities.StrictUtf8Encoding.GetBytes(data)) :
                 Append(Encoding.UTF8.GetBytes(data));
 
-        public StorageKeyBuilder Append(char data, bool asStrictUtf8 = true) =>
-            asStrictUtf8 ?
+        public StorageKeyBuilder Append(char data, bool isStrictUtf8 = true) =>
+            isStrictUtf8 ?
                 Append(CoreUtilities.StrictUtf8Encoding.GetBytes(data.ToString())) :
                 Append(Encoding.UTF8.GetBytes(data.ToString()));
 
@@ -361,8 +344,8 @@ namespace Neo.Platform.Storage
         public StorageKeyBuilder Append(UInt256 data) =>
             Append(data.ToArray());
 
-        public StorageKeyBuilder Append(string data, bool asStrictUtf8 = true) =>
-            asStrictUtf8 ?
+        public StorageKeyBuilder Append(string data, bool isStrictUtf8 = true) =>
+            isStrictUtf8 ?
                 Append(CoreUtilities.StrictUtf8Encoding.GetBytes(data)) :
                 Append(Encoding.UTF8.GetBytes(data));
 

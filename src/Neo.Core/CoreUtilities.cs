@@ -29,22 +29,22 @@ namespace Neo.Core
     {
         public static Encoding StrictUtf8Encoding => Encoding.GetEncoding("utf-8", EncoderFallback.ExceptionFallback, DecoderFallback.ExceptionFallback);
 
-        public static long ToUnixTimeMilliseconds(DateTime dateTime, TimeSpan utcOffset = default) =>
-            new DateTimeOffset(dateTime, utcOffset)
+        public static long ToUnixTimeMilliseconds(DateTime dateTime, TimeSpan offset = default) =>
+            new DateTimeOffset(dateTime, offset)
                 .ToUnixTimeMilliseconds();
 
-        public static long ToUnixTimeMilliseconds(TimeSpan timeSpan, TimeSpan utcOffset = default) =>
-            new DateTimeOffset(timeSpan.Ticks, utcOffset)
+        public static long ToUnixTimeMilliseconds(TimeSpan timeSpan, TimeSpan offset = default) =>
+            new DateTimeOffset(timeSpan.Ticks, offset)
                 .ToUnixTimeMilliseconds();
 
-        public static DateTime FromUnixTimeMilliseconds(ulong milliseconds, bool toLocalDateTime = false) =>
-            FromUnixTimeMilliseconds((long)milliseconds, toLocalDateTime);
+        public static DateTime FromUnixTimeMilliseconds(ulong milliseconds, bool isLocalDateTime = false) =>
+            FromUnixTimeMilliseconds((long)milliseconds, isLocalDateTime);
 
-        public static DateTime FromUnixTimeMilliseconds(long milliseconds, bool toLocalDateTime = false)
+        public static DateTime FromUnixTimeMilliseconds(long milliseconds, bool isLocalDateTime = false)
         {
             var dateTimeOffset = DateTimeOffset.FromUnixTimeMilliseconds(milliseconds);
 
-            return toLocalDateTime ? dateTimeOffset.LocalDateTime : dateTimeOffset.UtcDateTime;
+            return isLocalDateTime ? dateTimeOffset.LocalDateTime : dateTimeOffset.UtcDateTime;
         }
     }
 }
