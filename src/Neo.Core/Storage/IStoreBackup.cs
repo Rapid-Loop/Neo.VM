@@ -20,18 +20,14 @@
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 // SERVICES
 
-namespace Neo.Platform.Storage.Logging
+using System;
+
+namespace Neo.Core.Storage
 {
-    internal static class StoreEventId
+    public interface IStoreBackup : IDisposable
     {
-        public const int Fault = 100;
-        public const int Read = 200;
-        public const int Write = 300;
-        public const int Delete = 400;
-        public const int Snapshot = 500;
-        public const int Commit = 600;
-        public const int Restore = 700;
-        public const int Backup = 800;
-        public const int Checkpoint = 900;
+        void Backup();
+        void Purge(uint numberOfBackupsToKeep);
+        void Restore(string restorePath, string? walPath = null);
     }
 }

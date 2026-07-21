@@ -91,7 +91,7 @@ namespace Neo.Platform.Storage
             var logLevel = LogLevel.Debug;
 
             if (_logger.IsEnabled(logLevel))
-                _logger.LogCreateSnapshotMessage(logLevel, "Creating snapshot of the snapshot.");
+                _logger.LogSnapshotMessage(logLevel, "Creating snapshot of the snapshot.");
 
             return new BlockchainStoreSnapshot(this, _db, _loggerFactory);
         }

@@ -42,7 +42,13 @@ namespace Neo.Platform.Storage.Tests
                 DatabasePath = Path.Combine(Path.GetRandomFileName()),
             });
 
-            var store = new BlockchainStore(storeOptions, TestUtilities.TraceLoggerFactory);
+            var backupOptions = Options.Create(new BlockchainStoreBackupOptions()
+            {
+                BackupPath = Path.Combine(Path.GetRandomFileName()),
+                MaxBackups = 3,
+            });
+
+            var store = new BlockchainStore(storeOptions, backupOptions, TestUtilities.TraceLoggerFactory);
 
             _store.TryAdd(storeOptions.Value.DatabasePath, store);
 
@@ -51,11 +57,17 @@ namespace Neo.Platform.Storage.Tests
 
         public void Return(BlockchainStore store)
         {
-            if (_store.TryRemove(store.Options.DatabasePath, out var value))
+            if (_store.TryRemove(store.StoreOptions.DatabasePath, out var value))
             {
                 value.Dispose();
-                new DirectoryInfo(store.Options.DatabasePath)
+
+                new DirectoryInfo(store.StoreOptions.DatabasePath)
                     .Delete(true);
+
+                var backupDir = new DirectoryInfo(store.BackupOptions.BackupPath);
+
+                if (backupDir.Exists)
+                    backupDir.Delete(true);
             }
         }
     }

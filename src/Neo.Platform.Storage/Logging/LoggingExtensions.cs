@@ -82,11 +82,11 @@ namespace Neo.Platform.Storage.Logging
         );
 
         [LoggerMessage(
-            EventId = StoreEventId.CreateSnapshot,
-            EventName = nameof(StoreEventId.CreateSnapshot),
+            EventId = StoreEventId.Snapshot,
+            EventName = nameof(StoreEventId.Snapshot),
             Message = "{Message}"
         )]
-        public static partial void LogCreateSnapshotMessage(
+        public static partial void LogSnapshotMessage(
             this ILogger logger,
             LogLevel logLevel,
             string message
@@ -98,6 +98,39 @@ namespace Neo.Platform.Storage.Logging
             Message = "{Message}"
         )]
         public static partial void LogCommitMessage(
+            this ILogger logger,
+            LogLevel logLevel,
+            string message
+        );
+
+        [LoggerMessage(
+            EventId = StoreEventId.Backup,
+            EventName = nameof(StoreEventId.Backup),
+            Message = "{Message}"
+        )]
+        public static partial void LogBackupMessage(
+            this ILogger logger,
+            LogLevel logLevel,
+            string message
+        );
+
+        [LoggerMessage(
+            EventId = StoreEventId.Restore,
+            EventName = nameof(StoreEventId.Restore),
+            Message = "{Message}"
+        )]
+        public static partial void LogRestoreMessage(
+            this ILogger logger,
+            LogLevel logLevel,
+            string message
+        );
+
+        [LoggerMessage(
+            EventId = StoreEventId.Checkpoint,
+            EventName = nameof(StoreEventId.Checkpoint),
+            Message = "{Message}"
+        )]
+        public static partial void LogCheckpointMessage(
             this ILogger logger,
             LogLevel logLevel,
             string message

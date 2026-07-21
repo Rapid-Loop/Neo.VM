@@ -20,18 +20,15 @@
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 // SERVICES
 
-namespace Neo.Platform.Storage.Logging
+using System;
+using System.IO;
+
+namespace Neo.Configuration
 {
-    internal static class StoreEventId
+    public class BlockchainStoreBackupOptions
     {
-        public const int Fault = 100;
-        public const int Read = 200;
-        public const int Write = 300;
-        public const int Delete = 400;
-        public const int Snapshot = 500;
-        public const int Commit = 600;
-        public const int Restore = 700;
-        public const int Backup = 800;
-        public const int Checkpoint = 900;
+        public string BackupPath { get; init; } = Path.Combine(AppContext.BaseDirectory, "data", "backups");
+
+        public int MaxBackups { get; init; } = 3;
     }
 }

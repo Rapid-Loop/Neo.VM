@@ -37,7 +37,11 @@ namespace Neo.Platform.Storage
 {
     public sealed class BlockchainStore : IEnumerable<KeyValuePair<byte[], byte[]>>, IStore
     {
-        public BlockchainStoreOptions Options => _options;
+        public BlockchainStoreOptions StoreOptions => _storeOptions.Value;
+
+        public BlockchainStoreBackupOptions BackupOptions => _backupOptions.Value;
+
+        internal RocksDb Database => _db;
 
         private static readonly ColumnFamilyDescriptor[] s_columnFamilies =
         [
@@ -50,20 +54,23 @@ namespace Neo.Platform.Storage
         private readonly FilterPolicy _bloomFilter;
         private readonly RocksDb _db;
 
-        private readonly BlockchainStoreOptions _options;
+        private readonly IOptions<BlockchainStoreOptions> _storeOptions;
+        private readonly IOptions<BlockchainStoreBackupOptions> _backupOptions;
 
         private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _logger;
 
         public BlockchainStore(
             IOptions<BlockchainStoreOptions> options,
+            IOptions<BlockchainStoreBackupOptions>? backupOptions = default,
             ILoggerFactory? loggerFactory = default)
         {
-            _options = options.Value;
+            _storeOptions = options;
+            _backupOptions = backupOptions ?? Options.Create(new BlockchainStoreBackupOptions());
             _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
             _logger = _loggerFactory.CreateLogger<BlockchainStore>();
 
-            var dirInfo = new DirectoryInfo(_options.DatabasePath);
+            var dirInfo = new DirectoryInfo(_storeOptions.Value.DatabasePath);
 
             if (dirInfo.Exists == false)
                 dirInfo.Create();
@@ -76,7 +83,7 @@ namespace Neo.Platform.Storage
 
             var dbOptions = new DbOptions()
             {
-                CreateIfMissing = _options.CreateIfMissing,
+                CreateIfMissing = _storeOptions.Value.CreateIfMissing,
                 CreateMissingColumnFamilies = true,
 
                 // Compression
@@ -120,7 +127,7 @@ namespace Neo.Platform.Storage
 
             dbOptions.OptimizeForPointLookup(64); // 64MB
 
-            _db = RocksDb.Open(dbOptions, _options.DatabasePath, s_columnFamilies);
+            _db = RocksDb.Open(dbOptions, _storeOptions.Value.DatabasePath, s_columnFamilies);
         }
 
         public void Dispose()
@@ -130,12 +137,15 @@ namespace Neo.Platform.Storage
             _bloomFilter.Dispose();
         }
 
+        public IStoreBackup CreateBackup() =>
+            new BlockchainStoreBackup(_db, _backupOptions, _loggerFactory);
+
         public IStoreSnapshot CreateSnapshot()
         {
             var logLevel = LogLevel.Debug;
 
             if (_logger.IsEnabled(logLevel))
-                _logger.LogCreateSnapshotMessage(logLevel, "Creating snapshot of the store.");
+                _logger.LogSnapshotMessage(logLevel, "Creating snapshot of the store.");
 
             return new BlockchainStoreSnapshot(this, _db, _loggerFactory);
         }
@@ -147,7 +157,7 @@ namespace Neo.Platform.Storage
             var logLevel = LogLevel.Debug;
 
             if (_logger.IsEnabled(logLevel))
-                _logger.LogWriteMessage(logLevel, $"Put key: {Convert.ToHexStringLower(key)} value: {Convert.ToHexStringLower(value)}");
+                _logger.LogWriteMessage(logLevel, $"Put key: 0x{Convert.ToHexStringLower(key)} value: 0x{Convert.ToHexStringLower(value)}");
         }
 
         public void Delete(ReadOnlySpan<byte> key)
@@ -159,7 +169,7 @@ namespace Neo.Platform.Storage
                 var logLevel = LogLevel.Debug;
 
                 if (_logger.IsEnabled(logLevel))
-                    _logger.LogDeleteMessage(logLevel, $"Deleted key: {Convert.ToHexStringLower(key)}");
+                    _logger.LogDeleteMessage(logLevel, $"Deleted key: 0x{Convert.ToHexStringLower(key)}");
             }
         }
 
@@ -180,7 +190,7 @@ namespace Neo.Platform.Storage
                     var logLevel = LogLevel.Debug;
 
                     if (_logger.IsEnabled(logLevel))
-                        _logger.LogReadMessage(logLevel, $"Get key: {Convert.ToHexStringLower(key)} value: {Convert.ToHexStringLower(data)}");
+                        _logger.LogReadMessage(logLevel, $"Get key: 0x{Convert.ToHexStringLower(key)} value: 0x{Convert.ToHexStringLower(data)}");
 
                     return data;
                 }
@@ -200,7 +210,7 @@ namespace Neo.Platform.Storage
                     var logLevel = LogLevel.Debug;
 
                     if (_logger.IsEnabled(logLevel))
-                        _logger.LogReadMessage(logLevel, $"TryGet key: {Convert.ToHexStringLower(key)} value: {Convert.ToHexStringLower(data)}");
+                        _logger.LogReadMessage(logLevel, $"TryGet key: 0x{Convert.ToHexStringLower(key)} value: 0x{Convert.ToHexStringLower(data)}");
 
                     return true;
                 }
@@ -224,7 +234,7 @@ namespace Neo.Platform.Storage
                 var logLevel = LogLevel.Debug;
 
                 if (_logger.IsEnabled(logLevel))
-                    _logger.LogReadMessage(logLevel, $"Seek key: {Convert.ToHexStringLower(key)} value: {Convert.ToHexStringLower(value)}");
+                    _logger.LogReadMessage(logLevel, $"Seek key: 0x{Convert.ToHexStringLower(key)} value: 0x{Convert.ToHexStringLower(value)}");
 
                 if (seekFromEnd)
                     iter.Prev();
