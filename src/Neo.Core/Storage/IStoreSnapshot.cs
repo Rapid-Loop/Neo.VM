@@ -21,19 +21,13 @@
 // SERVICES
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
-namespace Neo.Platform.Storage.Interface
+namespace Neo.Core.Storage
 {
-    public interface IReadOnlyStore : IDisposable
+    public interface IStoreSnapshot : IStore, IDisposable
     {
-        bool ContainsKey(ReadOnlySpan<byte> key);
+        IStore Store { get; }
 
-        byte[]? Get(ReadOnlySpan<byte> key);
-
-        bool TryGet(ReadOnlySpan<byte> key, [NotNullWhen(true)] out byte[]? value);
-
-        IEnumerable<KeyValuePair<byte[], byte[]>> Seek(ReadOnlyMemory<byte> keyOrPrefix, bool seekFromEnd = false);
+        void Commit();
     }
 }

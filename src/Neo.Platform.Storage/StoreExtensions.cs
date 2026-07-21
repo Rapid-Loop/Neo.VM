@@ -22,7 +22,7 @@
 
 using Neo.Core.Extensions;
 using Neo.Core.Serialization;
-using Neo.Platform.Storage.Interface;
+using Neo.Core.Storage;
 using System;
 using System.Diagnostics.CodeAnalysis;
 

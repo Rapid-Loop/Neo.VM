@@ -24,7 +24,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Neo.Configuration;
-using Neo.Platform.Storage.Interface;
+using Neo.Core.Storage;
 using Neo.Platform.Storage.Logging;
 using RocksDbNet;
 using System;

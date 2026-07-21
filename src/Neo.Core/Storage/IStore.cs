@@ -22,12 +22,14 @@
 
 using System;
 
-namespace Neo.Platform.Storage.Interface
+namespace Neo.Core.Storage
 {
-    public interface IStoreSnapshot : IStore, IDisposable
+    public interface IStore : IReadOnlyStore
     {
-        IStore Store { get; }
+        IStoreSnapshot CreateSnapshot();
 
-        void Commit();
+        void Put(ReadOnlySpan<byte> key, ReadOnlySpan<byte> value);
+
+        void Delete(ReadOnlySpan<byte> key);
     }
 }
