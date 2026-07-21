@@ -39,7 +39,7 @@ namespace Neo.Platform.Storage
     {
         public BlockchainStoreOptions StoreOptions => _storeOptions.Value;
 
-        public BlockchainStoreBackupOptions BackupOptions => _backupOptions.Value;
+        public BlockchainBackupOptions BackupOptions => _backupOptions.Value;
 
         internal RocksDb Database => _db;
 
@@ -54,18 +54,18 @@ namespace Neo.Platform.Storage
         private readonly RocksDb _db;
 
         private readonly IOptions<BlockchainStoreOptions> _storeOptions;
-        private readonly IOptions<BlockchainStoreBackupOptions> _backupOptions;
+        private readonly IOptions<BlockchainBackupOptions> _backupOptions;
 
         private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _logger;
 
         public BlockchainStore(
             IOptions<BlockchainStoreOptions> options,
-            IOptions<BlockchainStoreBackupOptions>? backupOptions = default,
+            IOptions<BlockchainBackupOptions>? backupOptions = default,
             ILoggerFactory? loggerFactory = default)
         {
             _storeOptions = options;
-            _backupOptions = backupOptions ?? Options.Create(new BlockchainStoreBackupOptions());
+            _backupOptions = backupOptions ?? Options.Create(new BlockchainBackupOptions());
             _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
             _logger = _loggerFactory.CreateLogger<BlockchainStore>();
 
@@ -134,6 +134,20 @@ namespace Neo.Platform.Storage
             _db.Dispose();
             _blockSharedCache.Dispose();
             _bloomFilter.Dispose();
+        }
+
+        public void CreateCheckpoint(string checkpointDirectory)
+        {
+            if (string.IsNullOrEmpty(checkpointDirectory))
+                throw new ArgumentException("Checkpoint name cannot be null or empty.", nameof(checkpointDirectory));
+
+            using var checkpoint = Checkpoint.Create(_db);
+            checkpoint.CreateCheckpoint(checkpointDirectory);
+
+            var logLevel = LogLevel.Information;
+
+            if (_logger.IsEnabled(logLevel))
+                _logger.LogCheckpointMessage(logLevel, $"Created checkpoint: \'{checkpointDirectory}\'");
         }
 
         public IStoreBackup CreateBackup() =>

@@ -25,7 +25,7 @@ using System.IO;
 
 namespace Neo.Configuration
 {
-    public class BlockchainStoreBackupOptions
+    public class BlockchainBackupOptions
     {
         public string BackupPath { get; init; } = Path.Combine(AppContext.BaseDirectory, "data", "backups");
 

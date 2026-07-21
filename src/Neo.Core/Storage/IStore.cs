@@ -28,6 +28,10 @@ namespace Neo.Core.Storage
     {
         IStoreSnapshot CreateSnapshot();
 
+        IStoreBackup CreateBackup();
+
+        void CreateCheckpoint(string checkpointDirectory);
+
         void Put(ReadOnlySpan<byte> key, ReadOnlySpan<byte> value);
 
         void Delete(ReadOnlySpan<byte> key);

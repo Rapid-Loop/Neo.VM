@@ -20,6 +20,7 @@
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
 // SERVICES
 
+using System.IO;
 using System.Linq;
 
 namespace Neo.Platform.Storage.Tests
@@ -163,6 +164,23 @@ namespace Neo.Platform.Storage.Tests
             Assert.AreSequenceEqual((byte[])[0x00, 0x00, 0x02], actualResults[1].Key);
             Assert.AreSequenceEqual((byte[])[0x00, 0x00, 0x01], actualResults[2].Key);
             Assert.AreSequenceEqual((byte[])[0x00, 0x00, 0x00], actualResults[3].Key);
+
+            TestStorePool.Shared.Return(store);
+        }
+
+        [TestMethod]
+        public void TestCheckpoint()
+        {
+            var store = TestStorePool.Shared.Rent();
+
+            store.Put([0x00, 0x00, 0x00], [0x00]);
+
+            var actualCheckpointDir = new DirectoryInfo(Path.Combine(Path.GetRandomFileName()));
+            store.CreateCheckpoint(actualCheckpointDir.FullName);
+
+            Assert.IsNotEmpty(actualCheckpointDir.EnumerateFiles());
+
+            actualCheckpointDir.Delete(true);
 
             TestStorePool.Shared.Return(store);
         }

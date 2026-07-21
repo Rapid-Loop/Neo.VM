@@ -42,7 +42,7 @@ namespace Neo.Platform.Storage.Tests
                 DatabasePath = Path.Combine(Path.GetRandomFileName()),
             });
 
-            var backupOptions = Options.Create(new BlockchainStoreBackupOptions()
+            var backupOptions = Options.Create(new BlockchainBackupOptions()
             {
                 BackupPath = Path.Combine(Path.GetRandomFileName()),
                 MaxBackups = 3,

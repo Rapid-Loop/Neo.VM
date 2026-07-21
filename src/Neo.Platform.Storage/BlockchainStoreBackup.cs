@@ -35,9 +35,9 @@ namespace Neo.Platform.Storage
 {
     public class BlockchainStoreBackup : IStoreBackup
     {
-        public BlockchainStoreBackupOptions BackupOptions => _backupOptions;
+        public BlockchainBackupOptions BackupOptions => _backupOptions;
 
-        private readonly BlockchainStoreBackupOptions _backupOptions;
+        private readonly BlockchainBackupOptions _backupOptions;
 
         private readonly RocksDb _db;
         private readonly BackupEngine _backupEngine;
@@ -47,7 +47,7 @@ namespace Neo.Platform.Storage
 
         public BlockchainStoreBackup(
             RocksDb db,
-            IOptions<BlockchainStoreBackupOptions> options,
+            IOptions<BlockchainBackupOptions> options,
             ILoggerFactory? loggerFactory = default)
         {
             _db = db;
