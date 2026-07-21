@@ -26,6 +26,5 @@ namespace Neo.Platform.Storage
     {
         public static readonly string Default = "default";
         public static readonly string Checkpoints = "checkpoints";
-        public static readonly string Backups = "backups";
     }
 }

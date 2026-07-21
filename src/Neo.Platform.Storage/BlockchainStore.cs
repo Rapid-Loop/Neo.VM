@@ -47,7 +47,6 @@ namespace Neo.Platform.Storage
         [
             new(ColumnFamilyNames.Default),
             new(ColumnFamilyNames.Checkpoints),
-            new(ColumnFamilyNames.Backups),
         ];
 
         private readonly Cache _blockSharedCache;
