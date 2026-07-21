@@ -86,6 +86,12 @@ namespace Neo.Platform.Storage
             return false;
         }
 
+        public IStoreBackup CreateBackup() =>
+            _store.CreateBackup();
+
+        public void CreateCheckpoint(string checkpointDirectory) =>
+            _store.CreateCheckpoint(checkpointDirectory);
+
         public IStoreSnapshot CreateSnapshot()
         {
             var logLevel = LogLevel.Debug;
