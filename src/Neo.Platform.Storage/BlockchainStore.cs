@@ -46,7 +46,6 @@ namespace Neo.Platform.Storage
         private static readonly ColumnFamilyDescriptor[] s_columnFamilies =
         [
             new(ColumnFamilyNames.Default),
-            new(ColumnFamilyNames.Checkpoints),
         ];
 
         private readonly Cache _blockSharedCache;
