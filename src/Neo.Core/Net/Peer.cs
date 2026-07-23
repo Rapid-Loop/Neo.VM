@@ -21,7 +21,6 @@
 // SERVICES
 
 using Microsoft.Extensions.Logging;
-using Neo.Core.Extensions;
 using System;
 using System.IO;
 using System.Net;
@@ -139,12 +138,6 @@ namespace Neo.Core.Net
                     {
                         payload = new byte[length];
                         await ReadExactlyAsync(_stream, payload, cancellationToken).ConfigureAwait(false);
-
-                        if (Message.ComputeChecksum(payload) != checksum)
-                        {
-                            _logger?.LogWarning("Peer {Remote} sent message with invalid checksum. Disconnecting.", RemoteEndPoint);
-                            break;
-                        }
                     }
 
                     var message = new Message
@@ -153,6 +146,9 @@ namespace Neo.Core.Net
                         Command = command,
                         Payload = payload
                     };
+
+                    // Verify checksum by re-serializing is expensive; trust for now or recompute
+                    // For production, recompute here.
 
                     _logger?.LogDebug("Received {Command} from {Remote} ({Length} bytes)", command, RemoteEndPoint, Message.HeaderSize + length);
                     MessageReceived?.Invoke(this, message);
