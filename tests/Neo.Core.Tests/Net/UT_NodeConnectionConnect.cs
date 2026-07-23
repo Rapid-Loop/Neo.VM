@@ -29,20 +29,23 @@ using System.Threading.Tasks;
 
 namespace Neo.Core.Tests.Net
 {
+    // Socket/listen tests must not run in parallel (assembly uses MethodLevel parallelization).
     [TestClass]
+    [DoNotParallelize]
     public class UT_NodeConnectionConnect
     {
         [TestMethod]
         public async Task TestConnectAsyncHandshake()
         {
             var settings = new ProtocolSettings { Network = 0x334F454E };
-            var endPoint = new IPEndPoint(IPAddress.Loopback, TestUtilities.GetFreeTcpPort());
 
-            await using var server = new NodeServerListener(endPoint, settings);
+            await using var server = new NodeServerListener(
+                new IPEndPoint(IPAddress.Loopback, 0),
+                settings);
             server.Start(backlog: 4);
 
             await using var client = await NodeConnection.ConnectAsync(
-                endPoint,
+                server.BoundEndPoint,
                 settings,
                 localNonce: 42,
                 localCapabilities:

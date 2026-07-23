@@ -28,25 +28,31 @@ using System.Threading.Tasks;
 
 namespace Neo.Core.Tests.Net
 {
+    // Socket/listen tests must not run in parallel (assembly uses MethodLevel parallelization).
     [TestClass]
+    [DoNotParallelize]
     public class UT_NodeServerListener
     {
         [TestMethod]
         public async Task TestStartAndDispose()
         {
-            var endPoint = new IPEndPoint(IPAddress.Loopback, TestUtilities.GetFreeTcpPort());
-            await using var listener = new NodeServerListener(endPoint, ProtocolSettings.Default);
+            // Port 0: OS assigns a free port at Bind (avoids GetFreeTcpPort TOCTOU on CI).
+            await using var listener = new NodeServerListener(
+                new IPEndPoint(IPAddress.Loopback, 0),
+                ProtocolSettings.Default);
 
             listener.Start();
             Assert.IsTrue(listener.IsActive);
             Assert.IsGreaterThan(0u, listener.Nonce);
+            Assert.IsGreaterThan(0, listener.BoundEndPoint.Port);
         }
 
         [TestMethod]
         public async Task TestDoubleStartIsIdempotent()
         {
-            var endPoint = new IPEndPoint(IPAddress.Loopback, TestUtilities.GetFreeTcpPort());
-            await using var listener = new NodeServerListener(endPoint, ProtocolSettings.Default);
+            await using var listener = new NodeServerListener(
+                new IPEndPoint(IPAddress.Loopback, 0),
+                ProtocolSettings.Default);
 
             listener.Start();
             listener.Start();
@@ -56,8 +62,9 @@ namespace Neo.Core.Tests.Net
         [TestMethod]
         public async Task TestInvalidBacklogThrows()
         {
-            var endPoint = new IPEndPoint(IPAddress.Loopback, TestUtilities.GetFreeTcpPort());
-            await using var listener = new NodeServerListener(endPoint, ProtocolSettings.Default);
+            await using var listener = new NodeServerListener(
+                new IPEndPoint(IPAddress.Loopback, 0),
+                ProtocolSettings.Default);
 
             Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => listener.Start(0));
             Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => listener.Start(-1));
@@ -67,13 +74,14 @@ namespace Neo.Core.Tests.Net
         public async Task TestAcceptHandshakeAndClientRemovedOnDisconnect()
         {
             var settings = new ProtocolSettings { Network = 0x334F454E };
-            var endPoint = new IPEndPoint(IPAddress.Loopback, TestUtilities.GetFreeTcpPort());
 
-            await using var listener = new NodeServerListener(endPoint, settings);
+            await using var listener = new NodeServerListener(
+                new IPEndPoint(IPAddress.Loopback, 0),
+                settings);
             listener.Start(backlog: 8);
 
             await using var client = await NodeConnection.ConnectAsync(
-                endPoint,
+                listener.BoundEndPoint,
                 settings,
                 localNonce: listener.Nonce + 1,
                 localCapabilities: [new FullNodeCapabilityMessage(0)]);
@@ -92,16 +100,18 @@ namespace Neo.Core.Tests.Net
         public async Task TestOutboundConnectAsync()
         {
             var settings = new ProtocolSettings { Network = 0x334F454E };
-            var serverEndPoint = new IPEndPoint(IPAddress.Loopback, TestUtilities.GetFreeTcpPort());
-            var clientEndPoint = new IPEndPoint(IPAddress.Loopback, TestUtilities.GetFreeTcpPort());
 
-            await using var server = new NodeServerListener(serverEndPoint, settings);
+            await using var server = new NodeServerListener(
+                new IPEndPoint(IPAddress.Loopback, 0),
+                settings);
             server.Start(backlog: 8);
 
             // Client node may dial without listening, but still uses node identity.
-            await using var clientNode = new NodeServerListener(clientEndPoint, settings);
+            await using var clientNode = new NodeServerListener(
+                new IPEndPoint(IPAddress.Loopback, 0),
+                settings);
 
-            await using var outbound = await clientNode.ConnectAsync(serverEndPoint)
+            await using var outbound = await clientNode.ConnectAsync(server.BoundEndPoint)
                 .WaitAsync(TimeSpan.FromSeconds(5));
 
             await outbound.WaitForHandshakeAsync().WaitAsync(TimeSpan.FromSeconds(5));
@@ -122,13 +132,14 @@ namespace Neo.Core.Tests.Net
         public async Task TestPingPongAfterHandshake()
         {
             var settings = new ProtocolSettings { Network = 0x334F454E };
-            var endPoint = new IPEndPoint(IPAddress.Loopback, TestUtilities.GetFreeTcpPort());
 
-            await using var server = new NodeServerListener(endPoint, settings);
+            await using var server = new NodeServerListener(
+                new IPEndPoint(IPAddress.Loopback, 0),
+                settings);
             server.Start(backlog: 4);
 
             await using var client = await NodeConnection.ConnectAsync(
-                endPoint,
+                server.BoundEndPoint,
                 settings,
                 localNonce: server.Nonce + 1,
                 localCapabilities: [new FullNodeCapabilityMessage(5)]);

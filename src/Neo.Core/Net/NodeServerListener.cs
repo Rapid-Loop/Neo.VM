@@ -48,7 +48,18 @@ namespace Neo.Core.Net
 
         public ProtocolSettings ProtocolSettings => _protocolSettings;
 
-        public EndPoint LocalEndPoint => _endPoint;
+        /// <summary>
+        /// Configured listen endpoint (port may be 0 before <see cref="Start()"/>).
+        /// Prefer <see cref="BoundEndPoint"/> after start when port 0 was used.
+        /// </summary>
+        public EndPoint LocalEndPoint => _serverSocket.LocalEndPoint ?? _endPoint;
+
+        /// <summary>
+        /// Actual bound endpoint after <see cref="Start()"/> (resolves port 0 to the OS-assigned port).
+        /// </summary>
+        public IPEndPoint BoundEndPoint =>
+            _serverSocket.LocalEndPoint as IPEndPoint
+                ?? throw new InvalidOperationException($"Listener is not bound. Call {nameof(Start)} first.");
 
         public bool IsActive => _isActive != 0;
 
@@ -147,7 +158,10 @@ namespace Neo.Core.Net
 
             try
             {
-                _serverSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                // Exclusive bind on Windows: avoids port-sharing races under SO_REUSEADDR on CI.
+                if (OperatingSystem.IsWindows())
+                    _serverSocket.ExclusiveAddressUse = true;
+
                 _serverSocket.Bind(_endPoint);
                 _serverSocket.Listen(backlog);
                 _listeningTask = AcceptLoopAsync();

@@ -194,6 +194,9 @@ namespace Neo.Core.Net
             if (IsReady)
                 return;
 
+            if (Volatile.Read(ref _disconnected) != 0)
+                throw new IOException("Connection closed before handshake completed.");
+
             var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
             void OnCompleted(object? sender, EventArgs e) =>
@@ -207,8 +210,12 @@ namespace Neo.Core.Net
 
             try
             {
+                // Re-check after subscribe to close the race with concurrent handshake/disconnect.
                 if (IsReady)
                     return;
+
+                if (Volatile.Read(ref _disconnected) != 0)
+                    throw new IOException("Connection closed before handshake completed.");
 
                 await using (cancellationToken.Register(static state =>
                 {
