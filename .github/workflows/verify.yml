@@ -72,6 +72,6 @@ jobs:
       if: always()
       with:
         paths: |
-          TestResults/tests-${{ matrix.os }}.xml
+          ${{ github.workspace }}/TestResults/tests-${{ matrix.os }}.xml
         folded: true
         show: "all"
