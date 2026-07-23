@@ -48,14 +48,12 @@ jobs:
       if: matrix.os == 'macos-latest'
       run: |
         brew install rocksdb
-        dotnet add package JunitXml.TestLogger
         dotnet build -p:GITHUB_ACTIONS=true
         dotnet test --no-build --logger "junit;LogFilePath=TestResults/tests-${{ matrix.os }}.xml" -p:GITHUB_ACTIONS=true --binaryLogger:${{ matrix.os }}.binlog
 
     - name: Test (windows)
       if: matrix.os == 'windows-latest'
       run: |
-        dotnet add package JunitXml.TestLogger
         dotnet build -p:GITHUB_ACTIONS=true
         dotnet test --no-build --logger "junit;LogFilePath=TestResults/tests-${{ matrix.os }}.xml" -p:GITHUB_ACTIONS=true --binaryLogger:${{ matrix.os }}.binlog
 
@@ -63,7 +61,6 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get --assume-yes install librocksdb-dev
-        dotnet add package JunitXml.TestLogger
         dotnet build -p:GITHUB_ACTIONS=true
         dotnet test --no-build --logger "junit;LogFilePath=TestResults/tests-${{ matrix.os }}.xml" -p:GITHUB_ACTIONS=true --binaryLogger:${{ matrix.os }}.binlog
 
