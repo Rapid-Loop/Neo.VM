@@ -115,7 +115,6 @@ namespace Neo.Core.Net
         private readonly long _startedTicks = DateTime.UtcNow.Ticks;
 
         private Task _fillingPipeTask = Task.CompletedTask;
-        private Task _readingPipeTask = Task.CompletedTask;
         private Task _protocolTask = Task.CompletedTask;
         private Task _keepAliveTask = Task.CompletedTask;
         private int _disconnected;
@@ -256,7 +255,6 @@ namespace Neo.Core.Net
                 await _protocolTask.ConfigureAwait(false);
                 await _keepAliveTask.ConfigureAwait(false);
                 await _fillingPipeTask.ConfigureAwait(false);
-                await _readingPipeTask.ConfigureAwait(false);
             }
             catch (Exception)
             {
@@ -271,12 +269,26 @@ namespace Neo.Core.Net
         /// <summary>
         /// Starts receive pumps, keep-alive, and sends the local Version (Neo StartProtocol).
         /// </summary>
+        /// <remarks>
+        /// Local Version is sent before the frame reader runs. Otherwise a Verack reply to the
+        /// peer's Version can race ahead of our Version on the wire; the peer then sees Verack
+        /// first and aborts with a protocol violation (common on macOS CI scheduling).
+        /// Socket fill still runs concurrently so peer bytes buffer in the pipe until we read.
+        /// </remarks>
         internal void Start()
         {
             _fillingPipeTask = DoFillPipeAsync();
-            _readingPipeTask = DoReadPipeAsync();
-            _protocolTask = StartProtocolAsync();
+            _protocolTask = RunProtocolAsync();
             _keepAliveTask = RunKeepAliveAsync(_lifetimeCts.Token);
+        }
+
+        /// <summary>
+        /// Send local Version, then process inbound frames (including remote Version / Verack).
+        /// </summary>
+        private async Task RunProtocolAsync()
+        {
+            await StartProtocolAsync().ConfigureAwait(false);
+            await DoReadPipeAsync().ConfigureAwait(false);
         }
 
         /// <summary>
