@@ -18,9 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="10.0.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <!-- Always reference so VSTest can resolve the "junit" logger (not only on CI). -->
     <PackageReference Include="JunitXml.TestLogger" Version="8.0.0" />
   </ItemGroup>
 
