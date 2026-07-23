@@ -29,15 +29,31 @@ using System.Text.Json.Serialization;
 
 namespace Neo.Wallet.Json
 {
+    /// <summary>
+    /// JSON model for a wallet account witness contract.
+    /// </summary>
     public class ContractModel : JsonModel, IMap<WitnessContract>
     {
+        /// <summary>
+        /// Gets or sets the contract script bytes, serialized as a hex string.
+        /// </summary>
         [JsonConverter(typeof(JsonStringHexFormatConverter))]
         public byte[]? Script { get; set; }
 
+        /// <summary>
+        /// Gets or sets the contract parameter definitions.
+        /// </summary>
         public ContractParameterModel[]? Parameters { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the contract is considered deployed.
+        /// </summary>
         public bool Deployed { get; set; }
 
+        /// <summary>
+        /// Converts this model to a <see cref="WitnessContract"/>.
+        /// </summary>
+        /// <returns>A witness contract built from <see cref="Script"/> and <see cref="Parameters"/>.</returns>
         public WitnessContract ToObject() =>
             WitnessContract.Create(
                 Script ?? [],

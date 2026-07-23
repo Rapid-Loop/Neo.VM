@@ -77,16 +77,34 @@ namespace Neo.Core.Net
         /// </summary>
         public event EventHandler? Disconnected;
 
+        /// <summary>
+        /// Gets a value indicating whether the underlying socket is connected.
+        /// </summary>
         public bool Connected => _socket.Connected;
 
+        /// <summary>
+        /// Gets the remote endpoint of this connection, if available.
+        /// </summary>
         public EndPoint? RemoteEndPoint => _socket.RemoteEndPoint;
 
+        /// <summary>
+        /// Gets the local endpoint of this connection, if available.
+        /// </summary>
         public EndPoint? LocalEndPoint => _socket.LocalEndPoint;
 
+        /// <summary>
+        /// Gets the current handshake state.
+        /// </summary>
         public NodeHandshakeState HandshakeState => _handshake.State;
 
+        /// <summary>
+        /// Gets a value indicating whether the Version/Verack handshake has completed.
+        /// </summary>
         public bool IsReady => _handshake.IsReady;
 
+        /// <summary>
+        /// Gets the remote Version payload after handshake processing, if available.
+        /// </summary>
         public VersionMessage? RemoteVersion => _handshake.RemoteVersion;
 
         /// <summary>
@@ -123,6 +141,14 @@ namespace Neo.Core.Net
         private long _localBlockIndex;
         private long _remoteLastBlockIndex;
 
+        /// <summary>
+        /// Initializes a new connection over an already-connected socket.
+        /// </summary>
+        /// <param name="socket">The connected TCP socket.</param>
+        /// <param name="protocolSettings">The protocol settings for this network.</param>
+        /// <param name="localNonce">The local node nonce used for self-connection detection.</param>
+        /// <param name="localCapabilities">Optional local capabilities advertised in Version.</param>
+        /// <param name="loggerFactory">Optional logger factory; defaults to a null logger.</param>
         public NodeConnection(
             Socket socket,
             ProtocolSettings protocolSettings,
@@ -232,6 +258,10 @@ namespace Neo.Core.Net
             }
         }
 
+        /// <summary>
+        /// Cancels outstanding work, closes the socket, and releases resources.
+        /// </summary>
+        /// <returns>A task that completes when dispose work finishes.</returns>
         public async ValueTask DisposeAsync()
         {
             try

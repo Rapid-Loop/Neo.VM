@@ -26,20 +26,44 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Neo.VM.Core
 {
+    /// <summary>
+    /// Represents an opcode handler invoked by the engine for a single instruction.
+    /// </summary>
+    /// <param name="engine">The execution engine.</param>
+    /// <param name="instruction">The instruction being executed.</param>
     public delegate void VTableFunc(VirtualMachineEngine engine, OpCodeInst instruction);
 
+    /// <summary>
+    /// Dispatch table that maps <see cref="OpCode"/> values to handler methods.
+    /// Methods named after opcodes are auto-bound in the constructor via reflection.
+    /// </summary>
     public partial class VirtualTable
     {
+        /// <summary>
+        /// Gets the default virtual table with standard NeoVM opcode handlers.
+        /// </summary>
         public static readonly VirtualTable Default = new();
 
+        /// <summary>
+        /// Gets the array of handlers indexed by opcode byte value.
+        /// </summary>
         public VTableFunc[] Functions { get; protected set; } = new VTableFunc[byte.MaxValue];
 
+        /// <summary>
+        /// Gets or sets the handler for the specified opcode.
+        /// </summary>
+        /// <param name="opCode">The opcode to look up.</param>
+        /// <returns>The registered handler for <paramref name="opCode"/>.</returns>
         public VTableFunc this[OpCode opCode]
         {
             get => Functions[(byte)opCode];
             protected set => Functions[(byte)opCode] = value;
         }
 
+        /// <summary>
+        /// Initializes a new virtual table, filling undefined opcodes with <see cref="InvalidOpcode"/>
+        /// and binding public methods whose names match <see cref="OpCode"/> members.
+        /// </summary>
         public VirtualTable()
         {
             Array.Fill(Functions, InvalidOpcode);
@@ -52,6 +76,12 @@ namespace Neo.VM.Core
         }
 
 
+        /// <summary>
+        /// Default handler for opcodes that have no registered implementation.
+        /// </summary>
+        /// <param name="engine">The execution engine.</param>
+        /// <param name="instruction">The undefined instruction.</param>
+        /// <exception cref="InvalidOperationException">Always thrown for undefined opcodes.</exception>
         [DoesNotReturn]
         public static void InvalidOpcode(VirtualMachineEngine engine, OpCodeInst instruction)
         {

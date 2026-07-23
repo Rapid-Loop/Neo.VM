@@ -27,6 +27,9 @@ using System.IO;
 
 namespace Neo.Core.Blockchain
 {
+    /// <summary>
+    /// Base type for optional transaction attributes carried on a <see cref="Transaction"/>.
+    /// </summary>
     public abstract class TransactionAttribute : INeoSerializable
     {
         /// <summary>
@@ -39,8 +42,16 @@ namespace Neo.Core.Blockchain
         /// </summary>
         public abstract bool AllowMultiple { get; }
 
+        /// <summary>
+        /// Gets the serialized size of this attribute in bytes.
+        /// </summary>
         public virtual int Size => sizeof(TransactionAttributeType);
 
+        /// <summary>
+        /// Deserializes this attribute from the specified stream.
+        /// </summary>
+        /// <param name="reader">The stream to read from.</param>
+        /// <exception cref="FormatException">The attribute type is not defined.</exception>
         public virtual void Deserialize(Stream reader)
         {
             var type = reader.Read<TransactionAttributeType>();
@@ -49,6 +60,10 @@ namespace Neo.Core.Blockchain
                 throw new FormatException($"[{nameof(TransactionAttribute)}] Invalid {nameof(Type)} \'{type:d}\'.");
         }
 
+        /// <summary>
+        /// Serializes this attribute to the specified stream.
+        /// </summary>
+        /// <param name="writer">The stream to write to.</param>
         public virtual void Serialize(Stream writer)
         {
             writer.Write(Type);

@@ -1,4 +1,4 @@
-# NEO Platform - C# Blockchain SDK
+# NEO Platform
 
 [![License](https://img.shields.io/github/license/Rapid-Loop/neo-platform)](https://github.com/Rapid-Loop/neo-platform/blob/master/LICENSE)
 [![Stars](https://img.shields.io/github/stars/Rapid-Loop/neo-platform)](https://github.com/Rapid-Loop/neo-platform/stargazers)
@@ -7,105 +7,115 @@
 [![Last Commit](https://img.shields.io/github/last-commit/Rapid-Loop/neo-platform)](https://github.com/Rapid-Loop/neo-platform/commits/master)
 [![Verify Pull Request](https://github.com/Rapid-Loop/neo-platform/actions/workflows/verify.yml/badge.svg)](https://github.com/Rapid-Loop/neo-platform/actions/workflows/verify.yml)
 
-**Official Rapid Loop fork and enterprise-enhanced rebuild of the NEO Blockchain Smart Economy Platform.**
+**Modular Neo blockchain platform for C# / .NET** — maintained by [Rapid Loop](https://github.com/Rapid-Loop).
 
-A modern, high-performance C# library for building on the **Neo blockchain** — designed for developers and enterprises who need reliability, scalability, and seamless integration.
+A high-performance library set for building on **Neo**: core types, virtual machine, wallets, storage, and hosting integration. Aimed at developers and enterprises that need reliable packaging and a modern .NET experience.
 
----
+This repository is **compatible with Neo protocol semantics**. It is Rapid Loop’s platform packaging and engineering work — **not** an “official Neo Foundation” product unless separately stated by Neo.
 
-## 🌟 About This Project
-
-**neo-platform** is Rapid Loop's actively maintained fork of the Neo blockchain C# ecosystem. We are rebuilding and enhancing the Neo platform with enterprise-grade improvements for:
-
-- Better performance and scalability
-- Modern developer experience
-- Seamless integration with existing business systems
-- Enhanced security and tooling
-
-Whether you're building decentralized applications (dApps), smart contracts, wallets, or enterprise blockchain solutions, this SDK provides the core building blocks.
-
-**Official Neo Website**: [neo.org](https://neo.org)
+**Neo docs:** [developers.neo.org](https://developers.neo.org/) · **Neo site:** [neo.org](https://neo.org)
 
 ---
 
-## ✨ Key Features
+## About
 
-- **Full Neo Compatibility** — Core blockchain, VM, cryptography, and wallet functionality
-- **Enterprise Ready** — Robust configuration, logging, and integration tools
-- **Modular Architecture** — Clean separation across packages:
-  - `Neo.Core` — Core blockchain logic
-  - `Neo.VM` — Virtual Machine
-  - `Neo.Cryptography` — Secure cryptographic primitives
-  - `Neo.Wallet` — Wallet management
-  - And more...
-- **High Performance** — Optimized for real-world usage
-- **Comprehensive Testing** — Full test suite included
-- **NuGet Ready** — Easy package distribution
+**neo-platform** is Rapid Loop’s actively developed Neo C# stack: modular packages, enterprise-friendly configuration and logging hooks, and a cleaner project layout for real systems.
+
+Use it when you need:
+
+- Core blockchain types and serialization
+- Neo VM execution
+- Wallet formats (e.g. NEP-6) and account management
+- RocksDB-backed blockchain storage
+- .NET Generic Host / CLI integration
+
+Led by a [neo-project](https://github.com/neo-project) contributor with core Neo development experience. Rapid Loop commercial work (integration, review, support) is separate from open-source contribution — see [Rapid-Loop](https://github.com/Rapid-Loop).
 
 ---
 
-## 📁 Repository Structure
+## Packages
 
-```bash
+| Project | Role |
+|---------|------|
+| `Neo.Core` | Protocol types, crypto, P2P messages, serialization, VM opcodes / limits |
+| `Neo.VM` | Execution engine, stack types, middleware pipeline |
+| `Neo.Wallet` | Wallet abstractions, NEP-6 / dev wallets |
+| `Neo.IO` | I/O helpers (hashing, bloom filter) |
+| `Neo.Configuration` | Options and JSON converters for protocol / store settings |
+| `Neo.Platform.Storage` | Blockchain store, snapshots, backups (RocksDB) |
+| `Neo.Platform.Hosting` | Hosting, configuration, logging, command-line wiring |
+| `Neo.Platform.CLI` | Sample / entry CLI host |
+| `Neo.Localization` | Localized VM messages |
+
+---
+
+## Repository layout
+
+```text
 neo-platform/
-├── src/                  # Source code (multiple projects)
-│   ├── Neo.Core/
-│   ├── Neo.VM/
-│   ├── Neo.Cryptography/
-│   ├── Neo.Wallet/
-│   └── ...
-├── tests/                # Unit and integration tests
-├── pkgs/                 # Package distribution
-├── .github/workflows/    # CI/CD pipelines
-├── .images/              # Logos and assets
-└── All.slnx              # Solution file
+├── src/                   # Library and host projects
+├── tests/                 # Unit and integration tests
+├── pkgs/                  # NuGet package output
+├── .github/workflows/     # CI
+├── .images/               # Package / branding assets
+└── All.slnx               # Solution
 ```
 
 ---
 
-## 🚀 Quick Start
+## Quick start
 
-### 1. Clone the repository
+### Clone
+
 ```bash
 git clone https://github.com/Rapid-Loop/neo-platform.git
 cd neo-platform
 ```
 
-### 2. Build the solution
+### Build
+
 ```bash
 dotnet build All.slnx
 ```
 
-### 3. Run tests
+### Test
+
 ```bash
-dotnet test
+dotnet test All.slnx
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## Tech stack
 
-- **Language**: `C# (.NET)`
-- **Build System**: `dotnet`
-- **CI/CD**: `GitHub Actions`
-
----
-
-## 📖 Documentation
-
-- [Neo Official Documentation](https://developers.neo.org/)
-- Check individual project folders for more details.
+- **Language:** C# (.NET)
+- **Build:** `dotnet` / `All.slnx`
+- **CI:** GitHub Actions
 
 ---
 
-## 🤝 Contributing
+## Documentation
 
-We welcome contributions! See our [Contributing Guidelines](CONTRIBUTING.md) (create this file if needed).
+- [Neo developer documentation](https://developers.neo.org/)
+- Public APIs use XML documentation comments (`///`) in source under `src/`
+- Contribution guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 
-## 📜 License
+## License
 
-This project is licensed under the **BSD-2-Clause License** — see the [LICENSE](LICENSE) file for details.
+**BSD-2-Clause** — see [LICENSE](LICENSE).
 
 ---
+
+## Contact
+
+- **Org:** [github.com/Rapid-Loop](https://github.com/Rapid-Loop)
+- **Website:** [rapidloop.net](https://rapidloop.net)
+- **Email:** [github@rapidloop.net](mailto:github@rapidloop.net)

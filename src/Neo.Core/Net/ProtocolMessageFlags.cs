@@ -24,6 +24,9 @@ using System;
 
 namespace Neo.Core.Net
 {
+    /// <summary>
+    /// Flags carried in a Neo P2P protocol message frame.
+    /// </summary>
     [Flags]
     public enum ProtocolMessageFlags : byte
     {

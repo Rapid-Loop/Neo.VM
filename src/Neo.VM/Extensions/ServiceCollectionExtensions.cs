@@ -27,8 +27,17 @@ using System;
 
 namespace Neo.VM.Extensions
 {
+    /// <summary>
+    /// Dependency-injection helpers for registering the Neo VM engine and middleware.
+    /// </summary>
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        /// Registers a scoped <see cref="VirtualMachineEngine"/> built with any registered middleware.
+        /// When a <see cref="DebuggerMiddleware"/> is registered, it is placed first in the pipeline.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <returns>The same service collection for chaining.</returns>
         public static IServiceCollection AddExecutionEngine(this IServiceCollection services)
         {
             // Register VirtualMachineEngine using the built pipeline
@@ -54,6 +63,12 @@ namespace Neo.VM.Extensions
             return services;
         }
 
+        /// <summary>
+        /// Registers a middleware type as a singleton <see cref="IEngineMiddleware"/>.
+        /// </summary>
+        /// <typeparam name="TMiddleware">The middleware implementation type.</typeparam>
+        /// <param name="services">The service collection.</param>
+        /// <returns>The same service collection for chaining.</returns>
         public static IServiceCollection AddEngineMiddleware<TMiddleware>(this IServiceCollection services)
             where TMiddleware : class, IEngineMiddleware
         {
@@ -62,6 +77,11 @@ namespace Neo.VM.Extensions
             return services;
         }
 
+        /// <summary>
+        /// Registers the <see cref="DebuggerMiddleware"/> as a scoped service.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <returns>The same service collection for chaining.</returns>
         public static IServiceCollection AddEngineMiddlewareDebugger(this IServiceCollection services)
         {
             services.AddScoped<DebuggerMiddleware, DebuggerMiddleware>();
@@ -69,6 +89,11 @@ namespace Neo.VM.Extensions
             return services;
         }
 
+        /// <summary>
+        /// Registers the <see cref="ExecuteLoggerMiddleware"/> as a scoped <see cref="IEngineMiddleware"/>.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <returns>The same service collection for chaining.</returns>
         public static IServiceCollection AddEngineMiddlewareLogger(this IServiceCollection services)
         {
             services.AddScoped<IEngineMiddleware, ExecuteLoggerMiddleware>();
@@ -76,6 +101,13 @@ namespace Neo.VM.Extensions
             return services;
         }
 
+        /// <summary>
+        /// Registers one or more middleware types as singleton <see cref="IEngineMiddleware"/> implementations.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="middlewareTypes">Types that implement <see cref="IEngineMiddleware"/>.</param>
+        /// <returns>The same service collection for chaining.</returns>
+        /// <exception cref="ArgumentException">Thrown when a type does not implement <see cref="IEngineMiddleware"/>.</exception>
         public static IServiceCollection AddEngineMiddleware(this IServiceCollection services,
             params Type[] middlewareTypes)
         {

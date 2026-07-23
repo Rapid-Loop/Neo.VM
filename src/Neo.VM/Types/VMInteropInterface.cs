@@ -30,20 +30,46 @@ using System.Runtime.InteropServices;
 
 namespace Neo.VM.Types
 {
+    /// <summary>
+    /// Represents an interop interface stack item that wraps a CLR object.
+    /// </summary>
+    /// <param name="obj">The underlying object.</param>
+    /// <param name="name">A display name for the interface type.</param>
     public class VMInteropInterface(object obj, string name) : VMObject, IEquatable<VMInteropInterface>
     {
+        /// <inheritdoc />
         public override VMObjectType Type => VMObjectType.Interop;
 
         private readonly object _underlyingObject = obj;
         private readonly string _interfaceName = name;
 
+        /// <summary>
+        /// Gets the underlying CLR object.
+        /// </summary>
         public object UnderlyingObject => _underlyingObject;
+
+        /// <summary>
+        /// Gets the interface name associated with this wrapper.
+        /// </summary>
         public string InterfaceName => _interfaceName;
 
+        /// <summary>
+        /// Initializes a new interop interface wrapping a default <see cref="object"/>.
+        /// </summary>
         public VMInteropInterface() : this(new()) { }
 
+        /// <summary>
+        /// Initializes a new interop interface wrapping the specified object.
+        /// The interface name defaults to the object's type name.
+        /// </summary>
+        /// <param name="obj">The object to wrap.</param>
         public VMInteropInterface(object obj) : this(obj, obj.GetType().Name) { }
 
+        /// <summary>
+        /// Determines whether this interop item is equal to another.
+        /// </summary>
+        /// <param name="other">The other interop item.</param>
+        /// <returns><see langword="true"/> if the underlying objects and names match; otherwise <see langword="false"/>.</returns>
         public bool Equals(VMInteropInterface? other)
         {
             if (ReferenceEquals(other, this)) return true;
@@ -53,6 +79,7 @@ namespace Neo.VM.Types
                 string.Equals(_interfaceName, other._interfaceName);
         }
 
+        /// <inheritdoc />
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
             if (ReferenceEquals(obj, this)) return true;
@@ -60,17 +87,20 @@ namespace Neo.VM.Types
             return Equals(obj as VMInteropInterface);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return HashCode.Combine(RefCount, _underlyingObject, _interfaceName);
         }
 
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             // Do not dispose the underlying object - it's managed externally
             base.Dispose(disposing);
         }
 
+        /// <inheritdoc />
         public override VMObject Clone()
         {
             var clone = new VMInteropInterface(_underlyingObject, _interfaceName);
@@ -78,6 +108,7 @@ namespace Neo.VM.Types
             return clone;
         }
 
+        /// <inheritdoc />
         protected override ReadOnlySpan<byte> ComputeSpan(HashSet<VMObject> visited)
         {
             var ptr = nint.Zero;
@@ -107,6 +138,7 @@ namespace Neo.VM.Types
             }
         }
 
+        /// <inheritdoc />
         [DoesNotReturn]
         public override BigInteger GetInteger()
         {
@@ -114,11 +146,18 @@ namespace Neo.VM.Types
             throw new InvalidOperationException($"Cannot convert InteropInterface ({_interfaceName}) to integer");
         }
 
+        /// <inheritdoc />
         public override bool GetBoolean()
         {
             return _underlyingObject != null;
         }
 
+        /// <summary>
+        /// Casts the underlying object to the specified type.
+        /// </summary>
+        /// <typeparam name="T">The target type.</typeparam>
+        /// <returns>The underlying object as <typeparamref name="T"/>.</returns>
+        /// <exception cref="InvalidCastException">Thrown when the underlying object is not assignable to <typeparamref name="T"/>.</exception>
         public T CastTo<T>()
         {
             if (_underlyingObject is T t)
@@ -127,6 +166,13 @@ namespace Neo.VM.Types
             throw new InvalidCastException($"This {_interfaceName} can't be casted to type {typeof(T)}.");
         }
 
+        /// <summary>
+        /// Invokes a public method on the underlying object by name.
+        /// </summary>
+        /// <typeparam name="TResult">The expected return type (must be a reference type).</typeparam>
+        /// <param name="methodName">The name of the method to invoke.</param>
+        /// <param name="args">The method arguments.</param>
+        /// <returns>The method result cast to <typeparamref name="TResult"/>, or <see langword="null"/> if the method is missing or returns a different type.</returns>
         public TResult? CallMethod<TResult>(string methodName, params object[] args)
             where TResult : class?
         {

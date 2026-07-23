@@ -28,14 +28,26 @@ using System.Numerics;
 
 namespace Neo.VM.Types
 {
+    /// <summary>
+    /// Represents an arbitrary-precision integer stack item, limited to <see cref="MaxSize"/> bytes.
+    /// </summary>
     public class VMInteger : VMObject, IEquatable<VMInteger>
     {
+        /// <summary>
+        /// The maximum allowed size of the integer in bytes.
+        /// </summary>
         public const int MaxSize = 32;
 
+        /// <inheritdoc />
         public override VMObjectType Type => VMObjectType.Integer;
 
         private readonly BigInteger _value = BigInteger.Zero;
 
+        /// <summary>
+        /// Initializes a new integer stack item.
+        /// </summary>
+        /// <param name="value">The integer value.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="value"/> exceeds <see cref="MaxSize"/> bytes.</exception>
         public VMInteger(BigInteger value)
         {
             if (value.GetByteCount() > MaxSize)
@@ -43,11 +55,13 @@ namespace Neo.VM.Types
             _value = value;
         }
 
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
         }
 
+        /// <inheritdoc />
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
             if (ReferenceEquals(obj, this)) return true;
@@ -55,11 +69,13 @@ namespace Neo.VM.Types
             return Equals(obj as VMInteger);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return _value.GetHashCode();
         }
 
+        /// <inheritdoc />
         public override VMObject Clone()
         {
             var clone = new VMInteger(_value);
@@ -67,21 +83,29 @@ namespace Neo.VM.Types
             return clone;
         }
 
+        /// <inheritdoc />
         public override bool GetBoolean()
         {
             return _value != BigInteger.Zero;
         }
 
+        /// <inheritdoc />
         public override BigInteger GetInteger()
         {
             return _value;
         }
 
+        /// <inheritdoc />
         protected override ReadOnlySpan<byte> ComputeSpan(HashSet<VMObject> visited)
         {
             return _value.ToByteArray();
         }
 
+        /// <summary>
+        /// Determines whether this integer is equal to another integer stack item.
+        /// </summary>
+        /// <param name="other">The other integer.</param>
+        /// <returns><see langword="true"/> if the values are equal; otherwise <see langword="false"/>.</returns>
         public bool Equals([NotNullWhen(true)] VMInteger? other)
         {
             if (ReferenceEquals(other, this)) return true;
@@ -90,6 +114,9 @@ namespace Neo.VM.Types
             return _value == other._value;
         }
 
+        /// <summary>
+        /// Adds two integer stack items.
+        /// </summary>
         public static VMInteger operator +(VMInteger a, VMInteger b)
         {
             var result = new VMInteger(a._value + b._value);
@@ -97,6 +124,9 @@ namespace Neo.VM.Types
             return result;
         }
 
+        /// <summary>
+        /// Subtracts two integer stack items.
+        /// </summary>
         public static VMInteger operator -(VMInteger a, VMInteger b)
         {
             var result = new VMInteger(a._value - b._value);
@@ -104,6 +134,9 @@ namespace Neo.VM.Types
             return result;
         }
 
+        /// <summary>
+        /// Multiplies two integer stack items.
+        /// </summary>
         public static VMInteger operator *(VMInteger a, VMInteger b)
         {
             var result = new VMInteger(a._value * b._value);
@@ -111,6 +144,10 @@ namespace Neo.VM.Types
             return result;
         }
 
+        /// <summary>
+        /// Divides two integer stack items.
+        /// </summary>
+        /// <exception cref="DivideByZeroException">Thrown when the divisor is zero.</exception>
         public static VMInteger operator /(VMInteger a, VMInteger b)
         {
             if (b._value == BigInteger.Zero)
@@ -121,6 +158,9 @@ namespace Neo.VM.Types
             return result;
         }
 
+        /// <summary>
+        /// Computes the remainder of dividing two integer stack items.
+        /// </summary>
         public static VMInteger operator %(VMInteger a, VMInteger b)
         {
             var result = new VMInteger(a._value % b._value);
@@ -128,31 +168,55 @@ namespace Neo.VM.Types
             return result;
         }
 
+        /// <summary>
+        /// Negates an integer stack item.
+        /// </summary>
         public static VMInteger operator -(VMInteger a) =>
             new(-a._value);
 
         // Comparison operators
+        /// <summary>
+        /// Determines whether two integer stack items are equal.
+        /// </summary>
         public static bool operator ==(VMInteger a, VMInteger b)
         {
             if (ReferenceEquals(a, b)) return true;
             return a.Equals(b);
         }
 
+        /// <summary>
+        /// Determines whether two integer stack items are not equal.
+        /// </summary>
         public static bool operator !=(VMInteger a, VMInteger b) =>
             !(a == b);
 
+        /// <summary>
+        /// Determines whether the first integer is greater than the second.
+        /// </summary>
         public static bool operator >(VMInteger a, VMInteger b) =>
             a._value > b._value;
 
+        /// <summary>
+        /// Determines whether the first integer is less than the second.
+        /// </summary>
         public static bool operator <(VMInteger a, VMInteger b) =>
             a._value < b._value;
 
+        /// <summary>
+        /// Determines whether the first integer is greater than or equal to the second.
+        /// </summary>
         public static bool operator >=(VMInteger a, VMInteger b) =>
             a._value >= b._value;
 
+        /// <summary>
+        /// Determines whether the first integer is less than or equal to the second.
+        /// </summary>
         public static bool operator <=(VMInteger a, VMInteger b) =>
             a._value <= b._value;
 
+        /// <summary>
+        /// Converts a <see cref="VMInteger"/> to a <see cref="BigInteger"/>.
+        /// </summary>
         public static implicit operator BigInteger(VMInteger value)
         {
             return value.GetInteger();

@@ -25,11 +25,23 @@ using System.Security.Cryptography;
 
 namespace Neo.Core.Cryptography
 {
+    /// <summary>
+    /// SCrypt password-based key derivation and salt generation.
+    /// </summary>
     public static class SCrypt
     {
         /// <summary>
         /// Generates a derived key using SCrypt.
         /// </summary>
+        /// <param name="password">The password bytes.</param>
+        /// <param name="salt">The salt bytes.</param>
+        /// <param name="n">CPU/memory cost parameter; must be a power of two greater than 1.</param>
+        /// <param name="r">Block size parameter; must be at least 1.</param>
+        /// <param name="p">Parallelization parameter; must be at least 1.</param>
+        /// <param name="keyLength">The desired derived key length in bytes.</param>
+        /// <returns>The derived key.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="password"/> or <paramref name="salt"/> is empty.</exception>
+        /// <exception cref="ArgumentException">A parameter is outside the allowed range.</exception>
         public static byte[] Generate(byte[] password, byte[] salt, int n, int r, int p, int keyLength = 32)
         {
             ArgumentOutOfRangeException.ThrowIfZero(password.Length, nameof(password));
@@ -44,8 +56,15 @@ namespace Neo.Core.Cryptography
         }
 
         /// <summary>
-        /// Convenience overload for string password.
+        /// Generates a derived key from a string password using SCrypt.
         /// </summary>
+        /// <param name="password">The password string (UTF-8 encoded).</param>
+        /// <param name="salt">The salt bytes.</param>
+        /// <param name="n">CPU/memory cost parameter; must be a power of two greater than 1.</param>
+        /// <param name="r">Block size parameter; must be at least 1.</param>
+        /// <param name="p">Parallelization parameter; must be at least 1.</param>
+        /// <param name="keyLength">The desired derived key length in bytes.</param>
+        /// <returns>The derived key.</returns>
         public static byte[] Generate(string password, byte[] salt, int n = 16384, int r = 8, int p = 1, int keyLength = 32)
         {
             var passBytes = CoreUtilities.StrictUtf8Encoding.GetBytes(password);
@@ -55,6 +74,8 @@ namespace Neo.Core.Cryptography
         /// <summary>
         /// Generates a cryptographically secure random salt.
         /// </summary>
+        /// <param name="length">The salt length in bytes.</param>
+        /// <returns>A new random salt.</returns>
         public static byte[] GenerateSalt(int length = 16)
         {
             var salt = new byte[length];
@@ -63,8 +84,21 @@ namespace Neo.Core.Cryptography
         }
     }
 
+    /// <summary>
+    /// Low-level scrypt encoder helpers used by <see cref="SCrypt"/>.
+    /// </summary>
     internal static class ScryptEncoder
     {
+        /// <summary>
+        /// Derives a key using the scrypt password-based key derivation function.
+        /// </summary>
+        /// <param name="password">Password bytes.</param>
+        /// <param name="salt">Salt bytes.</param>
+        /// <param name="n">CPU/memory cost parameter (must be a power of two).</param>
+        /// <param name="r">Block size parameter.</param>
+        /// <param name="p">Parallelization parameter.</param>
+        /// <param name="keyLength">Length of the derived key in bytes.</param>
+        /// <returns>The derived key.</returns>
         public unsafe static byte[] CryptoScrypt(byte[] password, byte[] salt, int n, int r, int p, int keyLength = 32)
         {
             var ba = new byte[128 * r * p + 63];

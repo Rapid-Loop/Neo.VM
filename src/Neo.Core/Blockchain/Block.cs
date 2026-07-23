@@ -31,8 +31,14 @@ using System.Linq;
 
 namespace Neo.Core.Blockchain
 {
+    /// <summary>
+    /// A blockchain block that includes a header and its transactions.
+    /// </summary>
     public class Block : BlockHeader, IEquatable<Block>, INeoSerializable, IInventory, IVerifiable
     {
+        /// <summary>
+        /// Gets the hash of this block.
+        /// </summary>
         public override UInt256 Hash => this.ToArray().ToTxHash();
 
         /// <summary>
@@ -40,17 +46,32 @@ namespace Neo.Core.Blockchain
         /// </summary>
         public Transaction[] Transactions { get; set; } = [];
 
+        /// <summary>
+        /// Gets the inventory type for this block.
+        /// </summary>
         public InventoryType InventoryType => InventoryType.Block;
 
+        /// <summary>
+        /// Gets the serialized size of this block in bytes.
+        /// </summary>
         public override int Size =>
             base.Size +
             Transactions.GetSerializedSize();
 
+        /// <summary>
+        /// Returns a hash code for this block based on its hash.
+        /// </summary>
+        /// <returns>A hash code for the current block.</returns>
         public override int GetHashCode()
         {
             return Hash.GetHashCode();
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="Block"/> is equal to the current instance.
+        /// </summary>
+        /// <param name="other">The block to compare with the current instance.</param>
+        /// <returns><see langword="true"/> if the blocks have the same hash; otherwise, <see langword="false"/>.</returns>
         public bool Equals([NotNullWhen(true)] Block? other)
         {
             if (ReferenceEquals(other, this)) return true;
@@ -58,6 +79,11 @@ namespace Neo.Core.Blockchain
             return Hash == other.Hash;
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current block.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current instance.</param>
+        /// <returns><see langword="true"/> if the objects are equal; otherwise, <see langword="false"/>.</returns>
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
             if (ReferenceEquals(obj, this)) return true;
@@ -65,6 +91,11 @@ namespace Neo.Core.Blockchain
             return Equals(obj as Block);
         }
 
+        /// <summary>
+        /// Deserializes this block from the specified stream and validates the Merkle root.
+        /// </summary>
+        /// <param name="reader">The stream to read from.</param>
+        /// <exception cref="FormatException">The computed Merkle root does not match the header.</exception>
         public override void Deserialize(Stream reader)
         {
             base.Deserialize(reader);
@@ -78,6 +109,10 @@ namespace Neo.Core.Blockchain
                 throw new FormatException("The computed Merkle root does not match the expected value.");
         }
 
+        /// <summary>
+        /// Serializes this block to the specified stream, recomputing the Merkle root first.
+        /// </summary>
+        /// <param name="writer">The stream to write to.</param>
         public override void Serialize(Stream writer)
         {
             var txHashes = Transactions

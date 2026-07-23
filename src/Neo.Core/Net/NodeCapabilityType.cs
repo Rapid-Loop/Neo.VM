@@ -22,6 +22,9 @@
 
 namespace Neo.Core.Net
 {
+    /// <summary>
+    /// Identifies a node capability advertised in the P2P version handshake.
+    /// </summary>
     public enum NodeCapabilityType : byte
     {
         #region Servers

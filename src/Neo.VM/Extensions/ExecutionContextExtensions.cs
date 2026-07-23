@@ -25,11 +25,16 @@ using System.Collections.Generic;
 
 namespace Neo.VM.Extensions
 {
+    /// <summary>
+    /// Extension methods for inspecting gas usage across an <see cref="ExecutionContext"/> chain.
+    /// </summary>
     public static class ExecutionContextExtensions
     {
         /// <summary>
-        /// Returns the total GasConsumed across this context and all its parents (call stack).
+        /// Returns the total <see cref="ExecutionContext.GasConsumed"/> across this context and all its parents (call stack).
         /// </summary>
+        /// <param name="context">The leaf context, or <see langword="null"/>.</param>
+        /// <returns>The summed gas consumed along the parent chain.</returns>
         public static long GetTotalGasConsumed(this ExecutionContext? context)
         {
             var total = 0L;
@@ -45,9 +50,11 @@ namespace Neo.VM.Extensions
         }
 
         /// <summary>
-        /// Returns a list of GasConsumed values from bottom (root) to top (current).
+        /// Returns a list of <see cref="ExecutionContext.GasConsumed"/> values from bottom (root) to top (current).
         /// Useful for debugging / logging the full call stack gas usage.
         /// </summary>
+        /// <param name="context">The leaf context, or <see langword="null"/>.</param>
+        /// <returns>Gas-consumed values ordered from root to leaf.</returns>
         public static List<long> GetGasConsumedChain(this ExecutionContext? context)
         {
             var chain = new List<long>();

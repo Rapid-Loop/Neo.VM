@@ -26,10 +26,20 @@ using System.IO;
 
 namespace Neo.Configuration
 {
+    /// <summary>
+    /// Configuration options for blockchain store backups.
+    /// </summary>
     public class BlockchainBackupOptions : JsonModel
     {
+        /// <summary>
+        /// The directory path where backup files are stored.
+        /// Defaults to <c>data/backups</c> under the application base directory.
+        /// </summary>
         public string BackupPath { get; init; } = Path.Combine(AppContext.BaseDirectory, "data", "backups");
 
+        /// <summary>
+        /// The maximum number of backup files to retain. Defaults to 3.
+        /// </summary>
         public int MaxBackups { get; init; } = 3;
     }
 }

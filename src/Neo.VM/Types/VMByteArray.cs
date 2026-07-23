@@ -32,15 +32,26 @@ using System.Numerics;
 
 namespace Neo.VM.Types
 {
+    /// <summary>
+    /// Represents an immutable byte-string stack item (Neo <c>ByteString</c>).
+    /// </summary>
     public class VMByteArray : VMObject, IEquatable<VMByteArray>
     {
+        /// <inheritdoc />
         public override VMObjectType Type => VMObjectType.ByteString;
 
+        /// <summary>
+        /// Gets the length of the byte string in bytes.
+        /// </summary>
         public int Length => _byteCount;
 
         private readonly IMemoryOwner<byte> _memoryOwner;
         private readonly int _byteCount;
 
+        /// <summary>
+        /// Initializes a new byte string by copying the specified data.
+        /// </summary>
+        /// <param name="data">The source bytes.</param>
         public VMByteArray(byte[] data)
         {
             _byteCount = data.Length;
@@ -48,6 +59,10 @@ namespace Neo.VM.Types
             data.AsMemory().TryCopyTo(_memoryOwner.Memory);
         }
 
+        /// <summary>
+        /// Initializes a new byte string by copying the specified memory.
+        /// </summary>
+        /// <param name="data">The source memory.</param>
         public VMByteArray(Memory<byte> data)
         {
             _byteCount = data.Length;
@@ -55,6 +70,10 @@ namespace Neo.VM.Types
             data.TryCopyTo(_memoryOwner.Memory);
         }
 
+        /// <summary>
+        /// Initializes a new byte string by copying the specified span.
+        /// </summary>
+        /// <param name="data">The source bytes.</param>
         public VMByteArray(ReadOnlySpan<byte> data)
         {
             _byteCount = data.Length;
@@ -62,6 +81,10 @@ namespace Neo.VM.Types
             data.TryCopyTo(_memoryOwner.Memory.Span);
         }
 
+        /// <summary>
+        /// Initializes a new byte string by copying the specified span.
+        /// </summary>
+        /// <param name="data">The source bytes.</param>
         public VMByteArray(Span<byte> data)
         {
             _byteCount = data.Length;
@@ -69,6 +92,7 @@ namespace Neo.VM.Types
             data.TryCopyTo(_memoryOwner.Memory.Span);
         }
 
+        /// <inheritdoc />
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
             if (ReferenceEquals(obj, this)) return true;
@@ -76,18 +100,21 @@ namespace Neo.VM.Types
             return Equals(obj as VMByteArray);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return _memoryOwner.Memory[.._byteCount]
                 .ToHashCode(RefCount ^ 397);
         }
 
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             _memoryOwner.Dispose();
             base.Dispose(disposing);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             foreach (var v in _memoryOwner.Memory[.._byteCount].Span)
@@ -99,6 +126,7 @@ namespace Neo.VM.Types
             return CoreUtilities.StrictUtf8Encoding.GetString(_memoryOwner.Memory[.._byteCount].Span);
         }
 
+        /// <inheritdoc />
         public override VMObject Clone()
         {
             var clone = new VMByteArray(_memoryOwner.Memory[.._byteCount].ToArray());
@@ -106,11 +134,13 @@ namespace Neo.VM.Types
             return clone;
         }
 
+        /// <inheritdoc />
         public override bool GetBoolean()
         {
             return !_memoryOwner.Memory[.._byteCount].IsEmpty;
         }
 
+        /// <inheritdoc />
         public override BigInteger GetInteger()
         {
             var span = _memoryOwner.Memory[.._byteCount].Span;
@@ -121,6 +151,7 @@ namespace Neo.VM.Types
             return new(span);
         }
 
+        /// <inheritdoc />
         protected override ReadOnlySpan<byte> ComputeSpan(HashSet<VMObject> visited)
         {
             return _memoryOwner.Memory[.._byteCount].Span;
@@ -135,11 +166,20 @@ namespace Neo.VM.Types
             set => _memoryOwner.Memory[.._byteCount].Span[index] = value;
         }
 
+        /// <summary>
+        /// Returns the byte string as a lowercase hexadecimal string.
+        /// </summary>
+        /// <returns>The hex representation of the data.</returns>
         public string ToHexString()
         {
             return Convert.ToHexStringLower(_memoryOwner.Memory[.._byteCount].Span);
         }
 
+        /// <summary>
+        /// Determines whether this byte string is equal to another.
+        /// </summary>
+        /// <param name="other">The other byte string.</param>
+        /// <returns><see langword="true"/> if the contents are equal; otherwise <see langword="false"/>.</returns>
         public bool Equals([NotNullWhen(true)] VMByteArray? other)
         {
             if (ReferenceEquals(other, this)) return true;
@@ -172,6 +212,9 @@ namespace Neo.VM.Types
             return a.Equals(b);
         }
 
+        /// <summary>
+        /// Inequality comparison.
+        /// </summary>
         public static bool operator !=(VMByteArray a, VMByteArray b) =>
             !(a == b);
     }

@@ -29,6 +29,9 @@ namespace Neo.Core.VM
     /// </summary>
     public sealed class ExecutionEngineLimits
     {
+        /// <summary>
+        /// The default maximum amount of gas that can be consumed by a script execution.
+        /// </summary>
         public const long MaxGas = 20_00000000;
 
         /// <summary>

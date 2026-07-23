@@ -22,8 +22,14 @@
 
 namespace Neo.Core.Cryptography.ECC
 {
+    /// <summary>
+    /// Identifies a supported elliptic curve.
+    /// </summary>
     public enum ECCurveName : byte
     {
+        /// <summary>
+        /// The NIST P-256 / secp256r1 curve.
+        /// </summary>
         SecP256r1 = 0,
     }
 }

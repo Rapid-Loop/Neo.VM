@@ -29,17 +29,24 @@ using System;
 
 namespace Neo.VM.Middleware
 {
+    /// <summary>
+    /// Middleware that logs VM startup, per-opcode execution (at trace level), and completion.
+    /// </summary>
+    /// <param name="sp">Service provider used to resolve the <see cref="VirtualMachineEngine"/>.</param>
+    /// <param name="logger">Logger that receives execution messages.</param>
     public sealed class ExecuteLoggerMiddleware(IServiceProvider sp, ILogger<VirtualMachineEngine> logger) : IEngineMiddleware
     {
         private static readonly decimal s_factor = 1_00000000m;
 
         private VirtualMachineEngine Engine => sp.GetRequiredService<VirtualMachineEngine>();
 
+        /// <inheritdoc />
         public void PostExecute(ExecutionContext? context, ExecuteDelegate next)
         {
             next(context);
         }
 
+        /// <inheritdoc />
         public void PreExecution(ExecutionDelegate next)
         {
             var logLevel = LogLevel.Information;
@@ -61,6 +68,7 @@ namespace Neo.VM.Middleware
             next();
         }
 
+        /// <inheritdoc />
         public void PreExecute(ExecutionContext? context, ExecuteDelegate next)
         {
             var logLevel = LogLevel.Trace;
@@ -81,6 +89,7 @@ namespace Neo.VM.Middleware
             next(context);
         }
 
+        /// <inheritdoc />
         public void PostExecution(ExecutionDelegate next)
         {
             var logLevel = LogLevel.Information;

@@ -24,8 +24,15 @@ using Neo.Core.Interfaces;
 
 namespace Neo.Wallet.Json
 {
+    /// <summary>
+    /// JSON model for a <see cref="Nep6Wallet"/>.
+    /// </summary>
     public class Nep6WalletModel : WalletModel<object, Nep6WalletAccountModel>, IMap<Nep6Wallet>
     {
+        /// <summary>
+        /// Converts this model to a <see cref="Nep6Wallet"/>.
+        /// </summary>
+        /// <returns>A NEP-6 wallet initialized from this model.</returns>
         public Nep6Wallet ToObject() =>
             new(this);
     }

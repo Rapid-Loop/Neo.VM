@@ -27,11 +27,24 @@ using System.Security.Cryptography;
 
 namespace Neo.Core.Factory
 {
+    /// <summary>
+    /// Factory methods for generating random numbers and byte sequences.
+    /// </summary>
     public static class RandomNumberFactory
     {
+        /// <summary>
+        /// Returns a non-negative random <see cref="sbyte"/> less than <see cref="sbyte.MaxValue"/>.
+        /// </summary>
+        /// <returns>A random value in the range [0, <see cref="sbyte.MaxValue"/>).</returns>
         public static sbyte NextSByte() =>
             NextSByte(0, sbyte.MaxValue);
 
+        /// <summary>
+        /// Returns a non-negative random <see cref="sbyte"/> that is less than the specified maximum.
+        /// </summary>
+        /// <param name="maxValue">The exclusive upper bound of the random number to be generated.</param>
+        /// <returns>A random value in the range [0, <paramref name="maxValue"/>).</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxValue"/> is negative.</exception>
         public static sbyte NextSByte(sbyte maxValue)
         {
             if (maxValue < 0)
@@ -40,6 +53,13 @@ namespace Neo.Core.Factory
             return NextSByte(0, maxValue);
         }
 
+        /// <summary>
+        /// Returns a random <see cref="sbyte"/> within the specified range.
+        /// </summary>
+        /// <param name="minValue">The inclusive lower bound of the random number returned.</param>
+        /// <param name="maxValue">The exclusive upper bound of the random number returned.</param>
+        /// <returns>A random value in the range [<paramref name="minValue"/>, <paramref name="maxValue"/>).</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="minValue"/> is greater than <paramref name="maxValue"/>.</exception>
         public static sbyte NextSByte(sbyte minValue, sbyte maxValue)
         {
             if (minValue == maxValue) return maxValue;
@@ -50,12 +70,28 @@ namespace Neo.Core.Factory
             return (sbyte)(NextUInt32((uint)(maxValue - minValue)) + minValue);
         }
 
+        /// <summary>
+        /// Returns a random <see cref="byte"/> less than <see cref="byte.MaxValue"/>.
+        /// </summary>
+        /// <returns>A random value in the range [0, <see cref="byte.MaxValue"/>).</returns>
         public static byte NextByte() =>
             NextByte(0, byte.MaxValue);
 
+        /// <summary>
+        /// Returns a random <see cref="byte"/> that is less than the specified maximum.
+        /// </summary>
+        /// <param name="maxValue">The exclusive upper bound of the random number to be generated.</param>
+        /// <returns>A random value in the range [0, <paramref name="maxValue"/>).</returns>
         public static byte NextByte(byte maxValue) =>
             NextByte(0, maxValue);
 
+        /// <summary>
+        /// Returns a random <see cref="byte"/> within the specified range.
+        /// </summary>
+        /// <param name="minValue">The inclusive lower bound of the random number returned.</param>
+        /// <param name="maxValue">The exclusive upper bound of the random number returned.</param>
+        /// <returns>A random value in the range [<paramref name="minValue"/>, <paramref name="maxValue"/>).</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="minValue"/> is greater than <paramref name="maxValue"/>.</exception>
         public static byte NextByte(byte minValue, byte maxValue)
         {
             if (minValue == maxValue) return maxValue;
@@ -66,9 +102,19 @@ namespace Neo.Core.Factory
             return (byte)(NextUInt32((uint)(maxValue - minValue)) + minValue);
         }
 
+        /// <summary>
+        /// Returns a non-negative random <see cref="short"/> less than <see cref="short.MaxValue"/>.
+        /// </summary>
+        /// <returns>A random value in the range [0, <see cref="short.MaxValue"/>).</returns>
         public static short NextInt16() =>
             NextInt16(0, short.MaxValue);
 
+        /// <summary>
+        /// Returns a non-negative random <see cref="short"/> that is less than the specified maximum.
+        /// </summary>
+        /// <param name="maxValue">The exclusive upper bound of the random number to be generated.</param>
+        /// <returns>A random value in the range [0, <paramref name="maxValue"/>).</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxValue"/> is negative.</exception>
         public static short NextInt16(short maxValue)
         {
             if (maxValue < 0)
@@ -77,6 +123,13 @@ namespace Neo.Core.Factory
             return NextInt16(0, maxValue);
         }
 
+        /// <summary>
+        /// Returns a random <see cref="short"/> within the specified range.
+        /// </summary>
+        /// <param name="minValue">The inclusive lower bound of the random number returned.</param>
+        /// <param name="maxValue">The exclusive upper bound of the random number returned.</param>
+        /// <returns>A random value in the range [<paramref name="minValue"/>, <paramref name="maxValue"/>).</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="minValue"/> is greater than <paramref name="maxValue"/>.</exception>
         public static short NextInt16(short minValue, short maxValue)
         {
             if (minValue == maxValue) return maxValue;
@@ -87,12 +140,28 @@ namespace Neo.Core.Factory
             return (short)(NextUInt32((uint)(maxValue - minValue)) + minValue);
         }
 
+        /// <summary>
+        /// Returns a random <see cref="ushort"/> less than <see cref="ushort.MaxValue"/>.
+        /// </summary>
+        /// <returns>A random value in the range [0, <see cref="ushort.MaxValue"/>).</returns>
         public static ushort NextUInt16() =>
             NextUInt16(0, ushort.MaxValue);
 
+        /// <summary>
+        /// Returns a random <see cref="ushort"/> that is less than the specified maximum.
+        /// </summary>
+        /// <param name="maxValue">The exclusive upper bound of the random number to be generated.</param>
+        /// <returns>A random value in the range [0, <paramref name="maxValue"/>).</returns>
         public static ushort NextUInt16(ushort maxValue) =>
             NextUInt16(0, maxValue);
 
+        /// <summary>
+        /// Returns a random <see cref="ushort"/> within the specified range.
+        /// </summary>
+        /// <param name="minValue">The inclusive lower bound of the random number returned.</param>
+        /// <param name="maxValue">The exclusive upper bound of the random number returned.</param>
+        /// <returns>A random value in the range [<paramref name="minValue"/>, <paramref name="maxValue"/>).</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="minValue"/> is greater than <paramref name="maxValue"/>.</exception>
         public static ushort NextUInt16(ushort minValue, ushort maxValue)
         {
             if (minValue == maxValue) return maxValue;
@@ -103,9 +172,19 @@ namespace Neo.Core.Factory
             return (ushort)(NextUInt32((uint)(maxValue - minValue)) + minValue);
         }
 
+        /// <summary>
+        /// Returns a non-negative random <see cref="int"/> less than <see cref="int.MaxValue"/>.
+        /// </summary>
+        /// <returns>A random value in the range [0, <see cref="int.MaxValue"/>).</returns>
         public static int NextInt32() =>
             NextInt32(0, int.MaxValue);
 
+        /// <summary>
+        /// Returns a non-negative random <see cref="int"/> that is less than the specified maximum.
+        /// </summary>
+        /// <param name="maxValue">The exclusive upper bound of the random number to be generated.</param>
+        /// <returns>A random value in the range [0, <paramref name="maxValue"/>).</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxValue"/> is negative.</exception>
         public static int NextInt32(int maxValue)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(maxValue);
@@ -113,6 +192,13 @@ namespace Neo.Core.Factory
             return NextInt32(0, maxValue);
         }
 
+        /// <summary>
+        /// Returns a random <see cref="int"/> within the specified range.
+        /// </summary>
+        /// <param name="minValue">The inclusive lower bound of the random number returned.</param>
+        /// <param name="maxValue">The exclusive upper bound of the random number returned.</param>
+        /// <returns>A random value in the range [<paramref name="minValue"/>, <paramref name="maxValue"/>).</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="minValue"/> is greater than <paramref name="maxValue"/>.</exception>
         public static int NextInt32(int minValue, int maxValue)
         {
             if (minValue == maxValue) return maxValue;
@@ -122,9 +208,18 @@ namespace Neo.Core.Factory
             return (int)NextUInt32((uint)(maxValue - minValue)) + minValue;
         }
 
+        /// <summary>
+        /// Returns a random <see cref="uint"/> using cryptographic randomness.
+        /// </summary>
+        /// <returns>A random 32-bit unsigned integer.</returns>
         public static uint NextUInt32() =>
             BinaryPrimitives.ReadUInt32LittleEndian(NextBytes(4, true));
 
+        /// <summary>
+        /// Returns a random <see cref="uint"/> that is less than the specified maximum.
+        /// </summary>
+        /// <param name="maxValue">The exclusive upper bound of the random number to be generated.</param>
+        /// <returns>A random value in the range [0, <paramref name="maxValue"/>).</returns>
         public static uint NextUInt32(uint maxValue)
         {
             var randomProduct = (ulong)maxValue * NextUInt32();
@@ -144,6 +239,13 @@ namespace Neo.Core.Factory
             return (uint)(randomProduct >> 32);
         }
 
+        /// <summary>
+        /// Returns a random <see cref="uint"/> within the specified range.
+        /// </summary>
+        /// <param name="minValue">The inclusive lower bound of the random number returned.</param>
+        /// <param name="maxValue">The exclusive upper bound of the random number returned.</param>
+        /// <returns>A random value in the range [<paramref name="minValue"/>, <paramref name="maxValue"/>).</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="minValue"/> is greater than <paramref name="maxValue"/>.</exception>
         public static uint NextUInt32(uint minValue, uint maxValue)
         {
             if (minValue == maxValue) return maxValue;
@@ -153,14 +255,30 @@ namespace Neo.Core.Factory
             return NextUInt32(maxValue - minValue) + minValue;
         }
 
+        /// <summary>
+        /// Returns a non-negative random <see cref="long"/> less than <see cref="long.MaxValue"/>.
+        /// </summary>
+        /// <returns>A random value in the range [0, <see cref="long.MaxValue"/>).</returns>
         public static long NextInt64() =>
             NextInt64(0L, long.MaxValue);
 
+        /// <summary>
+        /// Returns a non-negative random <see cref="long"/> that is less than the specified maximum.
+        /// </summary>
+        /// <param name="maxValue">The exclusive upper bound of the random number to be generated.</param>
+        /// <returns>A random value in the range [0, <paramref name="maxValue"/>).</returns>
         public static long NextInt64(long maxValue)
         {
             return NextInt64(0L, maxValue);
         }
 
+        /// <summary>
+        /// Returns a random <see cref="long"/> within the specified range.
+        /// </summary>
+        /// <param name="minValue">The inclusive lower bound of the random number returned.</param>
+        /// <param name="maxValue">The exclusive upper bound of the random number returned.</param>
+        /// <returns>A random value in the range [<paramref name="minValue"/>, <paramref name="maxValue"/>).</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="minValue"/> is greater than <paramref name="maxValue"/>.</exception>
         public static long NextInt64(long minValue, long maxValue)
         {
             if (minValue == maxValue) return maxValue;
@@ -170,9 +288,18 @@ namespace Neo.Core.Factory
             return (long)NextUInt64((ulong)(maxValue - minValue)) + minValue;
         }
 
+        /// <summary>
+        /// Returns a random <see cref="ulong"/> using cryptographic randomness.
+        /// </summary>
+        /// <returns>A random 64-bit unsigned integer.</returns>
         public static ulong NextUInt64() =>
             BinaryPrimitives.ReadUInt64LittleEndian(NextBytes(8, true));
 
+        /// <summary>
+        /// Returns a random <see cref="ulong"/> that is less than the specified maximum.
+        /// </summary>
+        /// <param name="maxValue">The exclusive upper bound of the random number to be generated.</param>
+        /// <returns>A random value in the range [0, <paramref name="maxValue"/>).</returns>
         public static ulong NextUInt64(ulong maxValue)
         {
             var randomProduct = Math.BigMul(maxValue, NextUInt64(), out var lowPart);
@@ -190,6 +317,13 @@ namespace Neo.Core.Factory
             return randomProduct;
         }
 
+        /// <summary>
+        /// Returns a random <see cref="ulong"/> within the specified range.
+        /// </summary>
+        /// <param name="minValue">The inclusive lower bound of the random number returned.</param>
+        /// <param name="maxValue">The exclusive upper bound of the random number returned.</param>
+        /// <returns>A random value in the range [<paramref name="minValue"/>, <paramref name="maxValue"/>).</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="minValue"/> is greater than <paramref name="maxValue"/>.</exception>
         public static ulong NextUInt64(ulong minValue, ulong maxValue)
         {
             if (minValue == maxValue) return maxValue;
@@ -199,6 +333,13 @@ namespace Neo.Core.Factory
             return NextUInt64(maxValue - minValue) + minValue;
         }
 
+        /// <summary>
+        /// Returns a random <see cref="BigInteger"/> within the specified range.
+        /// </summary>
+        /// <param name="minValue">The inclusive lower bound of the random number returned.</param>
+        /// <param name="maxValue">The exclusive upper bound of the random number returned.</param>
+        /// <returns>A random value in the range [<paramref name="minValue"/>, <paramref name="maxValue"/>).</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="minValue"/> is greater than <paramref name="maxValue"/>.</exception>
         public static BigInteger NextBigInteger(BigInteger minValue, BigInteger maxValue)
         {
             if (minValue == maxValue) return maxValue;
@@ -208,6 +349,12 @@ namespace Neo.Core.Factory
             return NextBigInteger(maxValue - minValue) + minValue;
         }
 
+        /// <summary>
+        /// Returns a non-negative random <see cref="BigInteger"/> that is less than the specified maximum.
+        /// </summary>
+        /// <param name="maxValue">The exclusive upper bound of the random number to be generated.</param>
+        /// <returns>A random value in the range [0, <paramref name="maxValue"/>).</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxValue"/> is negative.</exception>
         public static BigInteger NextBigInteger(BigInteger maxValue)
         {
             if (maxValue.Sign < 0)
@@ -236,6 +383,12 @@ namespace Neo.Core.Factory
             return randomProduct >> maxValueBits;
         }
 
+        /// <summary>
+        /// Returns a non-negative random <see cref="BigInteger"/> with the specified bit length.
+        /// </summary>
+        /// <param name="sizeInBits">The number of bits in the generated value.</param>
+        /// <returns>A random non-negative integer with at most <paramref name="sizeInBits"/> bits.</returns>
+        /// <exception cref="ArgumentException"><paramref name="sizeInBits"/> is negative.</exception>
         public static BigInteger NextBigInteger(int sizeInBits)
         {
             if (sizeInBits < 0)
@@ -255,6 +408,15 @@ namespace Neo.Core.Factory
             return new BigInteger(b);
         }
 
+        /// <summary>
+        /// Returns a random byte array of the specified length.
+        /// </summary>
+        /// <param name="length">The number of random bytes to generate.</param>
+        /// <param name="cryptography">
+        /// <see langword="true"/> to use <see cref="RandomNumberGenerator"/>; otherwise <see cref="Random.Shared"/>.
+        /// </param>
+        /// <returns>A new array filled with random bytes.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="length"/> is negative.</exception>
         public static byte[] NextBytes(int length, bool cryptography = false)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(length, 0, nameof(length));

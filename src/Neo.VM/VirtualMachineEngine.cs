@@ -38,12 +38,24 @@ namespace Neo.VM
     /// </summary>
     public partial class VirtualMachineEngine : IDisposable
     {
+        /// <summary>
+        /// Gets the current execution status of the VM.
+        /// </summary>
         public VMState State { get; internal set; } = VMState.NONE;
 
+        /// <summary>
+        /// Gets the total amount of gas consumed so far during execution.
+        /// </summary>
         public long GasConsumed => _maxGasConsumed;
 
+        /// <summary>
+        /// Gets the remaining gas available before the limit is reached.
+        /// </summary>
         public long GasLeft => _maxGasLimit - _maxGasConsumed;
 
+        /// <summary>
+        /// Gets the maximum gas allowed for this execution.
+        /// </summary>
         public long GasLimit => _maxGasLimit;
 
         /// <summary>
@@ -71,8 +83,14 @@ namespace Neo.VM
         /// </summary>
         public Stack<VMObject> ResultStack { get; } = [];
 
+        /// <summary>
+        /// Gets the exception that caused a <see cref="VMState.FAULT"/>, if any.
+        /// </summary>
         public Exception? FaultException { get; private set; }
 
+        /// <summary>
+        /// Gets the hard fork active for the current persisting block.
+        /// </summary>
         public HardFork ActiveFork => _currentFork;
 
 
@@ -94,6 +112,15 @@ namespace Neo.VM
 
         private long _maxGasConsumed;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VirtualMachineEngine"/> class.
+        /// </summary>
+        /// <param name="persistingBlock">The block being persisted; when <see langword="null"/>, an empty block is used.</param>
+        /// <param name="container">The verifiable container (typically a transaction) that supplies the gas limit.</param>
+        /// <param name="protocolSettings">Protocol settings used to resolve the active hard fork; defaults to <see cref="ProtocolSettings.Default"/>.</param>
+        /// <param name="opCodeTable">The opcode dispatch table; defaults to <see cref="VirtualTable.Default"/>.</param>
+        /// <param name="limits">Execution limits; defaults to <see cref="ExecutionEngineLimits.Default"/>.</param>
+        /// <param name="pipeline">Middleware pipeline; defaults to <see cref="VirtualMachinePipeline.Empty"/>.</param>
         public VirtualMachineEngine(
             Block? persistingBlock = default,
             IVerifiable? container = default,
@@ -112,11 +139,20 @@ namespace Neo.VM
             _pipeline = pipeline ?? VirtualMachinePipeline.Empty;
         }
 
+        /// <summary>
+        /// Releases resources used by the engine.
+        /// </summary>
         public void Dispose()
         {
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Loads a script as a new root <see cref="ExecutionContext"/> and pushes it onto the invocation stack.
+        /// </summary>
+        /// <param name="script">The bytecode to execute.</param>
+        /// <param name="initialPosition">Reserved for future use; the context starts at offset zero.</param>
+        /// <returns>The loaded root execution context.</returns>
         public ExecutionContext LoadScript(byte[] script, int initialPosition = 0)
         {
             var activeFork = _protocolSettings.GetActiveHardFork(_persistingBlock.Index);
@@ -170,6 +206,10 @@ namespace Neo.VM
             context.Cleanup();
         }
 
+        /// <summary>
+        /// Runs the loaded script until completion, a fault, or a breakpoint.
+        /// </summary>
+        /// <returns>The final <see cref="VMState"/> after execution.</returns>
         public VMState Execute()
         {
             _maxGasConsumed = 0;

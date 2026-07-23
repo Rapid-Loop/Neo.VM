@@ -30,6 +30,9 @@ using System.Net;
 
 namespace Neo.Core
 {
+    /// <summary>
+    /// Network and chain protocol parameters for a NEO network.
+    /// </summary>
     public class ProtocolSettings
     {
         /// <summary>
@@ -126,6 +129,11 @@ namespace Neo.Core
             InitialGasDistribution = 52_000_000_00000000ul,
         };
 
+        /// <summary>
+        /// Gets the highest hard fork that is active at the specified block height.
+        /// </summary>
+        /// <param name="blockHeight">The block height to evaluate.</param>
+        /// <returns>The active hard fork at <paramref name="blockHeight"/>.</returns>
         public HardFork GetActiveHardFork(long blockHeight) =>
             HardForks
                 .OrderBy(static o => o.Key)

@@ -24,6 +24,9 @@ using System.IO;
 
 namespace Neo.Core.Serialization
 {
+    /// <summary>
+    /// Defines binary serialization and deserialization for Neo wire and storage types.
+    /// </summary>
     public interface INeoSerializable
     {
         /// <summary>

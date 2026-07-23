@@ -39,12 +39,18 @@ namespace Neo.VM.Builder
 
         private VirtualMachinePipelineBuilder() { }
 
+        /// <summary>
+        /// Creates a new <see cref="VirtualMachinePipelineBuilder"/> instance.
+        /// </summary>
+        /// <returns>A new builder.</returns>
         public static VirtualMachinePipelineBuilder Create() =>
             new();
 
         /// <summary>
         /// Registers a middleware instance.
         /// </summary>
+        /// <param name="middleware">The middleware to register.</param>
+        /// <returns>This builder for chaining.</returns>
         public VirtualMachinePipelineBuilder Use(IEngineMiddleware middleware)
         {
             ArgumentNullException.ThrowIfNull(middleware);
@@ -55,6 +61,8 @@ namespace Neo.VM.Builder
         /// <summary>
         /// Registers a middleware by type (requires parameterless constructor).
         /// </summary>
+        /// <typeparam name="TMiddleware">The middleware type to instantiate and register.</typeparam>
+        /// <returns>This builder for chaining.</returns>
         public VirtualMachinePipelineBuilder UseMiddleware<TMiddleware>()
             where TMiddleware : IEngineMiddleware, new()
         {
@@ -64,6 +72,8 @@ namespace Neo.VM.Builder
         /// <summary>
         /// Registers multiple middleware's at once.
         /// </summary>
+        /// <param name="middlewares">The middleware instances to register, in execution order.</param>
+        /// <returns>This builder for chaining.</returns>
         public VirtualMachinePipelineBuilder Use(IEnumerable<IEngineMiddleware> middlewares)
         {
             foreach (var middleware in middlewares)
@@ -75,6 +85,7 @@ namespace Neo.VM.Builder
         /// <summary>
         /// Builds the final optimized pipeline with separate chains for each hook.
         /// </summary>
+        /// <returns>A pipeline ready for use by <see cref="VirtualMachineEngine"/>.</returns>
         public VirtualMachinePipeline Build()
         {
             var preExecution = BuildExecutionChain(mw => mw.PreExecution);

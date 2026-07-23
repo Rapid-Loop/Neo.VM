@@ -32,30 +32,71 @@ using System.Net;
 
 namespace Neo.Configuration
 {
+    /// <summary>
+    /// JSON-bindable configuration options that map to <see cref="ProtocolSettings"/>.
+    /// </summary>
     public class ProtocolSettingsOptions : JsonModel, IMap<ProtocolSettings>
     {
+        /// <summary>
+        /// The magic number of the NEO network.
+        /// </summary>
         public uint Network { get; set; }
 
+        /// <summary>
+        /// The address version of the NEO system.
+        /// </summary>
         public byte AddressVersion { get; set; }
 
+        /// <summary>
+        /// The time in milliseconds between two blocks.
+        /// </summary>
         public uint MillisecondsPerBlock { get; set; }
 
+        /// <summary>
+        /// The maximum number of transactions that can be contained in a block.
+        /// </summary>
         public uint MaxTransactionsPerBlock { get; set; }
 
+        /// <summary>
+        /// The maximum number of transactions that can be contained in the memory pool.
+        /// </summary>
         public int MemoryPoolMaxTransactions { get; set; }
 
+        /// <summary>
+        /// The maximum number of blocks that can be traced in a smart contract.
+        /// </summary>
         public uint MaxTraceableBlocks { get; set; }
 
+        /// <summary>
+        /// The amount of GAS to distribute during initialization, in datoshi (1 GAS = 1e8 datoshi).
+        /// </summary>
         public ulong InitialGasDistribution { get; set; }
 
+        /// <summary>
+        /// The number of validators in the NEO system.
+        /// </summary>
         public int ValidatorsCount { get; set; }
 
+        /// <summary>
+        /// The default seed node endpoints, or <see langword="null"/> if none are configured.
+        /// </summary>
         public IPEndPoint[]? SeedList { get; set; }
 
+        /// <summary>
+        /// The block heights from which hard forks are activated, or <see langword="null"/> if none are configured.
+        /// </summary>
         public IDictionary<HardFork, uint>? HardForks { get; set; }
 
+        /// <summary>
+        /// The public keys of the standby committee members, or <see langword="null"/> if none are configured.
+        /// </summary>
         public ECPoint[]? StandbyCommittee { get; set; }
 
+        /// <summary>
+        /// Converts these options into a <see cref="ProtocolSettings"/> instance.
+        /// Nullable collections are replaced with empty defaults.
+        /// </summary>
+        /// <returns>A new <see cref="ProtocolSettings"/> populated from this instance.</returns>
         public ProtocolSettings ToObject() =>
             new()
             {

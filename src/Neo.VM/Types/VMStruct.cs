@@ -25,12 +25,22 @@ using System.Collections.Generic;
 
 namespace Neo.VM.Types
 {
+    /// <summary>
+    /// Represents a NeoVM structure: a value-type compound similar to <see cref="VMArray"/>
+    /// that deep-clones its fields when copied.
+    /// </summary>
+    /// <param name="items">The initial field values.</param>
     public class VMStruct(IEnumerable<VMObject> items) : VMArray(items)
     {
+        /// <inheritdoc />
         public override VMObjectType Type => VMObjectType.Struct;
 
+        /// <summary>
+        /// Initializes an empty structure.
+        /// </summary>
         public VMStruct() : this([]) { }
 
+        /// <inheritdoc />
         protected override VMObject CloneCore(Dictionary<VMObject, VMObject> objectMap)
         {
             if (objectMap.TryGetValue(this, out var thisItem)) return thisItem;

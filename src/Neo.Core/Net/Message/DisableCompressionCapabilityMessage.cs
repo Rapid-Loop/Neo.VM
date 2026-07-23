@@ -26,10 +26,19 @@ using System.IO;
 
 namespace Neo.Core.Net.Message
 {
+    /// <summary>
+    /// Advertises that the node does not support P2P payload compression.
+    /// </summary>
     public class DisableCompressionCapabilityMessage : NodeCapabilityMessage
     {
+        /// <summary>
+        /// Gets the capability type (<see cref="NodeCapabilityType.DisableCompression"/>).
+        /// </summary>
         public override NodeCapabilityType Type => NodeCapabilityType.DisableCompression;
 
+        /// <summary>
+        /// Gets the serialized size of this capability in bytes.
+        /// </summary>
         public override int Size =>
             base.Size +
             1;

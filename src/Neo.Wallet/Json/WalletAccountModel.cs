@@ -27,22 +27,47 @@ using System.Text.Json.Serialization;
 
 namespace Neo.Wallet.Json
 {
+    /// <summary>
+    /// Base JSON model for a wallet account.
+    /// </summary>
+    /// <typeparam name="TExtra">The type of account-level extra data.</typeparam>
     public class WalletAccountModel<TExtra> : JsonModel
         where TExtra : class?, new()
     {
+        /// <summary>
+        /// Gets or sets the account address as a script hash.
+        /// </summary>
         [JsonConverter(typeof(JsonStringAddressConverter))]
         public UInt160? Address { get; set; }
 
+        /// <summary>
+        /// Gets or sets an optional human-readable label for the account.
+        /// </summary>
         public string? Label { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this is the default account.
+        /// </summary>
         public bool IsDefault { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the account is locked.
+        /// </summary>
         public bool Lock { get; set; }
 
+        /// <summary>
+        /// Gets or sets the account key material (format depends on the concrete account model).
+        /// </summary>
         public virtual byte[]? Key { get; set; }
 
+        /// <summary>
+        /// Gets or sets the witness contract associated with the account.
+        /// </summary>
         public ContractModel? Contract { get; set; }
 
+        /// <summary>
+        /// Gets or sets optional account-level extra data.
+        /// </summary>
         public TExtra? Extra { get; set; }
     }
 }

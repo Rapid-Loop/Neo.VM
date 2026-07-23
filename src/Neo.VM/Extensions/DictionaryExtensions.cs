@@ -26,8 +26,18 @@ using System.Linq;
 
 namespace Neo.VM.Extensions
 {
+    /// <summary>
+    /// Extension methods for converting dictionaries to VM stack items.
+    /// </summary>
     public static class DictionaryExtensions
     {
+        /// <summary>
+        /// Converts a dictionary into a <see cref="VMMap"/> by mapping each key and value to a <see cref="VMObject"/>.
+        /// </summary>
+        /// <typeparam name="TKey">The dictionary key type.</typeparam>
+        /// <typeparam name="TValue">The dictionary value type.</typeparam>
+        /// <param name="source">The dictionary to convert.</param>
+        /// <returns>A <see cref="VMMap"/> containing the converted entries.</returns>
         public static VMMap ToStackItem<TKey, TValue>(this IDictionary<TKey, TValue> source) =>
             new(
                 source.Select(static kv => new KeyValuePair<VMObject, VMObject>(

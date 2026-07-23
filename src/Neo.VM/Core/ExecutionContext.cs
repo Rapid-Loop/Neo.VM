@@ -28,59 +28,68 @@ using System.Collections.Generic;
 
 namespace Neo.VM.Core
 {
+    /// <summary>
+    /// Represents a single invocation frame: script, instruction pointer, gas budget, and evaluation stack.
+    /// </summary>
     public class ExecutionContext
     {
         /// <summary>
-        /// The script being executed (bytecode)
+        /// Gets the script being executed (bytecode), including a trailing <c>RET</c> appended at construction.
         /// </summary>
         public ReadOnlyMemory<byte> Script => _script;
 
         /// <summary>
-        /// The pointer indicating the current instruction.
+        /// Gets the pointer indicating the current instruction.
         /// </summary>
         public int InstructionPointer { get; internal set; }
 
         /// <summary>
-        /// Returns the current <see cref="OpCodeInst"/>.
+        /// Gets the current <see cref="OpCodeInst"/> at <see cref="InstructionPointer"/>.
         /// </summary>
         public OpCodeInst CurrentInstruction => new(_script[InstructionPointer..]);
 
         /// <summary>
-        /// Returns the next <see cref="OpCodeInst"/>.
+        /// Gets the next <see cref="OpCodeInst"/> after the current instruction.
         /// </summary>
         public OpCodeInst NextInstruction => new(_script[(InstructionPointer + CurrentInstruction.Size)..]);
 
         /// <summary>
-        /// Current stack frame
+        /// Gets the current stack frame that owns the evaluation stack and locals.
         /// </summary>
         public StackFrame Frame { get; }
 
         /// <summary>
-        /// Gas remaining for this execution
+        /// Gets the amount of gas consumed by this context so far.
         /// </summary>
         public long GasConsumed => _maxGasConsumed;
 
         /// <summary>
-        /// Whether this context is currently executing
+        /// Gets a value indicating whether this context is still eligible to execute instructions.
         /// </summary>
         public bool IsExecuting { get; internal set; } = true;
 
         /// <summary>
-        /// Parent context (for nested calls)
+        /// Gets the parent context for nested calls, if any.
         /// </summary>
         public ExecutionContext? Parent => _parentContext;
 
         /// <summary>
-        /// Custom state / context data (e.g., contract storage, runtime)
+        /// Gets a dictionary of custom state objects keyed by type (for example, runtime services).
         /// </summary>
         public Dictionary<Type, object> State { get; } = [];
 
+        /// <summary>
+        /// Gets the hard fork under which this context executes.
+        /// </summary>
         public HardFork HardFork => _fork;
 
+        /// <summary>
+        /// Gets the block height associated with this context.
+        /// </summary>
         public uint BlockHeight => _blockHeight;
 
         /// <summary>
-        /// Invocation stack depth
+        /// Gets the depth of this context in the invocation chain.
         /// </summary>
         public int Depth => _contextDepth;
 
@@ -94,6 +103,15 @@ namespace Neo.VM.Core
         private long _initialGasLeft;
         private long _maxGasConsumed;
 
+        /// <summary>
+        /// Initializes a new execution context for the specified script.
+        /// </summary>
+        /// <param name="script">The bytecode to execute. A trailing <c>RET</c> is appended automatically.</param>
+        /// <param name="fork">The hard fork that determines gas costs and opcode behavior.</param>
+        /// <param name="blockHeight">The block height associated with this execution.</param>
+        /// <param name="initialGas">The gas budget available to this context.</param>
+        /// <param name="depth">The invocation depth of this context.</param>
+        /// <param name="parent">The parent context for nested calls, or <see langword="null"/> for a root context.</param>
         public ExecutionContext(byte[] script, HardFork fork = HardFork.Genesis, uint blockHeight = 0, long initialGas = 1_000000L, int depth = 0, ExecutionContext? parent = null)
         {
             script = [.. script, (byte)OpCode.RET];
@@ -110,16 +128,19 @@ namespace Neo.VM.Core
         }
 
         /// <summary>
-        /// Check if execution should continue
+        /// Determines whether execution should continue for this context.
         /// </summary>
+        /// <returns><see langword="true"/> if the context is active, has remaining script bytes, and has gas remaining.</returns>
         public bool ShouldContinue()
         {
             return IsExecuting && InstructionPointer < Script.Length && _initialGasLeft > 0;
         }
 
         /// <summary>
-        /// Consume gas for an operation
+        /// Attempts to consume the gas cost for the specified opcode.
         /// </summary>
+        /// <param name="opcode">The opcode whose gas cost should be charged.</param>
+        /// <returns><see langword="true"/> if gas was available and deducted; otherwise <see langword="false"/> and execution is stopped.</returns>
         public bool ConsumeGas(OpCode opcode)
         {
             var cost = GasTable.GetGasCost(opcode, HardFork);
@@ -136,62 +157,87 @@ namespace Neo.VM.Core
         }
 
         /// <summary>
-        /// Push value onto current frame's evaluation stack
+        /// Pushes a value onto the current frame's evaluation stack.
         /// </summary>
+        /// <param name="item">The stack item to push.</param>
+        /// <param name="addReferenceItem">Whether to increment the item's reference count.</param>
+        /// <param name="addReferenceChildren">Whether to increment reference counts of child items.</param>
         public void Push(VMObject item, bool addReferenceItem = true, bool addReferenceChildren = true)
         {
             Frame.Push(item, addReferenceItem, addReferenceChildren);
         }
 
         /// <summary>
-        /// Pop value from current frame's evaluation stack
+        /// Pops a value from the current frame's evaluation stack.
         /// </summary>
+        /// <param name="releaseReferenceItem">Whether to release the item's reference count.</param>
+        /// <param name="releaseReferenceChildren">Whether to release reference counts of child items.</param>
+        /// <returns>The popped stack item.</returns>
         public VMObject Pop(bool releaseReferenceItem = true, bool releaseReferenceChildren = true)
         {
             return Frame.Pop(releaseReferenceItem, releaseReferenceChildren);
         }
 
         /// <summary>
-        /// Peek value from current frame's evaluation stack without removing
+        /// Peeks at the top of the current frame's evaluation stack without removing it.
         /// </summary>
+        /// <returns>The top stack item.</returns>
         public VMObject Peek()
         {
             return Frame.Peek();
         }
 
         /// <summary>
-        /// Peek value from current frame's evaluation stack without removing by an index
+        /// Peeks at an item on the evaluation stack by depth without removing it.
         /// </summary>
+        /// <param name="index">Zero-based depth from the top of the stack.</param>
+        /// <returns>The stack item at the specified depth.</returns>
         public VMObject Peek(int index)
         {
             return Frame.Peek(index);
         }
 
+        /// <summary>
+        /// Inserts an item into the evaluation stack at the specified depth.
+        /// </summary>
+        /// <param name="index">Zero-based depth from the top of the stack.</param>
+        /// <param name="item">The item to insert.</param>
         public void Insert(int index, VMObject item)
         {
             Frame.Insert(index, item);
         }
 
+        /// <summary>
+        /// Swaps two items on the evaluation stack by depth.
+        /// </summary>
+        /// <param name="fromIndex">The first depth index.</param>
+        /// <param name="toIndex">The second depth index.</param>
         public void Swap(int fromIndex, int toIndex)
         {
             Frame.Swap(fromIndex, toIndex);
         }
 
+        /// <summary>
+        /// Reverses the order of the top <paramref name="n"/> items on the evaluation stack.
+        /// </summary>
+        /// <param name="n">The number of items from the top to reverse.</param>
         public void Reverse(int n)
         {
             Frame.Reverse(n);
         }
 
         /// <summary>
-        /// Pop value from current frame's evaluation stack at an index
+        /// Removes and returns the evaluation-stack item at the specified depth.
         /// </summary>
+        /// <param name="index">Zero-based depth from the top of the stack.</param>
+        /// <returns>The removed stack item.</returns>
         public VMObject RemoveAt(int index)
         {
             return Frame.RemoveAt(index);
         }
 
         /// <summary>
-        /// Safely clear current frame's evaluation stack and release all references
+        /// Clears the current frame's evaluation stack and releases all references.
         /// </summary>
         public void Clear()
         {
@@ -199,7 +245,7 @@ namespace Neo.VM.Core
         }
 
         /// <summary>
-        /// Clean up this execution context
+        /// Releases stack resources and marks this context as no longer executing.
         /// </summary>
         public void Cleanup()
         {

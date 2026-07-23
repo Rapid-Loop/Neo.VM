@@ -38,9 +38,22 @@ using System.Net;
 
 namespace Neo.Platform.Hosting
 {
+    /// <summary>
+    /// Extension methods that configure Neo platform hosting defaults on <see cref="IHostBuilder"/>.
+    /// </summary>
     public static class HostingExtensions
     {
-
+        /// <summary>
+        /// Registers a command action for a matching System.CommandLine command type.
+        /// </summary>
+        /// <typeparam name="TCommand">The command type expected on the parse result.</typeparam>
+        /// <typeparam name="TCommandAction">The action type resolved from DI and assigned to the command.</typeparam>
+        /// <param name="builder">The host builder.</param>
+        /// <returns>The same <paramref name="builder"/> for chaining.</returns>
+        /// <remarks>
+        /// Requires a <see cref="ParseResult"/> in <see cref="IHostBuilder.Properties"/> whose
+        /// selected command is exactly of type <typeparamref name="TCommand"/>.
+        /// </remarks>
         public static IHostBuilder UseCommandAction<TCommand, TCommandAction>(this IHostBuilder builder)
             where TCommand : Command
             where TCommandAction : CommandLineAction
@@ -61,6 +74,16 @@ namespace Neo.Platform.Hosting
             return builder;
         }
 
+        /// <summary>
+        /// Configures Neo platform host defaults for configuration, logging, lifetime, options, and type converters.
+        /// </summary>
+        /// <param name="builder">The host builder.</param>
+        /// <returns>The same <paramref name="builder"/> for chaining.</returns>
+        /// <remarks>
+        /// Loads JSON configuration from the application base and content root (including environment-specific files),
+        /// registers Neo platform logging, enables development service-provider validation in Development,
+        /// and applies <see cref="UseNeoPlatformLifetime"/> and <see cref="UseNeoPlatformOptions"/>.
+        /// </remarks>
         public static IHostBuilder UseNeoPlatformConfiguration(this IHostBuilder builder)
         {
             // Host Configuration
@@ -163,6 +186,12 @@ namespace Neo.Platform.Hosting
             return builder;
         }
 
+        /// <summary>
+        /// Binds protocol settings from configuration and registers them as a singleton
+        /// <see cref="ProtocolSettings"/> service.
+        /// </summary>
+        /// <param name="builder">The host builder.</param>
+        /// <returns>The same <paramref name="builder"/> for chaining.</returns>
         public static IHostBuilder UseNeoPlatformOptions(this IHostBuilder builder) =>
             builder.ConfigureServices
             (
@@ -174,6 +203,12 @@ namespace Neo.Platform.Hosting
                 }
             );
 
+        /// <summary>
+        /// Registers <see cref="NeoPlatformLifetime"/> as the host lifetime and optionally configures its options.
+        /// </summary>
+        /// <param name="builder">The host builder.</param>
+        /// <param name="configure">Optional callback that configures <see cref="NeoPlatformLifetimeOptions"/>.</param>
+        /// <returns>The same <paramref name="builder"/> for chaining.</returns>
         public static IHostBuilder UseNeoPlatformLifetime(this IHostBuilder builder, Action<NeoPlatformLifetimeOptions>? configure = default) =>
             builder.ConfigureServices(
                 services =>

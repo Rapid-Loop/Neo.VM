@@ -25,10 +25,19 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Neo.Localization.VM
 {
+    /// <summary>
+    /// Resolves localized virtual machine messages from resource files.
+    /// </summary>
     public static class VirtualMachineLocalizer
     {
         private static readonly IStringLocalizer s_localizer = ResourceFactory.Instance.Create(typeof(VirtualMachineLocalizer));
 
+        /// <summary>
+        /// Gets a localized virtual machine message by name, optionally formatting it with the provided arguments.
+        /// </summary>
+        /// <param name="messageName">The resource key of the message, typically from <see cref="VirtualMachineMessageNames"/>.</param>
+        /// <param name="args">Optional format arguments for the message template.</param>
+        /// <returns>The localized message string.</returns>
         [return: NotNullIfNotNull(nameof(s_localizer))]
         public static string GetMessage(string messageName, params object[] args) =>
             s_localizer[messageName, args];

@@ -25,20 +25,39 @@ using System.IO;
 
 namespace Neo.Core.Net.Message
 {
+    /// <summary>
+    /// Advertises that the node listens for TCP peers on a specific port.
+    /// </summary>
     public class ServerCapabilityMessage : NodeCapabilityMessage
     {
+        /// <summary>
+        /// Gets the capability type (<see cref="NodeCapabilityType.TcpServer"/>).
+        /// </summary>
         public override NodeCapabilityType Type => NodeCapabilityType.TcpServer;
 
+        /// <summary>
+        /// Gets the TCP listen port.
+        /// </summary>
         public ushort Port { get; private set; }
 
+        /// <summary>
+        /// Gets the serialized size of this capability in bytes.
+        /// </summary>
         public override int Size =>
             base.Size +
             sizeof(ushort);
 
+        /// <summary>
+        /// Initializes an empty server capability for deserialization.
+        /// </summary>
         public ServerCapabilityMessage()
         {
         }
 
+        /// <summary>
+        /// Initializes a server capability with the specified port.
+        /// </summary>
+        /// <param name="port">The TCP listen port.</param>
         public ServerCapabilityMessage(ushort port)
         {
             Port = port;

@@ -24,8 +24,14 @@ using System.CommandLine;
 
 namespace Neo.Platform.CLI.Commands
 {
+    /// <summary>
+    /// Root command for the Neo Platform CLI.
+    /// </summary>
     internal class ProgramRootCommand : RootCommand
     {
+        /// <summary>
+        /// Initializes the root command and registers subcommands.
+        /// </summary>
         public ProgramRootCommand() : base("Neo Platform Command-line Tool")
         {
             var showCommand = new ShowCommand();

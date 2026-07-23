@@ -28,6 +28,9 @@ using System.Runtime.Versioning;
 
 namespace Neo.Platform.Hosting.Logging
 {
+    /// <summary>
+    /// <see cref="ILoggerProvider"/> that creates <see cref="NeoPlatformLogger"/> instances.
+    /// </summary>
     [UnsupportedOSPlatform("browser")]
     [ProviderAlias("NeoPlatform")]
     internal sealed class NeoPlatformLoggerProvider : ILoggerProvider
@@ -37,6 +40,10 @@ namespace Neo.Platform.Hosting.Logging
 
         private NeoPlatformLoggerOptions _currentConfig;
 
+        /// <summary>
+        /// Initializes a new provider that tracks option changes from the monitor.
+        /// </summary>
+        /// <param name="config">Options monitor for logger configuration.</param>
         public NeoPlatformLoggerProvider(
             IOptionsMonitor<NeoPlatformLoggerOptions> config)
         {
@@ -44,6 +51,11 @@ namespace Neo.Platform.Hosting.Logging
             _onChangeToken = config.OnChange(updatedConfig => _currentConfig = updatedConfig);
         }
 
+        /// <summary>
+        /// Creates or returns a cached logger for the specified category.
+        /// </summary>
+        /// <param name="categoryName">Logger category name.</param>
+        /// <returns>An <see cref="ILogger"/> for the category.</returns>
         public ILogger CreateLogger(string categoryName) =>
             _loggers.GetOrAdd(
                 categoryName,
@@ -54,6 +66,9 @@ namespace Neo.Platform.Hosting.Logging
         private NeoPlatformLoggerOptions GetCurrentConfig() =>
             _currentConfig;
 
+        /// <summary>
+        /// Clears cached loggers and disposes option change subscriptions.
+        /// </summary>
         public void Dispose()
         {
             _loggers.Clear();

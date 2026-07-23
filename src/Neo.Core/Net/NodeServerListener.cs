@@ -44,8 +44,14 @@ namespace Neo.Core.Net
         /// </summary>
         public const int DefaultBacklog = 128;
 
+        /// <summary>
+        /// Gets the currently tracked peer connections.
+        /// </summary>
         public NodeConnection[] Clients => [.. _connections.Keys];
 
+        /// <summary>
+        /// Gets the protocol settings used for accepted and outbound connections.
+        /// </summary>
         public ProtocolSettings ProtocolSettings => _protocolSettings;
 
         /// <summary>
@@ -61,6 +67,9 @@ namespace Neo.Core.Net
             _serverSocket.LocalEndPoint as IPEndPoint
                 ?? throw new InvalidOperationException($"Listener is not bound. Call {nameof(Start)} first.");
 
+        /// <summary>
+        /// Gets a value indicating whether the accept loop has been started.
+        /// </summary>
         public bool IsActive => _isActive != 0;
 
         /// <summary>
@@ -84,6 +93,12 @@ namespace Neo.Core.Net
         private int _isActive;
         private int _disposed;
 
+        /// <summary>
+        /// Initializes a new listener for the specified endpoint.
+        /// </summary>
+        /// <param name="endPoint">The local endpoint to bind when starting.</param>
+        /// <param name="protocolSettings">Optional protocol settings; defaults to <see cref="ProtocolSettings.Default"/>.</param>
+        /// <param name="loggerFactory">Optional logger factory; defaults to a null logger.</param>
         public NodeServerListener(
             IPEndPoint endPoint,
             ProtocolSettings? protocolSettings = default,
@@ -100,6 +115,10 @@ namespace Neo.Core.Net
             _capabilities = CreateLocalCapabilities(endPoint);
         }
 
+        /// <summary>
+        /// Stops listening, disconnects peers, and releases resources.
+        /// </summary>
+        /// <returns>A task that completes when dispose work finishes.</returns>
         public async ValueTask DisposeAsync()
         {
             if (Interlocked.Exchange(ref _disposed, 1) != 0)
@@ -143,11 +162,20 @@ namespace Neo.Core.Net
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Binds the listener and starts accepting connections with <see cref="DefaultBacklog"/>.
+        /// </summary>
         public void Start()
         {
             Start(DefaultBacklog);
         }
 
+        /// <summary>
+        /// Binds the listener and starts accepting connections.
+        /// </summary>
+        /// <param name="backlog">The maximum length of the pending connections queue.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="backlog"/> is less than or equal to zero.</exception>
+        /// <exception cref="ObjectDisposedException">The listener has been disposed.</exception>
         public void Start(int backlog)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(backlog);

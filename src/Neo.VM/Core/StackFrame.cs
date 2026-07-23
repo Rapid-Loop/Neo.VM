@@ -26,40 +26,50 @@ using System.Collections.Generic;
 
 namespace Neo.VM.Core
 {
+    /// <summary>
+    /// Holds the evaluation stack, locals, static fields, and arguments for a single call frame.
+    /// </summary>
+    /// <param name="parent">The parent frame for nested calls, or <see langword="null"/> for a root frame.</param>
     public class StackFrame(StackFrame? parent = default) : IDisposable
     {
         /// <summary>
-        /// The evaluation stack for this frame
+        /// Gets the evaluation stack for this frame.
         /// </summary>
         public Stack<VMObject> EvaluationStack { get; } = [];
 
         /// <summary>
-        /// Local variables for this frame (indexed)
+        /// Gets the local variables for this frame (indexed).
         /// </summary>
         public List<VMObject> LocalVariables { get; } = [];
 
+        /// <summary>
+        /// Gets the static fields associated with this frame.
+        /// </summary>
         public List<VMObject> StaticFields { get; } = [];
 
         /// <summary>
-        /// The list used to store the arguments of the current method.
+        /// Gets the list used to store the arguments of the current method.
         /// </summary>
         public List<VMObject> Arguments { get; } = [];
 
         /// <summary>
-        /// Alternative stack (used by some NeoVM instructions)
+        /// Gets the alternative stack (used by some NeoVM instructions).
         /// </summary>
         public Stack<VMObject> AltStack { get; } = [];
 
         /// <summary>
-        /// Parent frame (for nested calls)
+        /// Gets the parent frame for nested calls.
         /// </summary>
         public StackFrame? Parent { get; } = parent;
 
         /// <summary>
-        /// Whether this frame is currently executing
+        /// Gets a value indicating whether this frame is still active.
         /// </summary>
         public bool IsActive { get; private set; } = true;
 
+        /// <summary>
+        /// Releases stack resources held by this frame.
+        /// </summary>
         public void Dispose()
         {
             Cleanup();
@@ -67,8 +77,11 @@ namespace Neo.VM.Core
         }
 
         /// <summary>
-        /// Push item onto evaluation stack with reference counting
+        /// Pushes an item onto the evaluation stack with optional reference counting.
         /// </summary>
+        /// <param name="item">The item to push.</param>
+        /// <param name="addReferenceItem">Whether to increment the item's reference count.</param>
+        /// <param name="addReferenceChildren">Whether to increment reference counts of child items.</param>
         public void Push(VMObject item, bool addReferenceItem = true, bool addReferenceChildren = true)
         {
             if (addReferenceItem)
@@ -87,8 +100,12 @@ namespace Neo.VM.Core
         }
 
         /// <summary>
-        /// Pop item from evaluation stack and release reference
+        /// Pops an item from the evaluation stack and optionally releases references.
         /// </summary>
+        /// <param name="releaseReferenceItem">Whether to release the item's reference count.</param>
+        /// <param name="releaseReferenceChildren">Whether to release reference counts of child items.</param>
+        /// <returns>The popped item.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the evaluation stack is empty.</exception>
         public VMObject Pop(bool releaseReferenceItem = true, bool releaseReferenceChildren = true)
         {
             if (EvaluationStack.Count == 0)
@@ -112,14 +129,21 @@ namespace Neo.VM.Core
         }
 
         /// <summary>
-        /// Peek from top of evaluation stack without removing by an index
+        /// Peeks at an evaluation-stack item by depth without removing it.
         /// </summary>
+        /// <param name="index">Zero-based depth from the top of the stack.</param>
+        /// <returns>The stack item at the specified depth.</returns>
         public VMObject Peek(int index = 0)
         {
             var list = new List<VMObject>(EvaluationStack); // Copy to list (top is at the end)
             return list[index];
         }
 
+        /// <summary>
+        /// Inserts an item into the evaluation stack at the specified depth.
+        /// </summary>
+        /// <param name="index">Zero-based depth from the top of the stack.</param>
+        /// <param name="item">The item to insert.</param>
         public void Insert(int index, VMObject item)
         {
             var list = new List<VMObject>(EvaluationStack); // Copy to list (top is at the end)
@@ -136,6 +160,11 @@ namespace Neo.VM.Core
             item.AddReference();
         }
 
+        /// <summary>
+        /// Swaps two items on the evaluation stack by depth.
+        /// </summary>
+        /// <param name="fromIndex">The first depth index.</param>
+        /// <param name="toIndex">The second depth index.</param>
         public void Swap(int fromIndex, int toIndex)
         {
             if (fromIndex == toIndex) return;
@@ -151,6 +180,11 @@ namespace Neo.VM.Core
             list.Clear();
         }
 
+        /// <summary>
+        /// Reverses the order of the top <paramref name="n"/> items on the evaluation stack.
+        /// </summary>
+        /// <param name="n">The number of items from the top to reverse.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="n"/> is outside the stack bounds.</exception>
         public void Reverse(int n)
         {
             var list = new List<VMObject>(EvaluationStack); // Copy to list (top is at the end)
@@ -171,6 +205,11 @@ namespace Neo.VM.Core
         }
 
 
+        /// <summary>
+        /// Removes and returns the evaluation-stack item at the specified depth.
+        /// </summary>
+        /// <param name="index">Zero-based depth from the top of the stack.</param>
+        /// <returns>The removed item.</returns>
         public VMObject RemoveAt(int index)
         {
             var list = new List<VMObject>(EvaluationStack); // Copy to list (top is at the end)
@@ -189,7 +228,7 @@ namespace Neo.VM.Core
         }
 
         /// <summary>
-        /// Safely clear a evaluation stack and release all references
+        /// Clears the evaluation stack and releases all references.
         /// </summary>
         public void Clear()
         {
@@ -200,6 +239,10 @@ namespace Neo.VM.Core
             }
         }
 
+        /// <summary>
+        /// Ensures the local-variable list has at least the specified number of slots, filling with <see cref="VMNull.Instance"/>.
+        /// </summary>
+        /// <param name="count">The required number of local slots.</param>
         public void InitLocalVariables(int count)
         {
             while (LocalVariables.Count < count)
@@ -207,8 +250,10 @@ namespace Neo.VM.Core
         }
 
         /// <summary>
-        /// Set local variable at index (with proper ref counting)
+        /// Sets the local variable at the specified index, updating reference counts.
         /// </summary>
+        /// <param name="index">The local-variable index.</param>
+        /// <param name="value">The value to store.</param>
         public void SetLocalVariable(int index, VMObject value)
         {
             // Expand locals list if needed
@@ -223,12 +268,21 @@ namespace Neo.VM.Core
             LocalVariables[index] = value;
         }
 
+        /// <summary>
+        /// Ensures the static-field list has at least the specified number of slots, filling with <see cref="VMNull.Instance"/>.
+        /// </summary>
+        /// <param name="count">The required number of static-field slots.</param>
         public void InitStaticFields(int count)
         {
             while (StaticFields.Count < count)
                 StaticFields.Add(VMNull.Instance);
         }
 
+        /// <summary>
+        /// Sets the static field at the specified index, updating reference counts.
+        /// </summary>
+        /// <param name="index">The static-field index.</param>
+        /// <param name="value">The value to store.</param>
         public void SetStaticField(int index, VMObject value)
         {
             StaticFields[index]?.Release();
@@ -238,12 +292,21 @@ namespace Neo.VM.Core
             StaticFields[index] = value;
         }
 
+        /// <summary>
+        /// Ensures the argument list has at least the specified number of slots, filling with <see cref="VMNull.Instance"/>.
+        /// </summary>
+        /// <param name="count">The required number of argument slots.</param>
         public void InitArguments(int count)
         {
             while (Arguments.Count < count)
                 Arguments.Add(VMNull.Instance);
         }
 
+        /// <summary>
+        /// Sets the argument at the specified index, updating reference counts.
+        /// </summary>
+        /// <param name="index">The argument index.</param>
+        /// <param name="value">The value to store.</param>
         public void SetArguments(int index, VMObject value)
         {
             while (Arguments.Count < index)
@@ -257,26 +320,39 @@ namespace Neo.VM.Core
         }
 
         /// <summary>
-        /// Get local variable at index
+        /// Gets the local variable at the specified index, or <see cref="VMNull.Instance"/> if out of range.
         /// </summary>
+        /// <param name="index">The local-variable index.</param>
+        /// <returns>The local value, or null when the index is invalid.</returns>
         public VMObject GetLocal(int index)
         {
             return (index >= 0 && index < LocalVariables.Count) ? LocalVariables[index] : VMNull.Instance;
         }
 
+        /// <summary>
+        /// Gets the static field at the specified index, or <see cref="VMNull.Instance"/> if out of range.
+        /// </summary>
+        /// <param name="index">The static-field index.</param>
+        /// <returns>The static-field value, or null when the index is invalid.</returns>
         public VMObject GetStaticFields(int index)
         {
             return (index >= 0 && index < StaticFields.Count) ? StaticFields[index] : VMNull.Instance;
         }
 
+        /// <summary>
+        /// Gets the argument at the specified index, or <see cref="VMNull.Instance"/> if out of range.
+        /// </summary>
+        /// <param name="index">The argument index.</param>
+        /// <returns>The argument value, or null when the index is invalid.</returns>
         public VMObject GetArguments(int index)
         {
             return (index >= 0 && index < Arguments.Count) ? Arguments[index] : VMNull.Instance;
         }
 
         /// <summary>
-        /// Checks if this stack frame contains any circular references
+        /// Determines whether this stack frame contains any circular references among its stack items.
         /// </summary>
+        /// <returns><see langword="true"/> if a cycle is detected; otherwise <see langword="false"/>.</returns>
         public bool HasCircularReference()
         {
             var visited = new HashSet<VMObject>(ReferenceEqualityComparer.Instance);
@@ -284,7 +360,7 @@ namespace Neo.VM.Core
         }
 
         /// <summary>
-        /// Clean up this frame (release all references)
+        /// Releases all references held by this frame and marks it inactive.
         /// </summary>
         public void Cleanup()
         {

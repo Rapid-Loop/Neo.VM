@@ -30,12 +30,25 @@ using System.Text.Json.Serialization;
 
 namespace Neo.Wallet.Json
 {
+    /// <summary>
+    /// JSON model for a <see cref="DevWalletAccount"/>, storing the private key as hex.
+    /// </summary>
     public class DevWalletAccountModel : WalletAccountModel<ProtocolSettingsOptions>, IMap<DevWalletAccount>
     {
+        /// <summary>
+        /// Gets or sets the private key bytes, serialized as a hex string.
+        /// </summary>
         [JsonConverter(typeof(JsonStringHexFormatConverter))]
         public override byte[]? Key { get => base.Key; set => base.Key = value; }
 
         // TODO: Add support for MultiSigAddresses
+        /// <summary>
+        /// Converts this model to a <see cref="DevWalletAccount"/>.
+        /// </summary>
+        /// <returns>
+        /// A signature account when <see cref="Key"/> is present; otherwise a contract or watch-only account.
+        /// </returns>
+        /// <exception cref="InvalidOperationException">Thrown when creating a keyless account without an address.</exception>
         public DevWalletAccount ToObject() =>
             (Key is not null && Key.Length > 0)
             ? new(

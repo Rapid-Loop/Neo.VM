@@ -26,19 +26,39 @@ using System.Text.Json.Serialization;
 
 namespace Neo.Wallet.Json
 {
+    /// <summary>
+    /// Base JSON model for a wallet file.
+    /// </summary>
+    /// <typeparam name="TExtras">The type of wallet-level extra data.</typeparam>
+    /// <typeparam name="TAccountModel">The type of account model entries.</typeparam>
     public class WalletModel<TExtras, TAccountModel> : JsonModel
         where TExtras : class?, new()
         where TAccountModel : class?, new()
     {
+        /// <summary>
+        /// Gets or sets the optional display name of the wallet.
+        /// </summary>
         public string? Name { get; set; }
 
+        /// <summary>
+        /// Gets or sets the wallet format version.
+        /// </summary>
         public Version? Version { get; set; }
 
+        /// <summary>
+        /// Gets or sets the SCrypt parameters used for key derivation.
+        /// </summary>
         [JsonPropertyName("scrypt")]
         public SCryptModel? SCrypt { get; set; }
 
+        /// <summary>
+        /// Gets or sets the accounts contained in the wallet.
+        /// </summary>
         public TAccountModel[]? Accounts { get; set; }
 
+        /// <summary>
+        /// Gets or sets optional wallet-level extra data.
+        /// </summary>
         public TExtras? Extra { get; set; }
     }
 }

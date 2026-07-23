@@ -22,6 +22,9 @@
 
 namespace Neo.Core.VM.SmartContract
 {
+    /// <summary>
+    /// Describes the expected parameter or return type of a smart-contract method.
+    /// </summary>
     public enum MethodParameterType : byte
     {
         /// <summary>

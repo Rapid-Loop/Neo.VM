@@ -25,8 +25,17 @@ using System.Numerics;
 
 namespace Neo.Core.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for integer types.
+    /// </summary>
     public static class IntegerExtensions
     {
+        /// <summary>
+        /// Gets the number of bytes required to encode the value as a Bitcoin-style compact size integer.
+        /// </summary>
+        /// <typeparam name="T">The integer type.</typeparam>
+        /// <param name="value">The value to measure.</param>
+        /// <returns>The encoded size in bytes (1, 3, 5, or 9).</returns>
         public static byte GetCompactSize<T>(this T value)
             where T : unmanaged, IBinaryInteger<T> =>
             Convert.ToUInt64(value) switch

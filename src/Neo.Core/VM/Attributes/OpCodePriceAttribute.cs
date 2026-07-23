@@ -30,8 +30,14 @@ namespace Neo.Core.VM.Attributes
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     public class OpCodePriceAttribute : Attribute
     {
+        /// <summary>
+        /// The hard fork from which this price applies.
+        /// </summary>
         public required HardFork HardFork { get; init; }
 
+        /// <summary>
+        /// The gas cost of the opcode at the specified hard fork.
+        /// </summary>
         public required long Cost { get; init; }
     }
 }

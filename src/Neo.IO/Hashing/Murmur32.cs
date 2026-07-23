@@ -26,6 +26,9 @@ using System.Text;
 
 namespace Neo.IO.Hashing
 {
+    /// <summary>
+    /// Implements the 32-bit MurmurHash3 non-cryptographic hash algorithm.
+    /// </summary>
     public sealed class Murmur32 : NonCryptographicHashAlgorithm
     {
         private const uint DefaultSeed = 0xdeadc0deu;
@@ -54,9 +57,21 @@ namespace Neo.IO.Hashing
             _hash = _seed;
         }
 
+        /// <summary>
+        /// Computes the 32-bit MurmurHash3 of the specified data.
+        /// </summary>
+        /// <param name="data">The input data to hash.</param>
+        /// <param name="seed">The hash seed. Defaults to a fixed non-zero seed.</param>
+        /// <returns>A 4-byte array containing the hash digest.</returns>
         public static byte[] Hash(byte[] data, uint seed = DefaultSeed) =>
             Hash(data.AsSpan(), seed);
 
+        /// <summary>
+        /// Computes the 32-bit MurmurHash3 of the specified data.
+        /// </summary>
+        /// <param name="data">The input data to hash.</param>
+        /// <param name="seed">The hash seed. Defaults to a fixed non-zero seed.</param>
+        /// <returns>A 4-byte array containing the hash digest.</returns>
         public static byte[] Hash(ReadOnlySpan<byte> data, uint seed = DefaultSeed)
         {
             var hasher = new Murmur32(seed);
@@ -64,24 +79,52 @@ namespace Neo.IO.Hashing
             return hasher.GetCurrentHash();
         }
 
+        /// <summary>
+        /// Computes the 32-bit MurmurHash3 of the UTF-8 encoding of the specified text.
+        /// </summary>
+        /// <param name="text">The text to hash.</param>
+        /// <param name="seed">The hash seed. Defaults to a fixed non-zero seed.</param>
+        /// <returns>A 4-byte array containing the hash digest.</returns>
         public static byte[] Hash(string text, uint seed = DefaultSeed)
         {
             var bytes = Encoding.UTF8.GetBytes(text);
             return Hash(bytes, seed);
         }
 
+        /// <summary>
+        /// Computes the 32-bit MurmurHash3 of the specified data and returns it as a <see cref="uint"/>.
+        /// </summary>
+        /// <param name="data">The input data to hash.</param>
+        /// <param name="seed">The hash seed. Defaults to a fixed non-zero seed.</param>
+        /// <returns>The hash digest as a <see cref="uint"/>.</returns>
         public static uint HashToUInt32(byte[] data, uint seed = DefaultSeed) =>
             HashToUInt32(data.AsSpan(), seed);
 
+        /// <summary>
+        /// Computes the 32-bit MurmurHash3 of the specified data and returns it as a <see cref="uint"/>.
+        /// </summary>
+        /// <param name="data">The input data to hash.</param>
+        /// <param name="seed">The hash seed. Defaults to a fixed non-zero seed.</param>
+        /// <returns>The hash digest as a <see cref="uint"/>.</returns>
         public static uint HashToUInt32(ReadOnlySpan<byte> data, uint seed = DefaultSeed) =>
             BitConverter.ToUInt32(Hash(data, seed), 0);
 
+        /// <summary>
+        /// Computes the 32-bit MurmurHash3 of the UTF-8 encoding of the specified text and returns it as a <see cref="uint"/>.
+        /// </summary>
+        /// <param name="text">The text to hash.</param>
+        /// <param name="seed">The hash seed. Defaults to a fixed non-zero seed.</param>
+        /// <returns>The hash digest as a <see cref="uint"/>.</returns>
         public static uint HashToUInt32(string text, uint seed = DefaultSeed)
         {
             var bytes = Encoding.UTF8.GetBytes(text);
             return HashToUInt32(bytes, seed);
         }
 
+        /// <summary>
+        /// Appends data to the hash computation.
+        /// </summary>
+        /// <param name="source">The data to include in the hash.</param>
         public override void Append(ReadOnlySpan<byte> source)
         {
             _length += (uint)source.Length;
@@ -120,6 +163,9 @@ namespace Neo.IO.Hashing
             }
         }
 
+        /// <summary>
+        /// Resets the hasher to its initial state.
+        /// </summary>
         public override void Reset()
         {
             _hash = 0;

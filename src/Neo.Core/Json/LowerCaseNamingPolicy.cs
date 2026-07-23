@@ -24,8 +24,16 @@ using System.Text.Json;
 
 namespace Neo.Core.Json
 {
+    /// <summary>
+    /// A JSON naming policy that converts property names to lower case.
+    /// </summary>
     public class LowerCaseNamingPolicy : JsonNamingPolicy
     {
+        /// <summary>
+        /// Converts the specified property name to lower case using the invariant culture.
+        /// </summary>
+        /// <param name="name">The property name to convert.</param>
+        /// <returns>The lower-case property name.</returns>
         public override string ConvertName(string name) =>
             name.ToLowerInvariant();
     }

@@ -31,20 +31,38 @@ using System.Numerics;
 
 namespace Neo.VM.Types
 {
+    /// <summary>
+    /// Represents a code pointer stack item: a script image plus an instruction position.
+    /// </summary>
     public class VMPointer : VMObject, IEquatable<VMPointer>
     {
+        /// <inheritdoc />
         public override VMObjectType Type => VMObjectType.Pointer;
 
+        /// <summary>
+        /// Gets the script bytes associated with this pointer.
+        /// </summary>
         public ReadOnlyMemory<byte> Script => _memoryOwner.Memory[.._byteCount];
 
+        /// <summary>
+        /// Gets the length of the script in bytes.
+        /// </summary>
         public int Length => _byteCount;
 
+        /// <summary>
+        /// Gets the instruction position within the script.
+        /// </summary>
         public int Position => _ip;
 
         private readonly IMemoryOwner<byte> _memoryOwner;
         private readonly int _ip = 0;
         private readonly int _byteCount;
 
+        /// <summary>
+        /// Initializes a new pointer from a script array and instruction position.
+        /// </summary>
+        /// <param name="script">The script bytecode.</param>
+        /// <param name="ip">The instruction pointer offset.</param>
         public VMPointer(byte[] script, int ip)
         {
             _ip = ip;
@@ -53,6 +71,11 @@ namespace Neo.VM.Types
             script.AsMemory().TryCopyTo(_memoryOwner.Memory);
         }
 
+        /// <summary>
+        /// Initializes a new pointer from script memory and instruction position.
+        /// </summary>
+        /// <param name="script">The script bytecode.</param>
+        /// <param name="ip">The instruction pointer offset.</param>
         public VMPointer(Memory<byte> script, int ip)
         {
             _ip = ip;
@@ -61,6 +84,11 @@ namespace Neo.VM.Types
             script.TryCopyTo(_memoryOwner.Memory);
         }
 
+        /// <summary>
+        /// Initializes a new pointer from script memory and instruction position.
+        /// </summary>
+        /// <param name="script">The script bytecode.</param>
+        /// <param name="ip">The instruction pointer offset.</param>
         public VMPointer(ReadOnlyMemory<byte> script, int ip)
         {
             _ip = ip;
@@ -69,6 +97,11 @@ namespace Neo.VM.Types
             script.TryCopyTo(_memoryOwner.Memory);
         }
 
+        /// <summary>
+        /// Initializes a new pointer from a <see cref="VMByteArray"/> script and instruction position.
+        /// </summary>
+        /// <param name="script">The script as a byte-string stack item.</param>
+        /// <param name="ip">The instruction pointer offset.</param>
         public VMPointer(VMByteArray script, int ip)
         {
             _ip = ip;
@@ -77,6 +110,11 @@ namespace Neo.VM.Types
             script.AsSpan().TryCopyTo(_memoryOwner.Memory.Span);
         }
 
+        /// <summary>
+        /// Determines whether this pointer is equal to another pointer.
+        /// </summary>
+        /// <param name="other">The other pointer.</param>
+        /// <returns><see langword="true"/> if the script and position match; otherwise <see langword="false"/>.</returns>
         public bool Equals(VMPointer? other)
         {
             if (ReferenceEquals(other, this)) return true;
@@ -89,6 +127,7 @@ namespace Neo.VM.Types
                 .SequenceEqual(other._memoryOwner.Memory[..other._byteCount].Span);
         }
 
+        /// <inheritdoc />
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
             if (ReferenceEquals(obj, this)) return true;
@@ -96,6 +135,7 @@ namespace Neo.VM.Types
             return Equals(obj as VMPointer);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return (31 * _ip) ^
@@ -103,6 +143,7 @@ namespace Neo.VM.Types
                 .ToHashCode(RefCount ^ 397);
         }
 
+        /// <inheritdoc />
         public override VMObject Clone()
         {
             var clone = new VMPointer(_memoryOwner.Memory[.._byteCount].ToArray(), _ip);
@@ -110,17 +151,20 @@ namespace Neo.VM.Types
             return clone;
         }
 
+        /// <inheritdoc />
         public override bool GetBoolean()
         {
             return true;
         }
 
+        /// <inheritdoc />
         [DoesNotReturn]
         public override BigInteger GetInteger()
         {
             throw new InvalidOperationException($"Cannot convert {Type} to integer");
         }
 
+        /// <inheritdoc />
         protected override ReadOnlySpan<byte> ComputeSpan(HashSet<VMObject> visited)
         {
             return _memoryOwner.Memory[.._byteCount].Span;

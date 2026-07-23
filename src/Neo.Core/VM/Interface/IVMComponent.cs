@@ -24,9 +24,19 @@ using System;
 
 namespace Neo.Core.VM.Interface
 {
+    /// <summary>
+    /// Represents a disposable VM component that tracks size and reference count.
+    /// </summary>
     public interface IVMComponent : IDisposable
     {
+        /// <summary>
+        /// Gets the size of the component in bytes for stack and limit accounting.
+        /// </summary>
         int Size { get; }
+
+        /// <summary>
+        /// Gets the current reference count of the component.
+        /// </summary>
         int RefCount { get; }
     }
 }

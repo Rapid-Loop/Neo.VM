@@ -22,6 +22,9 @@
 
 namespace Neo.Core.Blockchain
 {
+    /// <summary>
+    /// Identifies the type of a <see cref="TransactionAttribute"/>.
+    /// </summary>
     public enum TransactionAttributeType : byte
     {
         /// <summary>

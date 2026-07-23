@@ -25,14 +25,31 @@ using System.Linq;
 
 namespace Neo.Core.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for list types.
+    /// </summary>
     public static class ListExtensions
     {
+        /// <summary>
+        /// Computes a stable integer hash code over the list elements.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the list elements.</typeparam>
+        /// <param name="source">The list to hash.</param>
+        /// <param name="seed">The initial hash seed.</param>
+        /// <returns>An integer hash code derived from the list contents.</returns>
         public static int ToHashCode<TSource>(this IList<TSource> source, int seed = 397) =>
             source.Aggregate(seed,
                 (hash, b) =>
                         unchecked((hash * 31) ^ (b?.GetHashCode() ?? 0))
                 );
 
+        /// <summary>
+        /// Computes a stable integer hash code over the read-only list elements.
+        /// </summary>
+        /// <typeparam name="TSource">The type of the list elements.</typeparam>
+        /// <param name="source">The list to hash.</param>
+        /// <param name="seed">The initial hash seed.</param>
+        /// <returns>An integer hash code derived from the list contents.</returns>
         public static int ToHashCode<TSource>(this IReadOnlyList<TSource> source, int seed = 397) =>
             source.Aggregate(seed,
                 (hash, b) =>

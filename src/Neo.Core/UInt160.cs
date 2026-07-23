@@ -51,6 +51,9 @@ namespace Neo.Core
         [FieldOffset(8)] private ulong _value2;
         [FieldOffset(16)] private uint _value3;
 
+        /// <summary>
+        /// Gets the serialized size of this value in bytes.
+        /// </summary>
         public int Size => Length;
 
         /// <summary>
@@ -71,12 +74,26 @@ namespace Neo.Core
             value.CopyTo(span);
         }
 
+        /// <summary>
+        /// Compares this instance to a specified object.
+        /// </summary>
+        /// <param name="obj">An object to compare, or <see langword="null"/>.</param>
+        /// <returns>
+        /// A signed integer that indicates the relative order of this instance and <paramref name="obj"/>.
+        /// </returns>
         public int CompareTo(object? obj)
         {
             if (ReferenceEquals(obj, this)) return 0;
             return CompareTo(obj as UInt160);
         }
 
+        /// <summary>
+        /// Compares this instance to another <see cref="UInt160"/>.
+        /// </summary>
+        /// <param name="other">An <see cref="UInt160"/> to compare.</param>
+        /// <returns>
+        /// A signed integer that indicates the relative order of this instance and <paramref name="other"/>.
+        /// </returns>
         public int CompareTo(UInt160? other)
         {
             if (other is null) return 1;
@@ -87,6 +104,10 @@ namespace Neo.Core
             return _value1.CompareTo(other._value1);
         }
 
+        /// <summary>
+        /// Deserializes this value from the specified stream.
+        /// </summary>
+        /// <param name="reader">The stream to read from.</param>
         public void Deserialize(Stream reader)
         {
             _value1 = reader.Read<ulong>();
@@ -94,12 +115,22 @@ namespace Neo.Core
             _value3 = reader.Read<uint>();
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current <see cref="UInt160"/>.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current instance.</param>
+        /// <returns><see langword="true"/> if the objects are equal; otherwise, <see langword="false"/>.</returns>
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
             if (ReferenceEquals(obj, this)) return true;
             return Equals(obj as UInt160);
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="UInt160"/> is equal to the current instance.
+        /// </summary>
+        /// <param name="other">The <see cref="UInt160"/> to compare with the current instance.</param>
+        /// <returns><see langword="true"/> if the values are equal; otherwise, <see langword="false"/>.</returns>
         public bool Equals(UInt160? other)
         {
             if (other == null) return false;
@@ -108,6 +139,10 @@ namespace Neo.Core
                 _value3 == other._value3;
         }
 
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>A hash code for the current <see cref="UInt160"/>.</returns>
         public override int GetHashCode()
         {
             unchecked
@@ -122,6 +157,10 @@ namespace Neo.Core
             }
         }
 
+        /// <summary>
+        /// Serializes this value to the specified stream.
+        /// </summary>
+        /// <param name="writer">The stream to write to.</param>
         public void Serialize(Stream writer)
         {
             writer.Write(_value1);
@@ -129,6 +168,10 @@ namespace Neo.Core
             writer.Write(_value3);
         }
 
+        /// <summary>
+        /// Returns the hex string representation of this value with a <c>0x</c> prefix.
+        /// </summary>
+        /// <returns>A hex string of this <see cref="UInt160"/>.</returns>
         public override string ToString()
         {
             return "0x" + Convert.ToHexStringLower([.. this.ToArray().Reverse()]);
@@ -173,16 +216,27 @@ namespace Neo.Core
             return new UInt160([.. Convert.FromHexString(data).Reverse()]);
         }
 
+        /// <summary>
+        /// Implicitly converts a hex string to a <see cref="UInt160"/>.
+        /// </summary>
+        /// <param name="s">A hex string representation of a <see cref="UInt160"/>.</param>
         public static implicit operator UInt160(string s)
         {
             return Parse(s);
         }
 
+        /// <summary>
+        /// Implicitly converts a 20-byte array to a <see cref="UInt160"/>.
+        /// </summary>
+        /// <param name="b">The little-endian 20-byte value.</param>
         public static implicit operator UInt160(byte[] b)
         {
             return new UInt160(b);
         }
 
+        /// <summary>
+        /// Determines whether two <see cref="UInt160"/> values are equal.
+        /// </summary>
         public static bool operator ==(UInt160? left, UInt160? right)
         {
             if (left is null || right is null)
@@ -190,6 +244,9 @@ namespace Neo.Core
             return left.Equals(right);
         }
 
+        /// <summary>
+        /// Determines whether two <see cref="UInt160"/> values are not equal.
+        /// </summary>
         public static bool operator !=(UInt160? left, UInt160? right)
         {
             if (left is null || right is null)
@@ -197,21 +254,33 @@ namespace Neo.Core
             return !left.Equals(right);
         }
 
+        /// <summary>
+        /// Determines whether one <see cref="UInt160"/> is greater than another.
+        /// </summary>
         public static bool operator >(UInt160 left, UInt160 right)
         {
             return left.CompareTo(right) > 0;
         }
 
+        /// <summary>
+        /// Determines whether one <see cref="UInt160"/> is greater than or equal to another.
+        /// </summary>
         public static bool operator >=(UInt160 left, UInt160 right)
         {
             return left.CompareTo(right) >= 0;
         }
 
+        /// <summary>
+        /// Determines whether one <see cref="UInt160"/> is less than another.
+        /// </summary>
         public static bool operator <(UInt160 left, UInt160 right)
         {
             return left.CompareTo(right) < 0;
         }
 
+        /// <summary>
+        /// Determines whether one <see cref="UInt160"/> is less than or equal to another.
+        /// </summary>
         public static bool operator <=(UInt160 left, UInt160 right)
         {
             return left.CompareTo(right) <= 0;

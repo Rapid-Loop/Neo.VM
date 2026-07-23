@@ -32,8 +32,14 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Neo.Platform.Storage
 {
+    /// <summary>
+    /// Point-in-time RocksDB snapshot that stages writes in a batch until <see cref="Commit"/>.
+    /// </summary>
     public class BlockchainStoreSnapshot : IEnumerable<KeyValuePair<byte[], byte[]>>, IStoreSnapshot
     {
+        /// <summary>
+        /// Gets the store that produced this snapshot.
+        /// </summary>
         public IStore Store => _store;
 
         private readonly IStore _store;
@@ -45,6 +51,12 @@ namespace Neo.Platform.Storage
         private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _logger;
 
+        /// <summary>
+        /// Creates a new snapshot over the given store and RocksDB instance.
+        /// </summary>
+        /// <param name="store">The parent store associated with this snapshot.</param>
+        /// <param name="db">The open RocksDB database.</param>
+        /// <param name="loggerFactory">Optional logger factory. When omitted, a null logger is used.</param>
         public BlockchainStoreSnapshot(
             IStore store,
             RocksDb db,
@@ -61,6 +73,9 @@ namespace Neo.Platform.Storage
             _writeBatch = new();
         }
 
+        /// <summary>
+        /// Releases the RocksDB snapshot, read options, and write batch.
+        /// </summary>
         public void Dispose()
         {
             _snapshot.Dispose();
@@ -69,6 +84,9 @@ namespace Neo.Platform.Storage
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Applies all staged write-batch changes to the database.
+        /// </summary>
         public void Commit()
         {
             var logLevel = LogLevel.Debug;
@@ -79,6 +97,11 @@ namespace Neo.Platform.Storage
             _db.Write(_writeBatch);
         }
 
+        /// <summary>
+        /// Determines whether <paramref name="key"/> is present as of this snapshot.
+        /// </summary>
+        /// <param name="key">The storage key.</param>
+        /// <returns><see langword="true"/> if the key exists; otherwise, <see langword="false"/>.</returns>
         public bool ContainsKey(ReadOnlySpan<byte> key)
         {
             if (_db.KeyMayExist(key))
@@ -86,12 +109,24 @@ namespace Neo.Platform.Storage
             return false;
         }
 
+        /// <summary>
+        /// Creates a backup handle for the underlying store.
+        /// </summary>
+        /// <returns>An <see cref="IStoreBackup"/> from the parent store.</returns>
         public IStoreBackup CreateBackup() =>
             _store.CreateBackup();
 
+        /// <summary>
+        /// Creates a checkpoint of the underlying store.
+        /// </summary>
+        /// <param name="checkpointDirectory">The directory that will receive the checkpoint.</param>
         public void CreateCheckpoint(string checkpointDirectory) =>
             _store.CreateCheckpoint(checkpointDirectory);
 
+        /// <summary>
+        /// Creates a nested snapshot over the same database.
+        /// </summary>
+        /// <returns>A new <see cref="IStoreSnapshot"/>.</returns>
         public IStoreSnapshot CreateSnapshot()
         {
             var logLevel = LogLevel.Debug;
@@ -102,6 +137,10 @@ namespace Neo.Platform.Storage
             return new BlockchainStoreSnapshot(this, _db, _loggerFactory);
         }
 
+        /// <summary>
+        /// Stages deletion of <paramref name="key"/> in the write batch when the key may exist.
+        /// </summary>
+        /// <param name="key">The storage key to delete.</param>
         public void Delete(ReadOnlySpan<byte> key)
         {
             if (_db.KeyMayExist(key))
@@ -115,6 +154,11 @@ namespace Neo.Platform.Storage
             }
         }
 
+        /// <summary>
+        /// Gets the value for <paramref name="key"/> as of this snapshot, or <see langword="null"/> if missing.
+        /// </summary>
+        /// <param name="key">The storage key.</param>
+        /// <returns>The stored value, or <see langword="null"/> when missing.</returns>
         public byte[]? Get(ReadOnlySpan<byte> key)
         {
             if (_db.KeyMayExist(key))
@@ -133,6 +177,10 @@ namespace Neo.Platform.Storage
             return default;
         }
 
+        /// <summary>
+        /// Enumerates all key/value pairs visible in this snapshot.
+        /// </summary>
+        /// <returns>An enumerator over snapshot contents.</returns>
         public IEnumerator<KeyValuePair<byte[], byte[]>> GetEnumerator()
         {
             using var iter = _db.NewIterator(_readOptions);
@@ -140,6 +188,11 @@ namespace Neo.Platform.Storage
                 yield return new(iter.KeyToArray(), iter.ValueToArray());
         }
 
+        /// <summary>
+        /// Stages a put of <paramref name="value"/> under <paramref name="key"/> in the write batch.
+        /// </summary>
+        /// <param name="key">The storage key.</param>
+        /// <param name="value">The value to store.</param>
         public void Put(ReadOnlySpan<byte> key, ReadOnlySpan<byte> value)
         {
             _writeBatch.Put(key, value);
@@ -150,6 +203,14 @@ namespace Neo.Platform.Storage
                 _logger.LogWriteMessage(logLevel, $"Put key: {Convert.ToHexStringLower(key)} value: {Convert.ToHexStringLower(value)}");
         }
 
+        /// <summary>
+        /// Iterates key/value pairs from this snapshot starting at or before <paramref name="keyOrPrefix"/>.
+        /// </summary>
+        /// <param name="keyOrPrefix">The seek key or prefix.</param>
+        /// <param name="seekFromEnd">
+        /// When <see langword="true"/>, iterates backward; otherwise, forward.
+        /// </param>
+        /// <returns>An enumerable of key/value pairs in seek order.</returns>
         public IEnumerable<KeyValuePair<byte[], byte[]>> Seek(ReadOnlyMemory<byte> keyOrPrefix, bool seekFromEnd = false)
         {
             using var iter = _db.NewIterator(_readOptions);
@@ -173,6 +234,15 @@ namespace Neo.Platform.Storage
             }
         }
 
+        /// <summary>
+        /// Attempts to get the value for <paramref name="key"/> as of this snapshot.
+        /// </summary>
+        /// <param name="key">The storage key.</param>
+        /// <param name="value">
+        /// When this method returns <see langword="true"/>, contains the stored value;
+        /// otherwise, <see langword="null"/>.
+        /// </param>
+        /// <returns><see langword="true"/> if the key was found; otherwise, <see langword="false"/>.</returns>
         public bool TryGet(ReadOnlySpan<byte> key, [NotNullWhen(true)] out byte[]? value)
         {
             if (_db.KeyMayExist(key))

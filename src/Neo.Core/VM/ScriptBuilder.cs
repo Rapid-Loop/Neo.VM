@@ -42,6 +42,9 @@ namespace Neo.Core.VM
         /// </summary>
         public int Length => (int)_stream.Length;
 
+        /// <summary>
+        /// Releases the underlying script buffer.
+        /// </summary>
         public void Dispose()
         {
             _stream.Dispose();
@@ -200,6 +203,12 @@ namespace Neo.Core.VM
             return Emit(OpCode.SYSCALL, BitConverter.GetBytes(api));
         }
 
+        /// <summary>
+        /// Emits instructions that create an array from the specified items.
+        /// </summary>
+        /// <typeparam name="T">The type of the array elements.</typeparam>
+        /// <param name="list">The items to place into the array; when null or empty, emits <see cref="OpCode.NEWARRAY0"/>.</param>
+        /// <returns>A reference to this instance after the emit operation has completed.</returns>
         public ScriptBuilder EmitCreateArray<T>(IReadOnlyList<T>? list = null)
         {
             if (list is null || list.Count == 0)
@@ -213,6 +222,13 @@ namespace Neo.Core.VM
             return Emit(OpCode.PACK);
         }
 
+        /// <summary>
+        /// Emits instructions that create a map from the specified key/value pairs.
+        /// </summary>
+        /// <typeparam name="TKey">The type of the map keys.</typeparam>
+        /// <typeparam name="TValue">The type of the map values.</typeparam>
+        /// <param name="map">The key/value pairs to place into the map.</param>
+        /// <returns>A reference to this instance after the emit operation has completed.</returns>
         public ScriptBuilder EmitCreateMap<TKey, TValue>(IEnumerable<KeyValuePair<TKey, TValue>> map)
             where TKey : notnull
             where TValue : notnull
@@ -233,6 +249,13 @@ namespace Neo.Core.VM
             return Emit(OpCode.PACKMAP);
         }
 
+        /// <summary>
+        /// Emits instructions that create a map from the specified dictionary.
+        /// </summary>
+        /// <typeparam name="TKey">The type of the map keys.</typeparam>
+        /// <typeparam name="TValue">The type of the map values.</typeparam>
+        /// <param name="map">The dictionary to place into the map.</param>
+        /// <returns>A reference to this instance after the emit operation has completed.</returns>
         public ScriptBuilder EmitCreateMap<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> map)
             where TKey : notnull
             where TValue : notnull
@@ -251,6 +274,12 @@ namespace Neo.Core.VM
             return Emit(OpCode.PACKMAP);
         }
 
+        /// <summary>
+        /// Emits instructions that create a struct from the specified items.
+        /// </summary>
+        /// <typeparam name="T">The type of the struct elements.</typeparam>
+        /// <param name="array">The items to place into the struct.</param>
+        /// <returns>A reference to this instance after the emit operation has completed.</returns>
         public ScriptBuilder EmitCreateStruct<T>(IReadOnlyList<T> array)
             where T : notnull
         {
@@ -265,6 +294,11 @@ namespace Neo.Core.VM
             return Emit(OpCode.PACKSTRUCT);
         }
 
+        /// <summary>
+        /// Emits one or more opcodes without operands.
+        /// </summary>
+        /// <param name="ops">The opcodes to emit.</param>
+        /// <returns>A reference to this instance after the emit operation has completed.</returns>
         public ScriptBuilder Emit(params OpCode[] ops)
         {
             foreach (var op in ops)
@@ -273,6 +307,15 @@ namespace Neo.Core.VM
             return this;
         }
 
+        /// <summary>
+        /// Emits a push instruction for a supported object value.
+        /// </summary>
+        /// <param name="obj">
+        /// The value to push. Supported types include booleans, numeric types, strings, byte arrays,
+        /// enums, <see cref="INeoSerializable"/> instances, and <see langword="null"/>.
+        /// </param>
+        /// <returns>A reference to this instance after the emit operation has completed.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="obj"/> has an unsupported type.</exception>
         public ScriptBuilder EmitPush(object? obj)
         {
             switch (obj)
@@ -332,6 +375,12 @@ namespace Neo.Core.VM
             return this;
         }
 
+        /// <summary>
+        /// Emits argument pushes followed by an <see cref="OpCode.SYSCALL"/> for the specified API.
+        /// </summary>
+        /// <param name="method">The interoperable service hash to call.</param>
+        /// <param name="args">The arguments to push onto the stack before the call.</param>
+        /// <returns>A reference to this instance after the emit operation has completed.</returns>
         public ScriptBuilder EmitSysCall(uint method, params object[] args)
         {
             for (var i = args.Length - 1; i >= 0; i--)
@@ -340,6 +389,10 @@ namespace Neo.Core.VM
             return EmitSysCall(method);
         }
 
+        /// <summary>
+        /// Emits an <see cref="OpCode.RET"/> instruction.
+        /// </summary>
+        /// <returns>A reference to this instance after the emit operation has completed.</returns>
         public ScriptBuilder EmitReturn() =>
             Emit(OpCode.RET);
 

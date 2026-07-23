@@ -27,8 +27,14 @@ using System;
 
 namespace Neo.Localization
 {
+    /// <summary>
+    /// Provides a shared <see cref="ResourceManagerStringLocalizerFactory"/> for Neo localization resources.
+    /// </summary>
     public static class ResourceFactory
     {
+        /// <summary>
+        /// Gets the default string localizer factory configured with the <c>Resources</c> path.
+        /// </summary>
         public static readonly ResourceManagerStringLocalizerFactory Instance = Create(config => config.ResourcesPath = "Resources");
 
         private static ResourceManagerStringLocalizerFactory Create(Action<LocalizationOptions> configure)

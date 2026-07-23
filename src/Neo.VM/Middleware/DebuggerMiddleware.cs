@@ -30,10 +30,22 @@ using System.Linq;
 
 namespace Neo.VM.Middleware
 {
+    /// <summary>
+    /// Middleware that supports script-offset breakpoints and single-step execution.
+    /// When a breakpoint is hit or step mode advances, the engine enters <see cref="VMState.BREAK"/>.
+    /// </summary>
+    /// <param name="sp">Service provider used to resolve the <see cref="VirtualMachineEngine"/>.</param>
+    /// <param name="logger">Logger for debug messages.</param>
     public sealed class DebuggerMiddleware(IServiceProvider sp, ILogger<DebuggerMiddleware> logger) : IEngineMiddleware
     {
+        /// <summary>
+        /// Raised when a breakpoint or step stop occurs.
+        /// </summary>
         public event EventHandler<DebuggerEventArgs>? OnBreakpoint;
 
+        /// <summary>
+        /// Gets or sets whether the debugger pauses before each distinct instruction pointer.
+        /// </summary>
         public bool StepMode { get; set; }
 
         private static readonly decimal s_factor = 1_00000000m;
@@ -43,12 +55,20 @@ namespace Neo.VM.Middleware
         private readonly HashSet<int> _breakpoints = []; // script offset breakpoints
         private int _lastStepPosition = -1;
 
+        /// <summary>
+        /// Registers a breakpoint at the specified script offset.
+        /// </summary>
+        /// <param name="scriptOffset">The instruction pointer value at which to break.</param>
         public void AddBreakpoint(int scriptOffset) =>
             _breakpoints.Add(scriptOffset);
 
+        /// <summary>
+        /// Resumes execution by clearing the <see cref="VMState.BREAK"/> state.
+        /// </summary>
         public void Continue() =>
             Engine.State = VMState.NONE;
 
+        /// <inheritdoc />
         public void PreExecution(ExecutionDelegate next)
         {
             if (logger.IsEnabled(LogLevel.Debug))
@@ -61,6 +81,7 @@ namespace Neo.VM.Middleware
             next();
         }
 
+        /// <inheritdoc />
         public void PostExecution(ExecutionDelegate next)
         {
             StepMode = false;
@@ -68,6 +89,7 @@ namespace Neo.VM.Middleware
             next();
         }
 
+        /// <inheritdoc />
         public void PreExecute(ExecutionContext? context, ExecuteDelegate next)
         {
             if (context is null)
@@ -102,14 +124,22 @@ namespace Neo.VM.Middleware
             next(context);
         }
 
+        /// <inheritdoc />
         public void PostExecute(ExecutionContext? context, ExecuteDelegate next)
         {
             next(context);
         }
     }
 
+    /// <summary>
+    /// Event arguments for debugger breakpoint notifications.
+    /// </summary>
+    /// <param name="context">The execution context at the break site.</param>
     public class DebuggerEventArgs(ExecutionContext context) : EventArgs
     {
+        /// <summary>
+        /// Gets the execution context where the breakpoint was hit.
+        /// </summary>
         public ExecutionContext Context => context;
     }
 }

@@ -27,8 +27,15 @@ using System.Text.Json.Serialization;
 
 namespace Neo.Configuration.Json
 {
+    /// <summary>
+    /// Provides default <see cref="JsonSerializerOptions"/> used by configuration models.
+    /// </summary>
     public static class JsonDefaults
     {
+        /// <summary>
+        /// The default serializer options for Neo configuration JSON, including camel-case naming
+        /// and converters for enums, <see cref="Neo.Core.Cryptography.ECC.ECPoint"/>, <see cref="Neo.Core.UInt160"/>, and <see cref="System.Net.IPEndPoint"/>.
+        /// </summary>
         public static readonly JsonSerializerOptions SerializerOptions = new()
         {
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,

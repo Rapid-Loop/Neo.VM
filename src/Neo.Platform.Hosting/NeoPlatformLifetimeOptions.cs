@@ -24,6 +24,13 @@ using Microsoft.Extensions.Hosting;
 
 namespace Neo.Platform.Hosting
 {
+    /// <summary>
+    /// Options that configure <see cref="NeoPlatformLifetime"/>.
+    /// </summary>
+    /// <remarks>
+    /// Inherits console lifetime settings such as status message suppression from
+    /// <see cref="ConsoleLifetimeOptions"/>.
+    /// </remarks>
     public class NeoPlatformLifetimeOptions : ConsoleLifetimeOptions
     {
     }

@@ -28,6 +28,9 @@ using System.Runtime.CompilerServices;
 
 namespace Neo.Core.Blockchain
 {
+    /// <summary>
+    /// Base type for conditions evaluated as part of a <see cref="WitnessRule"/>.
+    /// </summary>
     public abstract class WitnessCondition : INeoSerializable
     {
         /// <summary>
@@ -35,8 +38,16 @@ namespace Neo.Core.Blockchain
         /// </summary>
         public abstract WitnessConditionType Type { get; }
 
+        /// <summary>
+        /// Gets the serialized size of this condition in bytes.
+        /// </summary>
         public virtual int Size => Unsafe.SizeOf<WitnessConditionType>();
 
+        /// <summary>
+        /// Deserializes this condition from the specified stream.
+        /// </summary>
+        /// <param name="reader">The stream to read from.</param>
+        /// <exception cref="FormatException">The type byte does not match <see cref="Type"/>.</exception>
         public void Deserialize(Stream reader)
         {
             var type = reader.Read<WitnessConditionType>();
@@ -45,6 +56,10 @@ namespace Neo.Core.Blockchain
                 throw new FormatException($"[{nameof(WitnessCondition)}::{nameof(Type)}] Value \'{type}\' does not match \'{Type}\'.");
         }
 
+        /// <summary>
+        /// Serializes this condition to the specified stream.
+        /// </summary>
+        /// <param name="writer">The stream to write to.</param>
         public void Serialize(Stream writer)
         {
             writer.Write(Type);

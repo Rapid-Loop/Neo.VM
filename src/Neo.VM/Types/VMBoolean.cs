@@ -28,12 +28,22 @@ using System.Numerics;
 
 namespace Neo.VM.Types
 {
+    /// <summary>
+    /// Represents a boolean stack item.
+    /// </summary>
+    /// <param name="value">The boolean value.</param>
     public class VMBoolean(bool value) : VMObject, IEquatable<VMBoolean>
     {
+        /// <inheritdoc />
         public override VMObjectType Type => VMObjectType.Boolean;
 
         private readonly bool _value = value;
 
+        /// <summary>
+        /// Determines whether this boolean is equal to another boolean stack item.
+        /// </summary>
+        /// <param name="other">The other boolean.</param>
+        /// <returns><see langword="true"/> if the values are equal; otherwise <see langword="false"/>.</returns>
         public bool Equals(VMBoolean? other)
         {
             if (ReferenceEquals(other, this)) return true;
@@ -42,6 +52,7 @@ namespace Neo.VM.Types
             return _value == other._value;
         }
 
+        /// <inheritdoc />
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
             if (ReferenceEquals(obj, this)) return true;
@@ -49,17 +60,20 @@ namespace Neo.VM.Types
             return Equals(obj as VMBoolean);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return _value ? 1 : 0;
         }
 
+        /// <inheritdoc />
         [return: MaybeNull]
         public override string? ToString()
         {
             return _value.ToString();
         }
 
+        /// <inheritdoc />
         public override VMObject Clone()
         {
             var clone = new VMBoolean(_value);
@@ -67,16 +81,19 @@ namespace Neo.VM.Types
             return clone;
         }
 
+        /// <inheritdoc />
         public override bool GetBoolean()
         {
             return _value;
         }
 
+        /// <inheritdoc />
         public override BigInteger GetInteger()
         {
             return _value ? BigInteger.One : BigInteger.Zero;
         }
 
+        /// <inheritdoc />
         protected override ReadOnlySpan<byte> ComputeSpan(HashSet<VMObject> visited)
         {
             return _value ? [1] : [0];

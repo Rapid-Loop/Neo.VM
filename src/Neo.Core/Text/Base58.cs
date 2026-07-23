@@ -28,6 +28,9 @@ using System.Text;
 
 namespace Neo.Core.Text
 {
+    /// <summary>
+    /// Provides Base58 and Base58Check encoding and decoding.
+    /// </summary>
     public static class Base58
     {
         private const string Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";

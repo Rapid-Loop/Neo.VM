@@ -26,8 +26,14 @@ using Neo.Wallet.Cryptography;
 
 namespace Neo.Wallet.Json
 {
+    /// <summary>
+    /// JSON model for SCrypt key-derivation parameters.
+    /// </summary>
     public class SCryptModel : JsonModel, IMap<ScryptParameters>
     {
+        /// <summary>
+        /// The default SCrypt parameters (<c>N=16384</c>, <c>R=8</c>, <c>P=8</c>).
+        /// </summary>
         public static readonly SCryptModel Default = new()
         {
             N = 16384,
@@ -50,6 +56,10 @@ namespace Neo.Wallet.Json
         /// </summary>
         public int P { get; set; }
 
+        /// <summary>
+        /// Converts this model to a <see cref="ScryptParameters"/> instance.
+        /// </summary>
+        /// <returns>A <see cref="ScryptParameters"/> with the same N, R, and P values.</returns>
         public ScryptParameters ToObject() =>
             new(N, R, P);
     }
