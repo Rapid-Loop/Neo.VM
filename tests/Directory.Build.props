@@ -7,9 +7,6 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <IsPackable>false</IsPackable>
-    <CollectCoverage>true</CollectCoverage>
-    <CoverletOutput>../../TestResults/$(MSBuildProjectName)/</CoverletOutput>
-    <CoverletOutputFormat>lcov</CoverletOutputFormat>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
     <AnalysisLevel>latest</AnalysisLevel>
@@ -17,7 +14,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="10.0.1" />
     <!-- Always reference so VSTest can resolve the "junit" logger (not only on CI). -->
     <PackageReference Include="JunitXml.TestLogger" Version="8.0.0" />
   </ItemGroup>
