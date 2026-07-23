@@ -20,4 +20,8 @@
     <PackageReference Include="coverlet.collector" Version="10.0.1" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <PackageReference Include="JunitXml.TestLogger" Version="8.0.0" />
+  </ItemGroup>
+
 </Project>
