@@ -23,36 +23,6 @@ jobs:
     - name: Verify Formatting
       run: dotnet format --verify-no-changes --verbosity diagnostic
 
-# --------------------------------------
-# Currnly there is bug in dotnet cli for
-# nuget that breaks when using
-# `Shared Projects`.
-# --------------------------------------
-# TURNING OFF JOB FOR NOW
-#---------------------------------------
-#  verify-packages:
-#    name: Verify Safe Packages
-#    needs: [verify-code]
-
-#    timeout-minutes: 5
-
-#    runs-on: ubuntu-latest
-
-#    steps:
-#    - name: Checkout (github)
-#      uses: actions/checkout@v6
-
-#    - name: Setup .NET ${{ env.DOTNET_VERSION }}
-#      uses: actions/setup-dotnet@v5
-#      with:
-#        dotnet-version: ${{ env.DOTNET_VERSION }}
-
-#    - name: Restore Solution
-#      run: dotnet restore
-
-#    - name: Check Solution Packages
-#      run: dotnet list package --vulnerable --include-transitive
-
   verify-tests:
     name: Verify Tests on ${{ matrix.os }}
     needs: [verify-code]
@@ -78,18 +48,30 @@ jobs:
       if: matrix.os == 'macos-latest'
       run: |
         brew install rocksdb
+        dotnet add package JunitXml.TestLogger
         dotnet build -p:GITHUB_ACTIONS=true
-        dotnet test --no-build -p:GITHUB_ACTIONS=true
+        dotnet test --no-build --logger "junit;LogFilePath=TestResults/tests-${{ matrix.os }}.xml" -p:GITHUB_ACTIONS=true --binaryLogger:${{ matrix.os }}.binlog
 
     - name: Test (windows)
       if: matrix.os == 'windows-latest'
       run: |
+        dotnet add package JunitXml.TestLogger
         dotnet build -p:GITHUB_ACTIONS=true
-        dotnet test --no-build -p:GITHUB_ACTIONS=true
+        dotnet test --no-build --logger "junit;LogFilePath=TestResults/tests-${{ matrix.os }}.xml" -p:GITHUB_ACTIONS=true --binaryLogger:${{ matrix.os }}.binlog
 
     - name: Test (linux)
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get --assume-yes install librocksdb-dev
+        dotnet add package JunitXml.TestLogger
         dotnet build -p:GITHUB_ACTIONS=true
-        dotnet test --no-build -p:GITHUB_ACTIONS=true
+        dotnet test --no-build --logger "junit;LogFilePath=TestResults/tests-${{ matrix.os }}.xml" -p:GITHUB_ACTIONS=true --binaryLogger:${{ matrix.os }}.binlog
+
+    - name: Publish Test Results (${{ matrix.os }})
+      uses: test-summary/action@dist
+      if: always()
+      with:
+        paths: |
+          TestResults/tests-${{ matrix.os }}.xml
+        folded: true
+        show: "all"
