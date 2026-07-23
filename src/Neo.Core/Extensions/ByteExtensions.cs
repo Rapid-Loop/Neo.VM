@@ -29,11 +29,18 @@ using System.Security.Cryptography;
 
 namespace Neo.Core.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for <see cref="byte"/> arrays.
+    /// </summary>
     public static class ByteExtensions
     {
         /// <summary>
         /// Returns a new byte array containing the bitwise XOR of the two arrays.
         /// </summary>
+        /// <param name="x">The first operand.</param>
+        /// <param name="y">The second operand; must be the same length as <paramref name="x"/>.</param>
+        /// <returns>A new array containing the bitwise XOR of <paramref name="x"/> and <paramref name="y"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when the arrays have different lengths.</exception>
         public static byte[] Xor(this byte[] x, byte[] y)
         {
             ArgumentOutOfRangeException.ThrowIfNotEqual(y.Length, x.Length, nameof(y));
@@ -85,23 +92,60 @@ namespace Neo.Core.Extensions
             return newObject;
         }
 
+        /// <summary>
+        /// Gets the serialized size of a byte array, including its compact-size length prefix.
+        /// </summary>
+        /// <param name="data">The byte array.</param>
+        /// <returns>The number of bytes required to serialize <paramref name="data"/>.</returns>
         public static int GetSerializedSize(this byte[] data) =>
             data.Length.GetCompactSize() + data.Length;
 
+        /// <summary>
+        /// Computes the script hash of the byte array (Hash160).
+        /// </summary>
+        /// <param name="data">The data to hash.</param>
+        /// <returns>A <see cref="UInt160"/> script hash of the data.</returns>
         public static UInt160 ToScriptHash(this byte[] data) =>
             new(data.ToHash160());
 
+        /// <summary>
+        /// Computes the RIPEMD-160 hash of the byte array.
+        /// </summary>
+        /// <param name="data">The data to hash.</param>
+        /// <returns>The 20-byte RIPEMD-160 digest.</returns>
         public static byte[] ToRipeMD160(this byte[] data) =>
             RipeMD160.HashData(data);
 
+        /// <summary>
+        /// Computes the SHA-256 hash of the byte array.
+        /// </summary>
+        /// <param name="data">The data to hash.</param>
+        /// <returns>The 32-byte SHA-256 digest.</returns>
         public static byte[] ToSha256(this byte[] data) =>
             SHA256.HashData(data);
 
+        /// <summary>
+        /// Computes Hash160 (SHA-256 followed by RIPEMD-160) of the byte array.
+        /// </summary>
+        /// <param name="data">The data to hash.</param>
+        /// <returns>The 20-byte Hash160 digest.</returns>
         public static byte[] ToHash160(this byte[] data) =>
             data.ToSha256().ToRipeMD160();
 
+        /// <summary>
+        /// Computes a transaction-style hash of the byte array as a <see cref="UInt256"/>.
+        /// </summary>
+        /// <param name="data">The data to hash.</param>
+        /// <returns>A <see cref="UInt256"/> containing the SHA-256 digest.</returns>
         public static UInt256 ToTxHash(this byte[] data) =>
             new(data.ToSha256());
+
+        /// <summary>
+        /// Computes a stable integer hash code over the byte array contents.
+        /// </summary>
+        /// <param name="data">The data to hash.</param>
+        /// <param name="seed">The initial hash seed.</param>
+        /// <returns>An integer hash code derived from the array contents.</returns>
         public static int ToHashCode(this byte[] data, int seed = 397) =>
             data.Aggregate(seed,
                 (hash, b) =>

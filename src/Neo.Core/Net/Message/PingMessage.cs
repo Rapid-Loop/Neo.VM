@@ -33,20 +33,43 @@ namespace Neo.Core.Net.Message
     /// </summary>
     public class PingMessage : INeoSerializable
     {
+        /// <summary>
+        /// Gets the last known block index of the sender.
+        /// </summary>
         public uint LastBlockIndex { get; private set; }
 
+        /// <summary>
+        /// Gets the Unix timestamp (seconds) when this payload was created.
+        /// </summary>
         public uint Timestamp { get; private set; }
 
+        /// <summary>
+        /// Gets the random nonce used to correlate Ping and Pong.
+        /// </summary>
         public uint Nonce { get; private set; }
 
+        /// <summary>
+        /// Gets the serialized size of this payload in bytes.
+        /// </summary>
         public int Size =>
             sizeof(uint) + // LastBlockIndex
             sizeof(uint) + // Timestamp
             sizeof(uint);  // Nonce
 
+        /// <summary>
+        /// Creates a ping/pong payload with a random nonce.
+        /// </summary>
+        /// <param name="lastBlockIndex">The sender's last known block index.</param>
+        /// <returns>A new <see cref="PingMessage"/>.</returns>
         public static PingMessage Create(uint lastBlockIndex) =>
             Create(lastBlockIndex, RandomNumberFactory.NextUInt32());
 
+        /// <summary>
+        /// Creates a ping/pong payload with the specified nonce.
+        /// </summary>
+        /// <param name="lastBlockIndex">The sender's last known block index.</param>
+        /// <param name="nonce">The correlation nonce.</param>
+        /// <returns>A new <see cref="PingMessage"/>.</returns>
         public static PingMessage Create(uint lastBlockIndex, uint nonce) =>
             new()
             {
@@ -55,6 +78,10 @@ namespace Neo.Core.Net.Message
                 Nonce = nonce,
             };
 
+        /// <summary>
+        /// Deserializes this payload from the specified stream.
+        /// </summary>
+        /// <param name="reader">The stream to read from.</param>
         public void Deserialize(Stream reader)
         {
             LastBlockIndex = reader.Read<uint>();
@@ -62,6 +89,10 @@ namespace Neo.Core.Net.Message
             Nonce = reader.Read<uint>();
         }
 
+        /// <summary>
+        /// Serializes this payload to the specified stream.
+        /// </summary>
+        /// <param name="writer">The stream to write to.</param>
         public void Serialize(Stream writer)
         {
             writer.Write(LastBlockIndex);

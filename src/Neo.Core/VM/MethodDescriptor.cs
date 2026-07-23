@@ -31,6 +31,9 @@ using System.Text;
 
 namespace Neo.Core.VM
 {
+    /// <summary>
+    /// Describes an interoperable service method that can be invoked from the VM via <see cref="OpCode.SYSCALL"/>.
+    /// </summary>
     public class MethodDescriptor : IEquatable<MethodDescriptor>
     {
         /// <summary>
@@ -49,7 +52,7 @@ namespace Neo.Core.VM
         public IReadOnlyList<ParameterInfo> Parameters => _targetMethodInfo.GetParameters();
 
         /// <summary>
-        /// the method info of the interoperable service.
+        /// The method info of the interoperable service.
         /// </summary>
         public MethodInfo TargetMethodInfo => _targetMethodInfo;
 
@@ -63,6 +66,16 @@ namespace Neo.Core.VM
         private readonly MethodInfo _targetMethodInfo;
         private readonly Delegate _targetMethod;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MethodDescriptor"/> class.
+        /// </summary>
+        /// <param name="targetInstance">The instance that owns the target method, property, or event.</param>
+        /// <param name="targetMethodName">The name of the method, property, or event to bind.</param>
+        /// <param name="systemMethodName">
+        /// Optional system method name used for the call address.
+        /// When omitted, a name of the form <c>System.{Type}.{Method}</c> is generated.
+        /// </param>
+        /// <exception cref="TargetException">Thrown when the named target cannot be found on the instance type.</exception>
         public MethodDescriptor(object targetInstance, string targetMethodName, string? systemMethodName = default)
         {
             var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
@@ -87,6 +100,11 @@ namespace Neo.Core.VM
             _hash = CreateCallAddress(_systemMethodName);
         }
 
+        /// <summary>
+        /// Determines whether this descriptor refers to the same interoperable service as another.
+        /// </summary>
+        /// <param name="other">The other descriptor to compare.</param>
+        /// <returns><see langword="true"/> if both descriptors share the same hash; otherwise, <see langword="false"/>.</returns>
         public bool Equals(MethodDescriptor? other)
         {
             if (ReferenceEquals(other, this)) return true;
@@ -94,6 +112,7 @@ namespace Neo.Core.VM
             return _hash == other._hash;
         }
 
+        /// <inheritdoc/>
         public override bool Equals(object? obj)
         {
             if (ReferenceEquals(obj, this)) return true;
@@ -101,6 +120,7 @@ namespace Neo.Core.VM
             return Equals(obj as MethodDescriptor);
         }
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             checked
@@ -109,9 +129,18 @@ namespace Neo.Core.VM
             }
         }
 
+        /// <summary>
+        /// Creates a 32-bit call address from a system method name by hashing it with SHA-256.
+        /// </summary>
+        /// <param name="systemMethodName">The interoperable service name to hash.</param>
+        /// <returns>The first four little-endian bytes of the SHA-256 hash.</returns>
         public static uint CreateCallAddress(string systemMethodName) =>
             BinaryPrimitives.ReadUInt32LittleEndian(Encoding.ASCII.GetBytes(systemMethodName).ToSha256());
 
+        /// <summary>
+        /// Converts the descriptor to its interoperable service hash.
+        /// </summary>
+        /// <param name="descriptor">The descriptor to convert.</param>
         public static implicit operator uint(MethodDescriptor descriptor)
         {
             return descriptor._hash;

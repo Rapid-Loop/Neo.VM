@@ -33,8 +33,14 @@ using System.Text;
 
 namespace Neo.Wallet
 {
+    /// <summary>
+    /// Provides cryptographic helpers and file open operations for Neo wallets.
+    /// </summary>
     public static class ChainWallet
     {
+        /// <summary>
+        /// The maximum supported private key size in bytes.
+        /// </summary>
         public const int MaxPrivateKeySizeInBytes = 32;
 
         /// <summary>
@@ -56,6 +62,14 @@ namespace Neo.Wallet
             return decodedWifBytes[1..^1];
         }
 
+        /// <summary>
+        /// Encrypts a private key into a NEP-2 string using the specified password and SCrypt parameters.
+        /// </summary>
+        /// <param name="privateKeyBytes">The private key to encrypt.</param>
+        /// <param name="password">The password used for key derivation.</param>
+        /// <param name="scryptParameters">The SCrypt parameters; uses <see cref="ScryptParameters.Default"/> when <see langword="null"/>.</param>
+        /// <param name="addressVersion">The address version used by the protocol (currently unused by the encryption payload).</param>
+        /// <returns>The NEP-2 encoded private key string.</returns>
         public static string ToNep2String(byte[] privateKeyBytes, string password, ScryptParameters? scryptParameters = default, byte addressVersion = 53)
         {
             const int SCryptKeyLengthInBytes = 64;
@@ -81,6 +95,15 @@ namespace Neo.Wallet
             return Base58.EncodeCheck(nep2StringBytes);
         }
 
+        /// <summary>
+        /// Decrypts a NEP-2 string into a private key using the specified password and SCrypt parameters.
+        /// </summary>
+        /// <param name="nep2String">The NEP-2 encoded private key string.</param>
+        /// <param name="password">The password used for key derivation.</param>
+        /// <param name="scryptParameters">The SCrypt parameters used when the key was encrypted.</param>
+        /// <param name="addressVersion">The address version used by the protocol (currently unused by the decryption payload).</param>
+        /// <returns>The decrypted private key bytes.</returns>
+        /// <exception cref="FormatException">Thrown when the NEP-2 payload is invalid.</exception>
         public static byte[] GetKeyFromNep2String(string nep2String, string password, ScryptParameters scryptParameters, byte addressVersion = 53)
         {
             ArgumentNullException.ThrowIfNullOrWhiteSpace(nep2String, nameof(nep2String));
@@ -112,6 +135,12 @@ namespace Neo.Wallet
             return privateKeyBytes;
         }
 
+        /// <summary>
+        /// Decrypts ciphertext using AES in ECB mode with no padding.
+        /// </summary>
+        /// <param name="ciphertextBytes">The encrypted data.</param>
+        /// <param name="keyBytes">The AES key.</param>
+        /// <returns>The decrypted plaintext bytes.</returns>
         public static byte[] AesDecryptECB(byte[] ciphertextBytes, byte[] keyBytes)
         {
             using var aes = Aes.Create();
@@ -123,6 +152,12 @@ namespace Neo.Wallet
             return decryptor.TransformFinalBlock(ciphertextBytes, 0, ciphertextBytes.Length);
         }
 
+        /// <summary>
+        /// Encrypts plaintext using AES in ECB mode with no padding.
+        /// </summary>
+        /// <param name="plaintextBytes">The data to encrypt.</param>
+        /// <param name="keyBytes">The AES key.</param>
+        /// <returns>The encrypted ciphertext bytes.</returns>
         public static byte[] AesEncryptECB(byte[] plaintextBytes, byte[] keyBytes)
         {
             using var aes = Aes.Create();
@@ -134,9 +169,19 @@ namespace Neo.Wallet
             return encryptor.TransformFinalBlock(plaintextBytes, 0, plaintextBytes.Length);
         }
 
+        /// <summary>
+        /// Opens a development wallet from a JSON file.
+        /// </summary>
+        /// <param name="file">The wallet file to open.</param>
+        /// <returns>The loaded <see cref="DevWallet"/>.</returns>
         public static DevWallet OpenDevWalletFile(FileInfo file) =>
             JsonModel.FromJson<DevWalletModel>(file)!.ToObject();
 
+        /// <summary>
+        /// Opens a NEP-6 wallet from a JSON file.
+        /// </summary>
+        /// <param name="file">The wallet file to open.</param>
+        /// <returns>The loaded <see cref="Nep6Wallet"/>, or <see langword="null"/> if unavailable.</returns>
         public static Nep6Wallet? OpenNep6WalletFie(FileInfo file) =>
             JsonModel.FromJson<Nep6WalletModel>(file)!.ToObject();
     }

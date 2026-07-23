@@ -24,8 +24,17 @@ using System.Runtime.CompilerServices;
 
 namespace Neo.Core.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for unmanaged object arrays.
+    /// </summary>
     public static class ObjectExtensions
     {
+        /// <summary>
+        /// Gets the serialized size of an unmanaged array, including its compact-size length prefix.
+        /// </summary>
+        /// <typeparam name="TSource">The unmanaged element type.</typeparam>
+        /// <param name="source">The array to measure.</param>
+        /// <returns>The number of bytes required to serialize the array.</returns>
         public static int GetSerializedSize<TSource>(this TSource[] source)
             where TSource : unmanaged =>
             source.Length.GetCompactSize() +

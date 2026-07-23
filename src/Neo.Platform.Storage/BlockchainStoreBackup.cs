@@ -33,8 +33,14 @@ using System.IO;
 
 namespace Neo.Platform.Storage
 {
+    /// <summary>
+    /// RocksDB backup engine wrapper that implements <see cref="IStoreBackup"/>.
+    /// </summary>
     public class BlockchainStoreBackup : IStoreBackup
     {
+        /// <summary>
+        /// Gets the backup options used by this instance.
+        /// </summary>
         public BlockchainBackupOptions BackupOptions => _backupOptions;
 
         private readonly BlockchainBackupOptions _backupOptions;
@@ -45,6 +51,12 @@ namespace Neo.Platform.Storage
         private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger<BlockchainStoreBackup> _logger;
 
+        /// <summary>
+        /// Initializes a new backup engine for the specified database.
+        /// </summary>
+        /// <param name="db">The open RocksDB instance to back up.</param>
+        /// <param name="options">Backup options, including the backup directory path.</param>
+        /// <param name="loggerFactory">Optional logger factory. When omitted, a null logger is used.</param>
         public BlockchainStoreBackup(
             RocksDb db,
             IOptions<BlockchainBackupOptions> options,
@@ -63,12 +75,18 @@ namespace Neo.Platform.Storage
             _backupEngine = BackupEngine.Open(new(), _backupOptions.BackupPath);
         }
 
+        /// <summary>
+        /// Releases the underlying RocksDB backup engine.
+        /// </summary>
         public void Dispose()
         {
             _backupEngine.Dispose();
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Creates a new backup of the database.
+        /// </summary>
         public void Backup()
         {
             _backupEngine.CreateNewBackup(_db);
@@ -79,6 +97,19 @@ namespace Neo.Platform.Storage
                 _logger.LogBackupMessage(logLevel, $"Created new backup of the store.");
         }
 
+        /// <summary>
+        /// Restores the latest backup to the specified path.
+        /// </summary>
+        /// <param name="restorePath">The directory that will receive the restored database.</param>
+        /// <param name="walPath">
+        /// Optional WAL directory. When omitted, <paramref name="restorePath"/> is used.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="restorePath"/> is <see langword="null"/> or empty.
+        /// </exception>
+        /// <exception cref="DirectoryNotFoundException">
+        /// <paramref name="restorePath"/> or <paramref name="walPath"/> does not exist.
+        /// </exception>
         public void Restore(string restorePath, string? walPath = default)
         {
             if (string.IsNullOrEmpty(restorePath))
@@ -99,9 +130,17 @@ namespace Neo.Platform.Storage
                 _logger.LogRestoreMessage(logLevel, $"Restored latest backup to path \'{restorePath}\'.");
         }
 
+        /// <summary>
+        /// Lists available backups managed by the backup engine.
+        /// </summary>
+        /// <returns>An enumerable of backup metadata.</returns>
         public IEnumerable<BackupInfo> ListBackups() =>
             _backupEngine.AsEnumerable();
 
+        /// <summary>
+        /// Deletes older backups, keeping only the newest backups up to the specified count.
+        /// </summary>
+        /// <param name="numberOfBackupsToKeep">The number of most recent backups to retain.</param>
         public void Purge(uint numberOfBackupsToKeep)
         {
             _backupEngine.PurgeOldBackups(numberOfBackupsToKeep);

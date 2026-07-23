@@ -25,8 +25,20 @@ using System.Collections.Generic;
 
 namespace Neo.Platform.Hosting.Configuration
 {
+    /// <summary>
+    /// Extension methods for adding Neo platform configuration sources.
+    /// </summary>
     public static class ConfigurationBuilderExtensions
     {
+        /// <summary>
+        /// Adds Neo platform defaults and <c>NEO_</c>-prefixed environment variables
+        /// as a configuration source.
+        /// </summary>
+        /// <param name="builder">The configuration builder.</param>
+        /// <param name="initialData">
+        /// Optional key/value pairs that override platform defaults before environment variables are applied.
+        /// </param>
+        /// <returns>The same <paramref name="builder"/> for chaining.</returns>
         public static IConfigurationBuilder AddNeoPlatformConfiguration(this IConfigurationBuilder builder, IEnumerable<KeyValuePair<string, string?>>? initialData = default)
         {
             builder.Add(new NeoEnvironmentConfigurationSource() { InitialData = initialData, });

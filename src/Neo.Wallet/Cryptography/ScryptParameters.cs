@@ -56,6 +56,10 @@ namespace Neo.Wallet.Cryptography
         /// </summary>
         public int P => p;
 
+        /// <summary>
+        /// Converts these parameters to their JSON model representation.
+        /// </summary>
+        /// <returns>A <see cref="SCryptModel"/> with the same N, R, and P values.</returns>
         public SCryptModel ToObject() =>
             new()
             {

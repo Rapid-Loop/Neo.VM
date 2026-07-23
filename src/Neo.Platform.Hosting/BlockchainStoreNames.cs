@@ -24,16 +24,39 @@ using Neo.Configuration;
 
 namespace Neo.Platform.Hosting
 {
+    /// <summary>
+    /// Configuration key names for blockchain store and backup options.
+    /// </summary>
     public static class BlockchainStoreNames
     {
+        /// <summary>
+        /// The root configuration section for store settings.
+        /// </summary>
         public static readonly string SectionKey = "Store";
 
+        /// <summary>
+        /// Configuration key for <see cref="BlockchainStoreOptions.DatabasePath"/>.
+        /// </summary>
         public static readonly string DatabasePathKey = $"{SectionKey}:{nameof(BlockchainStoreOptions.DatabasePath)}";
+
+        /// <summary>
+        /// Configuration key for <see cref="BlockchainStoreOptions.CreateIfMissing"/>.
+        /// </summary>
         public static readonly string CreateIfMissingKey = $"{SectionKey}:{nameof(BlockchainStoreOptions.CreateIfMissing)}";
 
+        /// <summary>
+        /// Configuration section for store backup settings.
+        /// </summary>
         public static readonly string BackupSectionKey = $"{SectionKey}:Backup";
 
+        /// <summary>
+        /// Configuration key for <see cref="BlockchainBackupOptions.BackupPath"/>.
+        /// </summary>
         public static readonly string BackupPathKey = $"{BackupSectionKey}:{nameof(BlockchainBackupOptions.BackupPath)}";
+
+        /// <summary>
+        /// Configuration key for <see cref="BlockchainBackupOptions.MaxBackups"/>.
+        /// </summary>
         public static readonly string MaxBackupsKey = $"{BackupSectionKey}:{nameof(BlockchainBackupOptions.MaxBackups)}";
     }
 }

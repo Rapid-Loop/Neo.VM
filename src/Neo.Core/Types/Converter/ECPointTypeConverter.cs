@@ -27,11 +27,20 @@ using System.Globalization;
 
 namespace Neo.Core.Types.Converter
 {
+    /// <summary>
+    /// Converts between <see cref="ECPoint"/> values and strings for design-time and configuration scenarios.
+    /// </summary>
     internal class ECPointTypeConverter : TypeConverter
     {
+        /// <summary>
+        /// Returns whether this converter can convert an object of the given type to an <see cref="ECPoint"/>.
+        /// </summary>
         public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType) =>
             sourceType == typeof(string) && base.CanConvertFrom(context, sourceType);
 
+        /// <summary>
+        /// Converts a string (or other supported value) to an <see cref="ECPoint"/> on secp256r1.
+        /// </summary>
         public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
         {
             if (value is string pointString)
@@ -43,6 +52,9 @@ namespace Neo.Core.Types.Converter
             return base.ConvertFrom(context, culture, value);
         }
 
+        /// <summary>
+        /// Converts an <see cref="ECPoint"/> to the requested destination type (typically a compressed hex string).
+        /// </summary>
         public override object? ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType) =>
             CanConvertTo(context, destinationType) ?
             value switch

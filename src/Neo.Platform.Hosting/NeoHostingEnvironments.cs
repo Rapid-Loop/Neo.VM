@@ -22,14 +22,29 @@
 
 namespace Neo.Platform.Hosting
 {
+    /// <summary>
+    /// Well-known hosting environment name strings for Neo platform hosts.
+    /// </summary>
     internal static class NeoHostingEnvironmentNames
     {
+        /// <summary>
+        /// Local development network environment name.
+        /// </summary>
         public static readonly string LocalNet = "localnet";
 
+        /// <summary>
+        /// Public test network environment name.
+        /// </summary>
         public static readonly string TestNet = "testnet";
 
+        /// <summary>
+        /// Public main network environment name.
+        /// </summary>
         public static readonly string MainNet = "mainnet";
 
+        /// <summary>
+        /// Private network environment name.
+        /// </summary>
         public static readonly string PrivateNet = "privatenet";
 
     }

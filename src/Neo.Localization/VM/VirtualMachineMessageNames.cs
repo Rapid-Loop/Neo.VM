@@ -22,12 +22,26 @@
 
 namespace Neo.Localization.VM
 {
+    /// <summary>
+    /// Resource keys for localized virtual machine messages.
+    /// </summary>
     public static class VirtualMachineMessageNames
     {
         private const string MessageSuffixString = "Message";
 
+        /// <summary>
+        /// Resource key for the message emitted when VM execution starts.
+        /// </summary>
         public const string ExecuteStartup = nameof(ExecuteStartup) + MessageSuffixString;
+
+        /// <summary>
+        /// Resource key for the message emitted when an opcode is executed.
+        /// </summary>
         public const string ExecuteOpCode = nameof(ExecuteOpCode) + MessageSuffixString;
+
+        /// <summary>
+        /// Resource key for the message emitted when VM execution completes successfully.
+        /// </summary>
         public const string ExecuteSuccessfully = nameof(ExecuteSuccessfully) + MessageSuffixString;
     }
 }

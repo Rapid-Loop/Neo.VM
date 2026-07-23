@@ -28,6 +28,9 @@ using System.Security.Cryptography;
 
 namespace Neo.Core.Cryptography
 {
+    /// <summary>
+    /// Builds Merkle trees over hash leaves and computes Merkle roots.
+    /// </summary>
     public class MerkleTree
     {
         private readonly byte[] _root = [];
@@ -41,6 +44,11 @@ namespace Neo.Core.Cryptography
             _root = BuildTree(_leaves);
         }
 
+        /// <summary>
+        /// Computes the Merkle root of the specified hash leaves.
+        /// </summary>
+        /// <param name="hashes">The leaf hashes; an empty array yields <see cref="UInt256.Zero"/>.</param>
+        /// <returns>The Merkle root of <paramref name="hashes"/>.</returns>
         public static UInt256 ComputeRoot(UInt256[] hashes)
         {
             if (hashes.Length == 0) return UInt256.Zero;

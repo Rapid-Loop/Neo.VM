@@ -26,10 +26,20 @@ using System.IO;
 
 namespace Neo.Configuration
 {
+    /// <summary>
+    /// Configuration options for the blockchain store database.
+    /// </summary>
     public class BlockchainStoreOptions : JsonModel
     {
+        /// <summary>
+        /// The directory path of the blockchain database.
+        /// Defaults to <c>data/chain</c> under the application base directory.
+        /// </summary>
         public string DatabasePath { get; init; } = Path.Combine(AppContext.BaseDirectory, "data", "chain");
 
+        /// <summary>
+        /// Whether to create the database if it does not already exist. Defaults to <see langword="true"/>.
+        /// </summary>
         public bool CreateIfMissing { get; init; } = true;
     }
 }

@@ -24,20 +24,69 @@ using Neo.Core;
 
 namespace Neo.Platform.Hosting
 {
+    /// <summary>
+    /// Configuration key names for Neo protocol settings.
+    /// </summary>
     public static class ProtocolSettingNames
     {
+        /// <summary>
+        /// The root configuration section for protocol settings.
+        /// </summary>
         public static readonly string SectionKey = "Protocol";
 
+        /// <summary>
+        /// Configuration key for <see cref="ProtocolSettings.Network"/>.
+        /// </summary>
         public static readonly string NetworkKey = $"{SectionKey}:{nameof(ProtocolSettings.Network)}";
+
+        /// <summary>
+        /// Configuration key for <see cref="ProtocolSettings.AddressVersion"/>.
+        /// </summary>
         public static readonly string AddressVersionKey = $"{SectionKey}:{nameof(ProtocolSettings.AddressVersion)}";
+
+        /// <summary>
+        /// Configuration key for <see cref="ProtocolSettings.StandbyCommittee"/>.
+        /// </summary>
         public static readonly string StandbyCommitteeKey = $"{SectionKey}:{nameof(ProtocolSettings.StandbyCommittee)}";
+
+        /// <summary>
+        /// Configuration key for <see cref="ProtocolSettings.ValidatorsCount"/>.
+        /// </summary>
         public static readonly string ValidatorsCountKey = $"{SectionKey}:{nameof(ProtocolSettings.ValidatorsCount)}";
+
+        /// <summary>
+        /// Configuration key for <see cref="ProtocolSettings.HardForks"/>.
+        /// </summary>
         public static readonly string HardForksKey = $"{SectionKey}:{nameof(ProtocolSettings.HardForks)}";
+
+        /// <summary>
+        /// Configuration key for <see cref="ProtocolSettings.SeedList"/>.
+        /// </summary>
         public static readonly string SeedListKey = $"{SectionKey}:{nameof(ProtocolSettings.SeedList)}";
+
+        /// <summary>
+        /// Configuration key for <see cref="ProtocolSettings.MillisecondsPerBlock"/>.
+        /// </summary>
         public static readonly string MillisecondsPerBlockKey = $"{SectionKey}:{nameof(ProtocolSettings.MillisecondsPerBlock)}";
+
+        /// <summary>
+        /// Configuration key for <see cref="ProtocolSettings.MaxTransactionsPerBlock"/>.
+        /// </summary>
         public static readonly string MaxTransactionsPerBlockKey = $"{SectionKey}:{nameof(ProtocolSettings.MaxTransactionsPerBlock)}";
+
+        /// <summary>
+        /// Configuration key for <see cref="ProtocolSettings.MemoryPoolMaxTransactions"/>.
+        /// </summary>
         public static readonly string MemoryPoolMaxTransactionsKey = $"{SectionKey}:{nameof(ProtocolSettings.MemoryPoolMaxTransactions)}";
+
+        /// <summary>
+        /// Configuration key for <see cref="ProtocolSettings.MaxTraceableBlocks"/>.
+        /// </summary>
         public static readonly string MaxTraceableBlocksKey = $"{SectionKey}:{nameof(ProtocolSettings.MaxTraceableBlocks)}";
+
+        /// <summary>
+        /// Configuration key for <see cref="ProtocolSettings.InitialGasDistribution"/>.
+        /// </summary>
         public static readonly string InitialGasDistributionKey = $"{SectionKey}:{nameof(ProtocolSettings.InitialGasDistribution)}";
     }
 }

@@ -27,8 +27,14 @@ using System.Text.Json.Serialization;
 
 namespace Neo.Wallet.Json
 {
+    /// <summary>
+    /// JSON model for a <see cref="Nep6WalletAccount"/>, storing the NEP-2 key material.
+    /// </summary>
     public class Nep6WalletAccountModel : WalletAccountModel<ProtocolSettingsOptions>, IMap<Nep6WalletAccount>
     {
+        /// <summary>
+        /// Gets or sets the NEP-2 key material as a UTF-8 byte array.
+        /// </summary>
         [JsonConverter(typeof(JsonStringByteArrayConverter))]
         public override byte[]? Key { get => base.Key; set => base.Key = value; }
 

@@ -30,9 +30,19 @@ using System.Linq;
 
 namespace Neo.Core.Blockchain
 {
+    /// <summary>
+    /// A NEO transaction that can be verified, inventoried, and serialized.
+    /// </summary>
     public class Transaction : IEquatable<Transaction>, IInventory, INeoSerializable, IVerifiable
     {
+        /// <summary>
+        /// The maximum allowed size of a serialized transaction in bytes.
+        /// </summary>
         public const int MaxTransactionSize = 102400;
+
+        /// <summary>
+        /// The maximum number of attributes allowed on a transaction.
+        /// </summary>
         public const int MaxTransactionAttributes = 16;
 
         /// <summary>
@@ -40,6 +50,9 @@ namespace Neo.Core.Blockchain
         /// </summary>
         public byte Version { get; set; }
 
+        /// <summary>
+        /// Gets the hash of this transaction.
+        /// </summary>
         public UInt256 Hash => this.ToArray().ToTxHash();
 
         /// <summary>
@@ -82,6 +95,9 @@ namespace Neo.Core.Blockchain
         /// </summary>
         public Signer[] Signers { get; set; } = [];
 
+        /// <summary>
+        /// The witnesses of the transaction.
+        /// </summary>
         public Witness[] Witnesses { get; set; } = [];
 
         /// <summary>
@@ -90,8 +106,14 @@ namespace Neo.Core.Blockchain
         /// <remarks>Note: The sender will pay the fees of the transaction.</remarks>
         public UInt160 Sender => Signers.FirstOrDefault()?.Account ?? UInt160.Zero;
 
+        /// <summary>
+        /// Gets the inventory type for this transaction.
+        /// </summary>
         public InventoryType InventoryType => InventoryType.TX;
 
+        /// <summary>
+        /// Gets the serialized size of this transaction in bytes.
+        /// </summary>
         public int Size =>
             sizeof(byte) +  //Version
             sizeof(uint) +  //Nonce
@@ -103,11 +125,20 @@ namespace Neo.Core.Blockchain
             Script.GetSerializedSize() +
             Witnesses.GetSerializedSize();
 
+        /// <summary>
+        /// Returns a hash code for this transaction based on its hash.
+        /// </summary>
+        /// <returns>A hash code for the current transaction.</returns>
         public override int GetHashCode()
         {
             return Hash.GetHashCode();
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current transaction.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current instance.</param>
+        /// <returns><see langword="true"/> if the objects are equal; otherwise, <see langword="false"/>.</returns>
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
             if (ReferenceEquals(obj, this)) return true;
@@ -115,6 +146,11 @@ namespace Neo.Core.Blockchain
             return Equals(obj as Transaction);
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="Transaction"/> is equal to the current instance.
+        /// </summary>
+        /// <param name="other">The transaction to compare with the current instance.</param>
+        /// <returns><see langword="true"/> if the transactions have the same hash; otherwise, <see langword="false"/>.</returns>
         public bool Equals([NotNullWhen(true)] Transaction? other)
         {
             if (ReferenceEquals(other, this)) return true;
@@ -122,6 +158,10 @@ namespace Neo.Core.Blockchain
             return Hash == other.Hash;
         }
 
+        /// <summary>
+        /// Deserializes this transaction from the specified stream.
+        /// </summary>
+        /// <param name="reader">The stream to read from.</param>
         public void Deserialize(Stream reader)
         {
             Version = reader.Read<byte>();
@@ -135,6 +175,10 @@ namespace Neo.Core.Blockchain
             Witnesses = reader.ReadObjects<Witness>();
         }
 
+        /// <summary>
+        /// Serializes this transaction to the specified stream.
+        /// </summary>
+        /// <param name="writer">The stream to write to.</param>
         public void Serialize(Stream writer)
         {
             writer.Write(Version);

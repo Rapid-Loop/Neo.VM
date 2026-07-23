@@ -26,8 +26,14 @@ using System;
 
 namespace Neo.VM.Extensions
 {
+    /// <summary>
+    /// Source-generated logging helpers for virtual machine execution events.
+    /// </summary>
     internal static partial class LoggerExtensions
     {
+        /// <summary>
+        /// Logs a VM execute message.
+        /// </summary>
         [LoggerMessage(
             EventId = VirtualMachineEventId.Execute,
             EventName = nameof(VirtualMachineEventId.Execute),
@@ -39,6 +45,9 @@ namespace Neo.VM.Extensions
             string message
         );
 
+        /// <summary>
+        /// Logs a VM load message.
+        /// </summary>
         [LoggerMessage(
             EventId = VirtualMachineEventId.Load,
             EventName = nameof(VirtualMachineEventId.Load),
@@ -50,6 +59,9 @@ namespace Neo.VM.Extensions
             string message
         );
 
+        /// <summary>
+        /// Logs a VM fault message.
+        /// </summary>
         [LoggerMessage(
             EventId = VirtualMachineEventId.Fault,
             EventName = nameof(VirtualMachineEventId.Fault),
@@ -61,6 +73,9 @@ namespace Neo.VM.Extensions
             string message
         );
 
+        /// <summary>
+        /// Logs a VM fault with an exception.
+        /// </summary>
         [LoggerMessage(
             EventId = VirtualMachineEventId.Fault,
             Message = ""
@@ -71,6 +86,9 @@ namespace Neo.VM.Extensions
             Exception exception
         );
 
+        /// <summary>
+        /// Logs a VM break (debugger breakpoint) message.
+        /// </summary>
         [LoggerMessage(
             EventId = VirtualMachineEventId.Break,
             EventName = nameof(VirtualMachineEventId.Break),

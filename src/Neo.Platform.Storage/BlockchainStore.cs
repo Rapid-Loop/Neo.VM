@@ -35,10 +35,19 @@ using System.IO;
 
 namespace Neo.Platform.Storage
 {
+    /// <summary>
+    /// RocksDB-backed blockchain key/value store implementing <see cref="IStore"/>.
+    /// </summary>
     public sealed class BlockchainStore : IEnumerable<KeyValuePair<byte[], byte[]>>, IStore
     {
+        /// <summary>
+        /// Gets the store options used to open the database.
+        /// </summary>
         public BlockchainStoreOptions StoreOptions => _storeOptions.Value;
 
+        /// <summary>
+        /// Gets the backup options used when creating backups.
+        /// </summary>
         public BlockchainBackupOptions BackupOptions => _backupOptions.Value;
 
         internal RocksDb Database => _db;
@@ -58,6 +67,12 @@ namespace Neo.Platform.Storage
         private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _logger;
 
+        /// <summary>
+        /// Opens or creates a RocksDB database at the path specified by <paramref name="options"/>.
+        /// </summary>
+        /// <param name="options">Store options, including the database path.</param>
+        /// <param name="backupOptions">Optional backup options. When omitted, default backup options are used.</param>
+        /// <param name="loggerFactory">Optional logger factory. When omitted, a null logger is used.</param>
         public BlockchainStore(
             IOptions<BlockchainStoreOptions> options,
             IOptions<BlockchainBackupOptions>? backupOptions = default,
@@ -128,6 +143,9 @@ namespace Neo.Platform.Storage
             _db = RocksDb.Open(dbOptions, _storeOptions.Value.DatabasePath, s_columnFamilies);
         }
 
+        /// <summary>
+        /// Releases the underlying RocksDB database and related native resources.
+        /// </summary>
         public void Dispose()
         {
             _db.Dispose();
@@ -135,6 +153,13 @@ namespace Neo.Platform.Storage
             _bloomFilter.Dispose();
         }
 
+        /// <summary>
+        /// Creates a RocksDB checkpoint in the specified directory.
+        /// </summary>
+        /// <param name="checkpointDirectory">The directory that will receive the checkpoint.</param>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="checkpointDirectory"/> is <see langword="null"/> or empty.
+        /// </exception>
         public void CreateCheckpoint(string checkpointDirectory)
         {
             if (string.IsNullOrEmpty(checkpointDirectory))
@@ -149,9 +174,17 @@ namespace Neo.Platform.Storage
                 _logger.LogCheckpointMessage(logLevel, $"Created checkpoint: \'{checkpointDirectory}\'");
         }
 
+        /// <summary>
+        /// Creates a backup handle for this store.
+        /// </summary>
+        /// <returns>An <see cref="IStoreBackup"/> bound to this database.</returns>
         public IStoreBackup CreateBackup() =>
             new BlockchainStoreBackup(_db, _backupOptions, _loggerFactory);
 
+        /// <summary>
+        /// Creates a consistent snapshot of the current store state.
+        /// </summary>
+        /// <returns>An <see cref="IStoreSnapshot"/> for transactional reads and writes.</returns>
         public IStoreSnapshot CreateSnapshot()
         {
             var logLevel = LogLevel.Debug;
@@ -162,6 +195,11 @@ namespace Neo.Platform.Storage
             return new BlockchainStoreSnapshot(this, _db, _loggerFactory);
         }
 
+        /// <summary>
+        /// Writes <paramref name="value"/> under <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">The storage key.</param>
+        /// <param name="value">The value to store.</param>
         public void Put(ReadOnlySpan<byte> key, ReadOnlySpan<byte> value)
         {
             _db.Put(key, value);
@@ -172,6 +210,10 @@ namespace Neo.Platform.Storage
                 _logger.LogWriteMessage(logLevel, $"Put key: 0x{Convert.ToHexStringLower(key)} value: 0x{Convert.ToHexStringLower(value)}");
         }
 
+        /// <summary>
+        /// Deletes the value associated with <paramref name="key"/> if it may exist.
+        /// </summary>
+        /// <param name="key">The storage key to delete.</param>
         public void Delete(ReadOnlySpan<byte> key)
         {
             if (_db.KeyMayExist(key))
@@ -185,6 +227,11 @@ namespace Neo.Platform.Storage
             }
         }
 
+        /// <summary>
+        /// Determines whether <paramref name="key"/> is present in the store.
+        /// </summary>
+        /// <param name="key">The storage key.</param>
+        /// <returns><see langword="true"/> if the key exists; otherwise, <see langword="false"/>.</returns>
         public bool ContainsKey(ReadOnlySpan<byte> key)
         {
             if (_db.KeyMayExist(key))
@@ -192,6 +239,11 @@ namespace Neo.Platform.Storage
             return false;
         }
 
+        /// <summary>
+        /// Gets the value for <paramref name="key"/>, or <see langword="null"/> if it does not exist.
+        /// </summary>
+        /// <param name="key">The storage key.</param>
+        /// <returns>The stored value, or <see langword="null"/> when missing.</returns>
         public byte[]? Get(ReadOnlySpan<byte> key)
         {
             if (_db.KeyMayExist(key))
@@ -210,6 +262,15 @@ namespace Neo.Platform.Storage
             return default;
         }
 
+        /// <summary>
+        /// Attempts to get the value for <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">The storage key.</param>
+        /// <param name="value">
+        /// When this method returns <see langword="true"/>, contains the stored value;
+        /// otherwise, <see langword="null"/>.
+        /// </param>
+        /// <returns><see langword="true"/> if the key was found; otherwise, <see langword="false"/>.</returns>
         public bool TryGet(ReadOnlySpan<byte> key, [NotNullWhen(true)] out byte[]? value)
         {
             if (_db.KeyMayExist(key))
@@ -232,6 +293,14 @@ namespace Neo.Platform.Storage
             return false;
         }
 
+        /// <summary>
+        /// Iterates key/value pairs starting at or before <paramref name="keyOrPrefix"/>.
+        /// </summary>
+        /// <param name="keyOrPrefix">The seek key or prefix.</param>
+        /// <param name="seekFromEnd">
+        /// When <see langword="true"/>, iterates backward; otherwise, forward.
+        /// </param>
+        /// <returns>An enumerable of key/value pairs in seek order.</returns>
         public IEnumerable<KeyValuePair<byte[], byte[]>> Seek(ReadOnlyMemory<byte> keyOrPrefix, bool seekFromEnd = false)
         {
             using var iter = _db.NewIterator();
@@ -255,6 +324,10 @@ namespace Neo.Platform.Storage
             }
         }
 
+        /// <summary>
+        /// Returns a non-generic enumerator over all key/value pairs.
+        /// </summary>
+        /// <returns>An enumerator for the store contents.</returns>
         public IEnumerator GetEnumerator() =>
             GetEnumerator();
 

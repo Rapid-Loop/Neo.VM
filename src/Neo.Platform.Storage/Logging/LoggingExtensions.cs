@@ -25,8 +25,14 @@ using System;
 
 namespace Neo.Platform.Storage.Logging
 {
+    /// <summary>
+    /// Source-generated logging helpers for blockchain store operations.
+    /// </summary>
     internal static partial class LoggerExtensions
     {
+        /// <summary>
+        /// Logs a store fault message.
+        /// </summary>
         [LoggerMessage(
             EventId = StoreEventId.Fault,
             EventName = nameof(StoreEventId.Fault),
@@ -38,6 +44,9 @@ namespace Neo.Platform.Storage.Logging
             string message
         );
 
+        /// <summary>
+        /// Logs a store fault with an exception.
+        /// </summary>
         [LoggerMessage(
             EventId = StoreEventId.Fault,
             Message = ""
@@ -48,6 +57,9 @@ namespace Neo.Platform.Storage.Logging
             Exception exception
         );
 
+        /// <summary>
+        /// Logs a store read message.
+        /// </summary>
         [LoggerMessage(
             EventId = StoreEventId.Read,
             EventName = nameof(StoreEventId.Read),
@@ -59,6 +71,9 @@ namespace Neo.Platform.Storage.Logging
             string message
         );
 
+        /// <summary>
+        /// Logs a store write message.
+        /// </summary>
         [LoggerMessage(
             EventId = StoreEventId.Write,
             EventName = nameof(StoreEventId.Write),
@@ -70,6 +85,9 @@ namespace Neo.Platform.Storage.Logging
             string message
         );
 
+        /// <summary>
+        /// Logs a store delete message.
+        /// </summary>
         [LoggerMessage(
             EventId = StoreEventId.Delete,
             EventName = nameof(StoreEventId.Delete),
@@ -81,6 +99,9 @@ namespace Neo.Platform.Storage.Logging
             string message
         );
 
+        /// <summary>
+        /// Logs a store snapshot message.
+        /// </summary>
         [LoggerMessage(
             EventId = StoreEventId.Snapshot,
             EventName = nameof(StoreEventId.Snapshot),
@@ -92,6 +113,9 @@ namespace Neo.Platform.Storage.Logging
             string message
         );
 
+        /// <summary>
+        /// Logs a store commit message.
+        /// </summary>
         [LoggerMessage(
             EventId = StoreEventId.Commit,
             EventName = nameof(StoreEventId.Commit),
@@ -103,6 +127,9 @@ namespace Neo.Platform.Storage.Logging
             string message
         );
 
+        /// <summary>
+        /// Logs a store backup message.
+        /// </summary>
         [LoggerMessage(
             EventId = StoreEventId.Backup,
             EventName = nameof(StoreEventId.Backup),
@@ -114,6 +141,9 @@ namespace Neo.Platform.Storage.Logging
             string message
         );
 
+        /// <summary>
+        /// Logs a store restore message.
+        /// </summary>
         [LoggerMessage(
             EventId = StoreEventId.Restore,
             EventName = nameof(StoreEventId.Restore),
@@ -125,6 +155,9 @@ namespace Neo.Platform.Storage.Logging
             string message
         );
 
+        /// <summary>
+        /// Logs a store checkpoint message.
+        /// </summary>
         [LoggerMessage(
             EventId = StoreEventId.Checkpoint,
             EventName = nameof(StoreEventId.Checkpoint),

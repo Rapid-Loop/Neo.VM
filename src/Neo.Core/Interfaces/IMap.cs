@@ -22,9 +22,17 @@
 
 namespace Neo.Core.Interfaces
 {
+    /// <summary>
+    /// Maps an instance to a destination representation of type <typeparamref name="TDestination"/>.
+    /// </summary>
+    /// <typeparam name="TDestination">The type of the mapped result.</typeparam>
     public interface IMap<TDestination>
         where TDestination : notnull
     {
+        /// <summary>
+        /// Converts this instance to a <typeparamref name="TDestination"/> value.
+        /// </summary>
+        /// <returns>The mapped destination object.</returns>
         TDestination ToObject();
     }
 }

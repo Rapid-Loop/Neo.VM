@@ -26,12 +26,25 @@ using Neo.Core.VM.SmartContract;
 
 namespace Neo.Wallet.Json
 {
+    /// <summary>
+    /// JSON model for a named contract parameter type.
+    /// </summary>
     public class ContractParameterModel : JsonModel, IMap<MethodParameterType>
     {
+        /// <summary>
+        /// Gets or sets the parameter name.
+        /// </summary>
         public string? Name { get; set; }
 
+        /// <summary>
+        /// Gets or sets the parameter type.
+        /// </summary>
         public MethodParameterType Type { get; set; }
 
+        /// <summary>
+        /// Converts this model to a <see cref="MethodParameterType"/>.
+        /// </summary>
+        /// <returns>The parameter <see cref="Type"/>.</returns>
         public MethodParameterType ToObject() =>
             Type;
     }

@@ -24,5 +24,10 @@ using System.CommandLine;
 
 namespace Neo.Platform.Hosting.Middleware
 {
+    /// <summary>
+    /// Continues the <see cref="Builder.PlatformCommandLineBuilder"/> middleware chain
+    /// with the current <see cref="ParseResult"/>.
+    /// </summary>
+    /// <param name="parseResult">The parse result to pass to the next middleware.</param>
     public delegate void PlatformCommandLineNextDelegate(ParseResult parseResult);
 }

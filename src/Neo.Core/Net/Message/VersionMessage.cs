@@ -30,26 +30,56 @@ using System.Reflection;
 
 namespace Neo.Core.Net.Message
 {
+    /// <summary>
+    /// Payload for the P2P Version handshake message.
+    /// </summary>
     public class VersionMessage : INeoSerializable
     {
+        /// <summary>
+        /// The maximum number of capabilities allowed in a version payload.
+        /// </summary>
         public const int MaxCapabilities = 32;
 
         private readonly static string s_version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.0.0";
 
+        /// <summary>
+        /// Gets the network magic of the sending node.
+        /// </summary>
         public uint Network { get; private set; }
 
+        /// <summary>
+        /// Gets the protocol version of the sending node.
+        /// </summary>
         public uint Version { get; private set; } = 0u;
 
+        /// <summary>
+        /// Gets the Unix timestamp (seconds) when this payload was created.
+        /// </summary>
         public uint Timestamp { get; private set; } = CoreUtilities.ToUnixTimeSeconds(DateTime.UtcNow);
 
+        /// <summary>
+        /// Gets the random nonce identifying the sending node.
+        /// </summary>
         public uint Nonce { get; private set; } = RandomNumberFactory.NextUInt32();
 
+        /// <summary>
+        /// Gets a value indicating whether the peer allows payload compression.
+        /// </summary>
         public bool AllowCompression => !Capabilities.Any(static a => a.Type == NodeCapabilityType.DisableCompression);
 
+        /// <summary>
+        /// Gets the user agent string of the sending node.
+        /// </summary>
         public string UserAgent { get; private set; } = $"/RapidLoop:{s_version}/";
 
+        /// <summary>
+        /// Gets the node capabilities advertised by the sender.
+        /// </summary>
         public NodeCapabilityMessage[] Capabilities { get; private set; } = [];
 
+        /// <summary>
+        /// Gets the serialized size of this payload in bytes.
+        /// </summary>
         public int Size =>
             sizeof(uint) + // Network
             sizeof(uint) + // Version
@@ -58,6 +88,12 @@ namespace Neo.Core.Net.Message
             UserAgent.GetSerializedSize() +   // UserAgent
             Capabilities.GetSerializedSize(); // Node Capabilities
 
+        /// <summary>
+        /// Creates a version payload for the specified network and capabilities.
+        /// </summary>
+        /// <param name="network">The network magic number.</param>
+        /// <param name="capabilities">The node capabilities to advertise.</param>
+        /// <returns>A new <see cref="VersionMessage"/>.</returns>
         public static VersionMessage Create(uint network, params NodeCapabilityMessage[] capabilities) =>
             new()
             {
@@ -65,6 +101,13 @@ namespace Neo.Core.Net.Message
                 Capabilities = capabilities,
             };
 
+        /// <summary>
+        /// Creates a version payload with an explicit node nonce.
+        /// </summary>
+        /// <param name="network">The network magic number.</param>
+        /// <param name="nonce">The local node nonce.</param>
+        /// <param name="capabilities">The node capabilities to advertise.</param>
+        /// <returns>A new <see cref="VersionMessage"/>.</returns>
         public static VersionMessage Create(uint network, uint nonce, params NodeCapabilityMessage[] capabilities) =>
             new()
             {
@@ -73,6 +116,11 @@ namespace Neo.Core.Net.Message
                 Capabilities = capabilities,
             };
 
+        /// <summary>
+        /// Deserializes this payload from the specified stream.
+        /// </summary>
+        /// <param name="reader">The stream to read from.</param>
+        /// <exception cref="FormatException">Capability count exceeds the limit or capabilities are duplicated.</exception>
         public void Deserialize(Stream reader)
         {
             Network = reader.Read<uint>();
@@ -94,6 +142,10 @@ namespace Neo.Core.Net.Message
                 throw new FormatException("Duplicate node capabilities.");
         }
 
+        /// <summary>
+        /// Serializes this payload to the specified stream.
+        /// </summary>
+        /// <param name="writer">The stream to write to.</param>
         public void Serialize(Stream writer)
         {
             writer.Write(Network);

@@ -34,8 +34,14 @@ namespace Neo.Core.Net.Message
     /// </summary>
     public abstract class NodeCapabilityMessage : INeoSerializable
     {
+        /// <summary>
+        /// Gets the capability type of this message.
+        /// </summary>
         public abstract NodeCapabilityType Type { get; }
 
+        /// <summary>
+        /// Gets the serialized size of this capability in bytes.
+        /// </summary>
         public virtual int Size =>
             sizeof(NodeCapabilityType);
 
@@ -73,6 +79,10 @@ namespace Neo.Core.Net.Message
             DeserializeWithoutType(reader);
         }
 
+        /// <summary>
+        /// Serializes this capability to the specified stream.
+        /// </summary>
+        /// <param name="writer">The stream to write to.</param>
         public void Serialize(Stream writer)
         {
             writer.Write(Type);

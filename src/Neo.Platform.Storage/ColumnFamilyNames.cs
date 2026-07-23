@@ -22,8 +22,14 @@
 
 namespace Neo.Platform.Storage
 {
+    /// <summary>
+    /// Well-known RocksDB column family names used by the blockchain store.
+    /// </summary>
     public static class ColumnFamilyNames
     {
+        /// <summary>
+        /// The default column family name.
+        /// </summary>
         public static readonly string Default = "default";
     }
 }

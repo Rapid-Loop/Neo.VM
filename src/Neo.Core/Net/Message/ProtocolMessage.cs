@@ -43,12 +43,24 @@ namespace Neo.Core.Net.Message
         private const int CompressionMinSize = 128;
         private const int CompressionThreshold = 64;
 
+        /// <summary>
+        /// Gets the message flags (for example, compressed).
+        /// </summary>
         public ProtocolMessageFlags Flags { get; private set; }
 
+        /// <summary>
+        /// Gets the protocol command of this frame.
+        /// </summary>
         public ProtocolMessageCommand Command { get; private set; }
 
+        /// <summary>
+        /// Gets the decoded payload object when known (Version, Ping, or Pong); otherwise, <see langword="null"/>.
+        /// </summary>
         public INeoSerializable? Message => _protocolMessage;
 
+        /// <summary>
+        /// Gets a value indicating whether the payload is LZ4-compressed on the wire.
+        /// </summary>
         public bool Compressed => Flags.HasFlag(ProtocolMessageFlags.Compressed);
 
         /// <summary>
@@ -56,6 +68,9 @@ namespace Neo.Core.Net.Message
         /// </summary>
         public ReadOnlyMemory<byte> PayloadBytes => _compressedPayloadBytes;
 
+        /// <summary>
+        /// Gets the serialized size of this frame in bytes.
+        /// </summary>
         public int Size =>
             sizeof(ProtocolMessageFlags) +
             sizeof(ProtocolMessageCommand) +
@@ -195,6 +210,10 @@ namespace Neo.Core.Net.Message
             return ms.ToArray();
         }
 
+        /// <summary>
+        /// Deserializes this frame from the specified stream.
+        /// </summary>
+        /// <param name="reader">The stream to read from.</param>
         public void Deserialize(Stream reader)
         {
             Flags = reader.Read<ProtocolMessageFlags>();
@@ -205,6 +224,10 @@ namespace Neo.Core.Net.Message
             DecodePayload();
         }
 
+        /// <summary>
+        /// Serializes this frame to the specified stream.
+        /// </summary>
+        /// <param name="writer">The stream to write to.</param>
         public void Serialize(Stream writer)
         {
             writer.Write(Flags);

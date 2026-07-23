@@ -25,6 +25,9 @@ using System;
 
 namespace Neo.Core.VM.Attributes
 {
+    /// <summary>
+    /// Describes an interoperable service method exposed to the VM, including pricing, permissions, and type metadata.
+    /// </summary>
     [AttributeUsage(
         AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Event,
         AllowMultiple = true
@@ -51,8 +54,14 @@ namespace Neo.Core.VM.Attributes
         /// </summary>
         public required CallFlags CallFlags { get; init; } = CallFlags.None;
 
+        /// <summary>
+        /// Indicates whether the method is safe to invoke without changing chain state.
+        /// </summary>
         public required bool Safe { get; init; }
 
+        /// <summary>
+        /// The return type of the interoperable service method.
+        /// </summary>
         public required MethodParameterType ReturnType { get; init; } = MethodParameterType.Any;
     }
 }

@@ -22,6 +22,9 @@
 
 namespace Neo.Core.Blockchain.Interface
 {
+    /// <summary>
+    /// An object that can be cryptographically verified via its hash and witnesses.
+    /// </summary>
     public interface IVerifiable
     {
         /// <summary>

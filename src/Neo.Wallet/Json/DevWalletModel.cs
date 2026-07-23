@@ -24,8 +24,15 @@ using Neo.Core.Interfaces;
 
 namespace Neo.Wallet.Json
 {
+    /// <summary>
+    /// JSON model for a <see cref="DevWallet"/>.
+    /// </summary>
     public class DevWalletModel : WalletModel<object, DevWalletAccountModel>, IMap<DevWallet>
     {
+        /// <summary>
+        /// Converts this model to a <see cref="DevWallet"/>.
+        /// </summary>
+        /// <returns>A development wallet initialized from this model.</returns>
         public DevWallet ToObject() =>
             new(this);
     }

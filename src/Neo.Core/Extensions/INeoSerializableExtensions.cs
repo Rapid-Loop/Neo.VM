@@ -26,6 +26,9 @@ using System.Linq;
 
 namespace Neo.Core.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for <see cref="INeoSerializable"/> types.
+    /// </summary>
     public static class INeoSerializableExtensions
     {
         /// <summary>
@@ -41,6 +44,11 @@ namespace Neo.Core.Extensions
             return ms.ToArray();
         }
 
+        /// <summary>
+        /// Gets the serialized size of an array of <see cref="INeoSerializable"/> objects, including the compact-size length prefix.
+        /// </summary>
+        /// <param name="source">The array of serializable objects.</param>
+        /// <returns>The number of bytes required to serialize the array.</returns>
         public static int GetSerializedSize(this INeoSerializable[] source) =>
             source.Length.GetCompactSize() +
             source.Sum(static s => s.Size);

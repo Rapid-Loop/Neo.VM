@@ -25,8 +25,19 @@ using System.Reflection;
 
 namespace Neo.Core.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for <see cref="Type"/>.
+    /// </summary>
     public static class TypeExtensions
     {
+        /// <summary>
+        /// Creates a new instance of the specified type using its public or non-public parameterless constructor.
+        /// </summary>
+        /// <param name="source">The type to instantiate.</param>
+        /// <returns>A newly constructed instance of <paramref name="source"/>.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the type does not have a parameterless constructor.
+        /// </exception>
         public static object CreateInitializedObject(this Type source)
         {
             // Try to get the private/public parameterless constructor.

@@ -26,10 +26,21 @@ using System.Collections.Generic;
 
 namespace Neo.Platform.Hosting.Configuration
 {
+    /// <summary>
+    /// Configuration source that supplies Neo environment-related settings.
+    /// </summary>
     internal class NeoEnvironmentConfigurationSource : IConfigurationSource
     {
+        /// <summary>
+        /// Optional initial key/value pairs merged into the configuration provider.
+        /// </summary>
         public IEnumerable<KeyValuePair<string, string?>>? InitialData { get; set; }
 
+        /// <summary>
+        /// Builds a configuration provider for this source.
+        /// </summary>
+        /// <param name="builder">The configuration builder.</param>
+        /// <returns>A <see cref="NeoEnvironmentConfigurationProvider"/> instance.</returns>
         public IConfigurationProvider Build(IConfigurationBuilder builder) =>
             new NeoEnvironmentConfigurationProvider(this);
     }

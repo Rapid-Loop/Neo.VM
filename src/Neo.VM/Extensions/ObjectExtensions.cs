@@ -29,8 +29,19 @@ using System.Numerics;
 
 namespace Neo.VM.Extensions
 {
+    /// <summary>
+    /// Extension methods for converting CLR values to <see cref="VMObject"/> stack items.
+    /// </summary>
     public static class ObjectExtensions
     {
+        /// <summary>
+        /// Converts a CLR value into the corresponding <see cref="VMObject"/> representation.
+        /// Supported primitives become integer, boolean, or byte-string items; sequences become arrays;
+        /// other reference types become <see cref="VMInteropInterface"/> wrappers.
+        /// </summary>
+        /// <typeparam name="TSource">The source value type.</typeparam>
+        /// <param name="source">The value to convert; <see langword="null"/> becomes <see cref="VMNull.Instance"/>.</param>
+        /// <returns>A stack item suitable for evaluation-stack operations.</returns>
         public static VMObject ToStackItem<TSource>(this TSource? source) =>
             source switch
             {

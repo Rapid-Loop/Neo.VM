@@ -27,8 +27,17 @@ using System.Threading.Tasks;
 
 namespace Neo.Platform.CLI.Commands
 {
+    /// <summary>
+    /// A no-op command-line action that always succeeds with exit code 0.
+    /// </summary>
     public class EmptyHandler : AsynchronousCommandLineAction
     {
+        /// <summary>
+        /// Invokes the handler without performing any work.
+        /// </summary>
+        /// <param name="parseResult">The parse result for the current command invocation.</param>
+        /// <param name="cancellationToken">A token that can cancel the operation.</param>
+        /// <returns>A completed task with exit code 0.</returns>
         public override Task<int> InvokeAsync(ParseResult parseResult, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(0);

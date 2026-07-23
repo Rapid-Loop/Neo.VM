@@ -117,6 +117,13 @@ namespace Neo.Core.Blockchain
             return sb.ToArray();
         }
 
+        /// <summary>
+        /// Determines whether the specified redeem script is a multi-signature contract script.
+        /// </summary>
+        /// <param name="redeemScriptBytes">The redeem script to inspect.</param>
+        /// <returns>
+        /// <see langword="true"/> if the script ends with a multi-signature system call; otherwise, <see langword="false"/>.
+        /// </returns>
         public static bool IsMultiSigContract(byte[] redeemScriptBytes)
         {
             using var sb = new ScriptBuilder();

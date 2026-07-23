@@ -30,15 +30,26 @@ namespace Neo.Core.Net
     /// Pure Neo N3 handshake state machine (no I/O).
     /// Local already sent Version; then: receive Version → send Verack → receive Verack → Ready.
     /// </summary>
+    /// <param name="network">The local network magic expected from the remote Version.</param>
+    /// <param name="localNonce">The local node nonce; matching remote nonce is treated as a self-connection.</param>
     public sealed class NodeHandshake(uint network, uint localNonce)
     {
         private readonly uint _network = network;
         private readonly uint _localNonce = localNonce;
 
+        /// <summary>
+        /// Gets the current handshake state.
+        /// </summary>
         public NodeHandshakeState State { get; private set; } = NodeHandshakeState.WaitingForVersion;
 
+        /// <summary>
+        /// Gets the remote Version payload after it has been accepted.
+        /// </summary>
         public VersionMessage? RemoteVersion { get; private set; }
 
+        /// <summary>
+        /// Gets a value indicating whether the handshake has completed successfully.
+        /// </summary>
         public bool IsReady => State == NodeHandshakeState.Ready;
 
         /// <summary>

@@ -22,15 +22,49 @@
 
 namespace Neo.Core.VM
 {
+    /// <summary>
+    /// Identifies protocol hard forks that may change VM behavior, gas costs, or features.
+    /// </summary>
     public enum HardFork : byte
     {
+        /// <summary>
+        /// The initial protocol state before any named hard fork.
+        /// </summary>
         Genesis = 0,
+
+        /// <summary>
+        /// The Aspidochelone hard fork.
+        /// </summary>
         Aspidochelone,
+
+        /// <summary>
+        /// The Basilisk hard fork.
+        /// </summary>
         Basilisk,
+
+        /// <summary>
+        /// The Cockatrice hard fork.
+        /// </summary>
         Cockatrice,
+
+        /// <summary>
+        /// The Domovoi hard fork.
+        /// </summary>
         Domovoi,
+
+        /// <summary>
+        /// The Echidna hard fork.
+        /// </summary>
         Echidna,
+
+        /// <summary>
+        /// The Faun hard fork.
+        /// </summary>
         Faun,
+
+        /// <summary>
+        /// The Gorgon hard fork.
+        /// </summary>
         Gorgon,
     }
 }

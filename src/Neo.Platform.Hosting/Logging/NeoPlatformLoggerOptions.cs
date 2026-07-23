@@ -24,15 +24,33 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Neo.Platform.Hosting.Logging
 {
+    /// <summary>
+    /// Options that control Neo platform console log formatting.
+    /// </summary>
     public sealed class NeoPlatformLoggerOptions
     {
+        /// <summary>
+        /// The default timestamp format string used by <see cref="TimestampFormat"/>.
+        /// </summary>
         public const string DefaultDateTimeFormatString = "yyyy-MM-dd HH:mm:ss.ffff";
 
+        /// <summary>
+        /// Gets or sets a value indicating whether log timestamps use UTC.
+        /// Defaults to <see langword="true"/>.
+        /// </summary>
         public bool UseUtcTimestamp { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets the .NET date/time format string used for log timestamps.
+        /// Defaults to <see cref="DefaultDateTimeFormatString"/>.
+        /// </summary>
         [StringSyntax(StringSyntaxAttribute.DateTimeFormat)]
         public string TimestampFormat { get; set; } = DefaultDateTimeFormatString;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether exception stack traces are written to the console.
+        /// Defaults to <see langword="true"/>.
+        /// </summary>
         public bool ShowExceptionStackTrace { get; set; } = true;
     }
 }

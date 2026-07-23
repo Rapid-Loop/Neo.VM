@@ -22,8 +22,14 @@
 
 namespace Neo.Core.Blockchain.Interface
 {
+    /// <summary>
+    /// An inventory item that can be relayed on the network (transaction, block, or extensible payload).
+    /// </summary>
     public interface IInventory
     {
+        /// <summary>
+        /// Gets the inventory type of this item.
+        /// </summary>
         InventoryType InventoryType { get; }
     }
 }

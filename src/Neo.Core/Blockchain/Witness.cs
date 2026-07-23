@@ -26,11 +26,24 @@ using System.IO;
 
 namespace Neo.Core.Blockchain
 {
+    /// <summary>
+    /// A cryptographic witness consisting of invocation and verification scripts.
+    /// </summary>
     public class Witness : INeoSerializable
     {
+        /// <summary>
+        /// The maximum allowed length of an invocation script in bytes.
+        /// </summary>
         public const int MaxInvocationScript = 1024;
+
+        /// <summary>
+        /// The maximum allowed length of a verification script in bytes.
+        /// </summary>
         public const int MaxVerificationScript = 1024;
 
+        /// <summary>
+        /// Gets an empty witness with no scripts.
+        /// </summary>
         public static Witness Empty => new();
 
         /// <summary>
@@ -48,16 +61,27 @@ namespace Neo.Core.Blockchain
         /// </summary>
         public UInt160 ScriptHash => VerificationScript.ToScriptHash();
 
+        /// <summary>
+        /// Gets the serialized size of this witness in bytes.
+        /// </summary>
         public int Size =>
             InvocationScript.GetSerializedSize() +
             VerificationScript.GetSerializedSize();
 
+        /// <summary>
+        /// Deserializes this witness from the specified stream.
+        /// </summary>
+        /// <param name="reader">The stream to read from.</param>
         public void Deserialize(Stream reader)
         {
             InvocationScript = reader.ReadDynamic<byte>();
             VerificationScript = reader.ReadDynamic<byte>();
         }
 
+        /// <summary>
+        /// Serializes this witness to the specified stream.
+        /// </summary>
+        /// <param name="writer">The stream to write to.</param>
         public void Serialize(Stream writer)
         {
             writer.Write<byte>(InvocationScript);

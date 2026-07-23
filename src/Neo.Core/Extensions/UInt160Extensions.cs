@@ -24,6 +24,9 @@ using Neo.Core.Text;
 
 namespace Neo.Core.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for <see cref="UInt160"/>.
+    /// </summary>
     public static class UInt160Extensions
     {
         /// <summary>

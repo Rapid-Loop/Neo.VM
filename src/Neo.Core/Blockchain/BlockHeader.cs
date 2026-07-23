@@ -29,6 +29,9 @@ using System.IO;
 
 namespace Neo.Core.Blockchain
 {
+    /// <summary>
+    /// A blockchain block header without transaction bodies.
+    /// </summary>
     public class BlockHeader : IEquatable<BlockHeader>, INeoSerializable, IVerifiable
     {
         /// <summary>
@@ -36,6 +39,9 @@ namespace Neo.Core.Blockchain
         /// </summary>
         public uint Version { get; set; }
 
+        /// <summary>
+        /// Gets the hash of this block header.
+        /// </summary>
         public virtual UInt256 Hash => this.ToArray().ToTxHash();
 
         /// <summary>
@@ -83,6 +89,9 @@ namespace Neo.Core.Blockchain
         /// </summary>
         public Witness[] Witnesses => [Witness];
 
+        /// <summary>
+        /// Gets the serialized size of this block header in bytes.
+        /// </summary>
         public virtual int Size =>
             sizeof(uint) +      // Version
             UInt256.Length +    // PrevHash
@@ -94,11 +103,20 @@ namespace Neo.Core.Blockchain
             UInt160.Length +    // NextConsensus
             Witnesses.GetSerializedSize();
 
+        /// <summary>
+        /// Returns a hash code for this header based on its hash.
+        /// </summary>
+        /// <returns>A hash code for the current header.</returns>
         public override int GetHashCode()
         {
             return Hash.GetHashCode();
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="BlockHeader"/> is equal to the current instance.
+        /// </summary>
+        /// <param name="other">The header to compare with the current instance.</param>
+        /// <returns><see langword="true"/> if the headers have the same hash; otherwise, <see langword="false"/>.</returns>
         public bool Equals([NotNullWhen(true)] BlockHeader? other)
         {
             if (ReferenceEquals(other, this)) return true;
@@ -106,6 +124,11 @@ namespace Neo.Core.Blockchain
             return Hash == other.Hash;
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current header.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current instance.</param>
+        /// <returns><see langword="true"/> if the objects are equal; otherwise, <see langword="false"/>.</returns>
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
             if (ReferenceEquals(obj, this)) return true;
@@ -113,6 +136,11 @@ namespace Neo.Core.Blockchain
             return Equals(obj as BlockHeader);
         }
 
+        /// <summary>
+        /// Deserializes this header from the specified stream.
+        /// </summary>
+        /// <param name="reader">The stream to read from.</param>
+        /// <exception cref="FormatException">Version is not 0, or the witness count is not 1.</exception>
         public virtual void Deserialize(Stream reader)
         {
             Version = reader.Read<uint>();
@@ -133,6 +161,10 @@ namespace Neo.Core.Blockchain
             Witness = witnesses[0];
         }
 
+        /// <summary>
+        /// Serializes this header to the specified stream.
+        /// </summary>
+        /// <param name="writer">The stream to write to.</param>
         public virtual void Serialize(Stream writer)
         {
             writer.Write(Version);

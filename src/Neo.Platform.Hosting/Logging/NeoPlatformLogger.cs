@@ -26,6 +26,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Neo.Platform.Hosting.Logging
 {
+    /// <summary>
+    /// Console logger implementation used by the Neo platform host.
+    /// </summary>
     internal sealed class NeoPlatformLogger(
         string name,
         Func<NeoPlatformLoggerOptions> config) : ILogger
@@ -36,12 +39,15 @@ namespace Neo.Platform.Hosting.Logging
         private readonly string _name = name;
         private readonly Func<NeoPlatformLoggerOptions> _getConfig = config;
 
+        /// <inheritdoc />
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull =>
             default!;
 
+        /// <inheritdoc />
         public bool IsEnabled(LogLevel logLevel) =>
             logLevel != LogLevel.None;
 
+        /// <inheritdoc />
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             if (IsEnabled(logLevel) == false)
@@ -90,12 +96,19 @@ namespace Neo.Platform.Hosting.Logging
                 Write(format, DateTimeNow);
         }
 
+        /// <summary>
+        /// Writes a formatted message to standard output without a trailing newline.
+        /// </summary>
         public static void Write([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             var message = string.Format(format, args);
 
             Console.Out.Write(message);
         }
+
+        /// <summary>
+        /// Writes a formatted message to standard error without a trailing newline.
+        /// </summary>
         public static void ErrorWrite([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             var message = string.Format(format, args);
@@ -103,18 +116,33 @@ namespace Neo.Platform.Hosting.Logging
             Console.Error.Write(message);
         }
 
+        /// <summary>
+        /// Writes a newline to standard output.
+        /// </summary>
         public static void WriteLine() =>
             Write(Environment.NewLine);
 
+        /// <summary>
+        /// Writes a formatted message to standard output followed by a newline.
+        /// </summary>
         public static void WriteLine([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args) =>
             Write(string.Format(format, args) + Environment.NewLine);
 
+        /// <summary>
+        /// Writes a newline to standard error.
+        /// </summary>
         public static void ErrorWriteLine() =>
             ErrorWrite(Environment.NewLine);
 
+        /// <summary>
+        /// Writes a formatted message to standard error followed by a newline.
+        /// </summary>
         public static void ErrorWriteLine([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args) =>
             ErrorWrite(string.Format(format, args) + Environment.NewLine);
 
+        /// <summary>
+        /// Writes an information-level message with platform coloring.
+        /// </summary>
         public void InfoMessage([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             WriteDateTime();
@@ -125,6 +153,9 @@ namespace Neo.Platform.Hosting.Logging
             ResetColor();
         }
 
+        /// <summary>
+        /// Writes a warning-level message with platform coloring.
+        /// </summary>
         public void WarningMessage([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             WriteDateTime();
@@ -135,6 +166,9 @@ namespace Neo.Platform.Hosting.Logging
             ResetColor();
         }
 
+        /// <summary>
+        /// Writes a debug-level message with platform coloring.
+        /// </summary>
         public void DebugMessage([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             SetTerminalForegroundColor(ConsoleColor.DarkGray);
@@ -144,6 +178,9 @@ namespace Neo.Platform.Hosting.Logging
             ResetColor();
         }
 
+        /// <summary>
+        /// Writes a trace-level message with platform coloring.
+        /// </summary>
         public void TraceMessage([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             SetTerminalForegroundColor(ConsoleColor.DarkGray);
@@ -153,6 +190,11 @@ namespace Neo.Platform.Hosting.Logging
             ResetColor();
         }
 
+        /// <summary>
+        /// Writes exception details to standard error, optionally including a stack trace.
+        /// </summary>
+        /// <param name="exception">Exception to report.</param>
+        /// <param name="showStackTrace">When <see langword="true"/>, includes stack trace output.</param>
         public void ErrorMessage(Exception exception, bool showStackTrace = true)
         {
             var stackTrace = exception.InnerException?.StackTrace ?? exception.StackTrace;
@@ -174,6 +216,9 @@ namespace Neo.Platform.Hosting.Logging
             ResetColor();
         }
 
+        /// <summary>
+        /// Writes an error-level formatted message to standard error.
+        /// </summary>
         public void ErrorMessage([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             SetTerminalForegroundColor(ConsoleColor.Red);
@@ -185,16 +230,25 @@ namespace Neo.Platform.Hosting.Logging
             ResetColor();
         }
 
+        /// <summary>
+        /// Sets the console foreground color.
+        /// </summary>
         public static void SetTerminalForegroundColor(ConsoleColor consoleColor)
         {
             Console.ForegroundColor = consoleColor;
         }
 
+        /// <summary>
+        /// Sets the console background color.
+        /// </summary>
         public static void SetTerminalBackgroundColor(ConsoleColor consoleColor)
         {
             Console.BackgroundColor = consoleColor;
         }
 
+        /// <summary>
+        /// Resets console colors to the default.
+        /// </summary>
         public static void ResetColor()
         {
             Console.ResetColor();

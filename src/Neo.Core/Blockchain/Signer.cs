@@ -30,6 +30,9 @@ using System.IO;
 
 namespace Neo.Core.Blockchain
 {
+    /// <summary>
+    /// A transaction signer describing an account, witness scopes, and related permissions.
+    /// </summary>
     public class Signer : INeoSerializable, IEquatable<Signer>
     {
         /// <summary>
@@ -60,8 +63,16 @@ namespace Neo.Core.Blockchain
         /// </summary>
         public WitnessRule[] Rules { get; set; } = [];
 
+        /// <summary>
+        /// Gets the serialized size of this signer in bytes.
+        /// </summary>
+        /// <exception cref="NotImplementedException">Always thrown; size calculation is not implemented.</exception>
         public int Size => throw new NotImplementedException();
 
+        /// <summary>
+        /// Returns a hash code for this signer.
+        /// </summary>
+        /// <returns>A hash code for the current signer.</returns>
         public override int GetHashCode()
         {
             unchecked
@@ -78,12 +89,23 @@ namespace Neo.Core.Blockchain
             }
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current signer.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current instance.</param>
+        /// <returns><see langword="true"/> if the objects are equal; otherwise, <see langword="false"/>.</returns>
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
             if (ReferenceEquals(obj, this)) return true;
             if (obj is null) return false;
             return Equals(obj as Signer);
         }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="Signer"/> is equal to the current instance.
+        /// </summary>
+        /// <param name="other">The signer to compare with the current instance.</param>
+        /// <returns><see langword="true"/> if the signers are equal; otherwise, <see langword="false"/>.</returns>
         public bool Equals([NotNullWhen(true)] Signer? other)
         {
             if (ReferenceEquals(other, this)) return true;
@@ -106,6 +128,11 @@ namespace Neo.Core.Blockchain
             return true;
         }
 
+        /// <summary>
+        /// Deserializes this signer from the specified stream.
+        /// </summary>
+        /// <param name="reader">The stream to read from.</param>
+        /// <exception cref="FormatException"><see cref="Scopes"/> combines <see cref="WitnessScope.Global"/> with other flags.</exception>
         public void Deserialize(Stream reader)
         {
             Account.Deserialize(reader);
@@ -124,6 +151,10 @@ namespace Neo.Core.Blockchain
                 Rules = reader.ReadObjects<WitnessRule>();
         }
 
+        /// <summary>
+        /// Serializes this signer to the specified stream.
+        /// </summary>
+        /// <param name="writer">The stream to write to.</param>
         public void Serialize(Stream writer)
         {
             Account.Serialize(writer);

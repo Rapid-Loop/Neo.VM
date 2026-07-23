@@ -25,6 +25,9 @@ using System.Security.Cryptography;
 
 namespace Neo.Core.Cryptography
 {
+    /// <summary>
+    /// Computes the RIPEMD-160 cryptographic hash for the input data.
+    /// </summary>
     public class RipeMD160 : HashAlgorithm
     {
         private readonly byte[] _buffer;
@@ -41,6 +44,11 @@ namespace Neo.Core.Cryptography
             InitializeState();
         }
 
+        /// <summary>
+        /// Computes the RIPEMD-160 hash of the specified data.
+        /// </summary>
+        /// <param name="data">The data to hash.</param>
+        /// <returns>The 20-byte hash value.</returns>
         public static byte[] HashData(byte[] data)
         {
             using var hasher = new RipeMD160();
@@ -50,6 +58,9 @@ namespace Neo.Core.Cryptography
 #pragma warning restore CA1850
         }
 
+        /// <summary>
+        /// Initializes this instance for a new hash computation.
+        /// </summary>
         public override void Initialize()
         {
             InitializeState();

@@ -27,8 +27,21 @@ using System.Text.Json.Serialization;
 
 namespace Neo.Configuration.Json.Converters
 {
+    /// <summary>
+    /// Converts <see cref="ECPoint"/> values to and from hex-encoded JSON strings on the secp256r1 curve.
+    /// </summary>
     public class JsonStringECPointConverter : JsonConverter<ECPoint?>
     {
+        /// <summary>
+        /// Reads an <see cref="ECPoint"/> from a hex-encoded JSON string.
+        /// </summary>
+        /// <param name="reader">The reader positioned at the JSON value.</param>
+        /// <param name="typeToConvert">The type to convert.</param>
+        /// <param name="options">The serializer options.</param>
+        /// <returns>The parsed point, or <see langword="null"/> when the string is empty.</returns>
+        /// <exception cref="FormatException">
+        /// Thrown when the token is not a JSON string, or the string is not a valid secp256r1 point.
+        /// </exception>
         public override ECPoint? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType != JsonTokenType.String)
@@ -45,6 +58,12 @@ namespace Neo.Configuration.Json.Converters
             return value;
         }
 
+        /// <summary>
+        /// Writes an <see cref="ECPoint"/> as a hex-encoded JSON string, or JSON null when the value is <see langword="null"/>.
+        /// </summary>
+        /// <param name="writer">The writer to which the value is written.</param>
+        /// <param name="value">The point to write.</param>
+        /// <param name="options">The serializer options.</param>
         public override void Write(Utf8JsonWriter writer, ECPoint? value, JsonSerializerOptions options)
         {
             if (value is null)

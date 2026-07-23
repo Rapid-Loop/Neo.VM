@@ -30,6 +30,16 @@ using System.Linq;
 
 namespace Neo.Platform.Hosting.Builder
 {
+    /// <summary>
+    /// Fluent builder that wires System.CommandLine parsing with a Microsoft.Extensions host.
+    /// </summary>
+    /// <param name="rootCommand">
+    /// The root command to parse. When <see langword="null"/>, a new <see cref="RootCommand"/> is used.
+    /// </param>
+    /// <param name="args">
+    /// Command-line arguments to parse when <see cref="Build"/> is called.
+    /// When <see langword="null"/>, an empty argument list is used.
+    /// </param>
     public class PlatformCommandLineBuilder(Command? rootCommand = default, string[]? args = default)
     {
         internal Command Command { get; } = rootCommand ?? new RootCommand();
@@ -42,6 +52,19 @@ namespace Neo.Platform.Hosting.Builder
         internal void AddMiddleware(Action<ParseResult, PlatformCommandLineNextDelegate> middleware) =>
             _middleware.Add(middleware);
 
+        /// <summary>
+        /// Configures host creation middleware that runs after parsing.
+        /// </summary>
+        /// <param name="hostBuilderFactory">
+        /// Factory that creates an <see cref="IHostBuilder"/> from unmatched tokens.
+        /// When <see langword="null"/>, a new <see cref="HostBuilder"/> is created.
+        /// </param>
+        /// <param name="configure">Optional callback that further configures the host builder.</param>
+        /// <returns>The same builder for chaining.</returns>
+        /// <remarks>
+        /// The middleware stores the <see cref="ParseResult"/> on the host builder properties,
+        /// registers it for DI, and enables <see cref="HostingExtensions.UseNeoPlatformLifetime"/>.
+        /// </remarks>
         public PlatformCommandLineBuilder UseHost(
             Func<string[], IHostBuilder>? hostBuilderFactory,
             Action<IHostBuilder>? configure = default)
@@ -68,24 +91,43 @@ namespace Neo.Platform.Hosting.Builder
             return this;
         }
 
+        /// <summary>
+        /// Enables or disables the default System.CommandLine exception handler.
+        /// </summary>
+        /// <param name="value"><see langword="true"/> to enable the handler; otherwise, <see langword="false"/>.</param>
+        /// <returns>The same builder for chaining.</returns>
         public PlatformCommandLineBuilder EnableDefaultExceptionHandler(bool value = true)
         {
             InvocationConfiguration.EnableDefaultExceptionHandler = value;
             return this;
         }
 
+        /// <summary>
+        /// Sets the process termination timeout used during command invocation.
+        /// </summary>
+        /// <param name="timeout">The termination timeout.</param>
+        /// <returns>The same builder for chaining.</returns>
         public PlatformCommandLineBuilder SetProcessTerminationTimeout(TimeSpan timeout)
         {
             InvocationConfiguration.ProcessTerminationTimeout = timeout;
             return this;
         }
 
+        /// <summary>
+        /// Enables or disables POSIX-style option bundling for the parser.
+        /// </summary>
+        /// <param name="value"><see langword="true"/> to enable bundling; otherwise, <see langword="false"/>.</param>
+        /// <returns>The same builder for chaining.</returns>
         public PlatformCommandLineBuilder EnablePosixBundling(bool value = true)
         {
             ParserConfiguration.EnablePosixBundling = value;
             return this;
         }
 
+        /// <summary>
+        /// Parses the configured arguments, runs middleware, builds the host, and returns a runnable command line.
+        /// </summary>
+        /// <returns>A <see cref="PlatformCommandLine"/> that can start the host and invoke the command.</returns>
         public PlatformCommandLine Build()
         {
             var parseResults = Command.Parse(args ?? [], ParserConfiguration);

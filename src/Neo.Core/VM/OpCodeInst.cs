@@ -36,18 +36,47 @@ using System.Text;
 
 namespace Neo.Core.VM
 {
+    /// <summary>
+    /// Represents a single decoded instruction within a Neo VM script, including its opcode and operand.
+    /// </summary>
     [DebuggerDisplay("OpCode={OpCode}, OperandSize={OperandSize}")]
     public sealed class OpCodeInst : IEnumerable<OpCodeInst>
     {
         private const int OpCodeSize = 1;
 
+        /// <summary>
+        /// Gets a prebuilt instruction containing only <see cref="OpCode.RET"/>.
+        /// </summary>
         public static OpCodeInst Ret => new((byte[])[(byte)OpCode.RET]);
 
+        /// <summary>
+        /// Gets the byte offset of this instruction within the script.
+        /// </summary>
         public int Position { get; private init; }
+
+        /// <summary>
+        /// Gets the opcode of this instruction.
+        /// </summary>
         public OpCode OpCode { get; private init; }
+
+        /// <summary>
+        /// Gets the operand bytes associated with this instruction.
+        /// </summary>
         public ReadOnlyMemory<byte> Operand { get; private init; }
+
+        /// <summary>
+        /// Gets the total operand size in bytes, including any size prefix.
+        /// </summary>
         public int OperandSize { get; private init; }
+
+        /// <summary>
+        /// Gets the size of the operand length prefix in bytes, or zero when the operand size is fixed.
+        /// </summary>
         public int OperandPrefixSize { get; private init; }
+
+        /// <summary>
+        /// Gets the total size of this instruction in bytes, including the opcode and operand.
+        /// </summary>
         public int Size => OperandPrefixSize > 0 ?
             OpCodeSize + Operand.Length :
             OpCodeSize + OperandSize;
@@ -57,6 +86,14 @@ namespace Neo.Core.VM
 
         private readonly ReadOnlyMemory<byte> _script;
 
+        /// <summary>
+        /// Decodes the instruction at the specified position in a script.
+        /// </summary>
+        /// <param name="script">The script that contains the instruction.</param>
+        /// <param name="start">The byte offset at which the instruction begins.</param>
+        /// <exception cref="Exception">Thrown when the script is empty.</exception>
+        /// <exception cref="InvalidDataException">Thrown when the opcode or operand prefix is invalid.</exception>
+        /// <exception cref="IndexOutOfRangeException">Thrown when the operand extends past the end of the script.</exception>
         public OpCodeInst(ReadOnlyMemory<byte> script, int start = 0)
         {
             if (script.IsEmpty)
@@ -104,6 +141,10 @@ namespace Neo.Core.VM
             }
         }
 
+        /// <summary>
+        /// Enumerates this instruction and all subsequent instructions in the script.
+        /// </summary>
+        /// <returns>An enumerator over instructions starting at the current position.</returns>
         public IEnumerator<OpCodeInst> GetEnumerator()
         {
             var nip = Position + OperandSize + OpCodeSize;
@@ -114,9 +155,14 @@ namespace Neo.Core.VM
                 yield return instruct = new OpCodeInst(_script, ip);
         }
 
+        /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator() =>
             GetEnumerator();
 
+        /// <summary>
+        /// Returns a human-readable representation of the instruction, including position, opcode, and decoded operand.
+        /// </summary>
+        /// <returns>A formatted instruction string.</returns>
         public override string ToString()
         {
             var sb = new StringBuilder();
@@ -124,6 +170,15 @@ namespace Neo.Core.VM
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Interprets a portion of the operand as an unmanaged value of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The unmanaged type to read from the operand.</typeparam>
+        /// <param name="index">The byte offset within the operand at which to begin reading.</param>
+        /// <returns>The value read from the operand.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <typeparamref name="T"/> does not fit in the operand at the specified index.
+        /// </exception>
         public T AsToken<T>(uint index = 0)
             where T : unmanaged
         {
@@ -138,6 +193,10 @@ namespace Neo.Core.VM
             return Unsafe.As<byte, T>(ref bytes[index]);
         }
 
+        /// <summary>
+        /// Produces a short human-readable decoding of the operand for display and debugging.
+        /// </summary>
+        /// <returns>A string describing the operand, or an empty string when no decoding is available.</returns>
         public string DecodeOperand()
         {
             var operand = Operand[OperandPrefixSize..].ToArray();

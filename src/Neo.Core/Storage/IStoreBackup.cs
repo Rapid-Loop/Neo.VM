@@ -24,10 +24,27 @@ using System;
 
 namespace Neo.Core.Storage
 {
+    /// <summary>
+    /// Creates, purges, and restores store backups.
+    /// </summary>
     public interface IStoreBackup : IDisposable
     {
+        /// <summary>
+        /// Creates a backup of the store.
+        /// </summary>
         void Backup();
+
+        /// <summary>
+        /// Removes older backups, retaining the specified number of most recent ones.
+        /// </summary>
+        /// <param name="numberOfBackupsToKeep">The number of backups to keep.</param>
         void Purge(uint numberOfBackupsToKeep);
+
+        /// <summary>
+        /// Restores the store from a backup path.
+        /// </summary>
+        /// <param name="restorePath">The path of the backup to restore.</param>
+        /// <param name="walPath">Optional write-ahead log path used during restore.</param>
         void Restore(string restorePath, string? walPath = null);
     }
 }

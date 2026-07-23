@@ -29,6 +29,9 @@ using System.Runtime.CompilerServices;
 
 namespace Neo.Core.Blockchain
 {
+    /// <summary>
+    /// A witness rule pairing an action with a <see cref="WitnessCondition"/>.
+    /// </summary>
     public class WitnessRule : IEquatable<WitnessRule>, INeoSerializable
     {
         /// <summary>
@@ -41,10 +44,17 @@ namespace Neo.Core.Blockchain
         /// </summary>
         public WitnessCondition Condition { get; set; } = default!;
 
+        /// <summary>
+        /// Gets the serialized size of this rule in bytes.
+        /// </summary>
         public int Size =>
             Unsafe.SizeOf<WitnessRuleAction>() +
             Condition.Size;
 
+        /// <summary>
+        /// Returns a hash code for this rule.
+        /// </summary>
+        /// <returns>A hash code for the current rule.</returns>
         public override int GetHashCode()
         {
             unchecked
@@ -58,6 +68,11 @@ namespace Neo.Core.Blockchain
             }
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current rule.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current instance.</param>
+        /// <returns><see langword="true"/> if the objects are equal; otherwise, <see langword="false"/>.</returns>
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
             if (ReferenceEquals(obj, this)) return true;
@@ -65,6 +80,11 @@ namespace Neo.Core.Blockchain
             return Equals(obj as WitnessRule);
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="WitnessRule"/> is equal to the current instance.
+        /// </summary>
+        /// <param name="other">The rule to compare with the current instance.</param>
+        /// <returns><see langword="true"/> if the rules are equal; otherwise, <see langword="false"/>.</returns>
         public bool Equals([NotNullWhen(true)] WitnessRule? other)
         {
             if (ReferenceEquals(other, this)) return true;
@@ -72,12 +92,20 @@ namespace Neo.Core.Blockchain
             return Action == other.Action && Condition == other.Condition;
         }
 
+        /// <summary>
+        /// Deserializes this rule from the specified stream.
+        /// </summary>
+        /// <param name="reader">The stream to read from.</param>
         public void Deserialize(Stream reader)
         {
             Action = reader.Read<WitnessRuleAction>();
             Condition.Deserialize(reader);
         }
 
+        /// <summary>
+        /// Serializes this rule to the specified stream.
+        /// </summary>
+        /// <param name="writer">The stream to write to.</param>
         public void Serialize(Stream writer)
         {
             writer.Write(Action);

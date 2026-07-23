@@ -26,10 +26,19 @@ using System.IO;
 
 namespace Neo.Core.Net.Message
 {
+    /// <summary>
+    /// Advertises that the node stores full block history for archival synchronization.
+    /// </summary>
     public class ArchivalNodeCapabilityMessage : NodeCapabilityMessage
     {
+        /// <summary>
+        /// Gets the capability type (<see cref="NodeCapabilityType.ArchivalNode"/>).
+        /// </summary>
         public override NodeCapabilityType Type => NodeCapabilityType.ArchivalNode;
 
+        /// <summary>
+        /// Gets the serialized size of this capability in bytes.
+        /// </summary>
         public override int Size =>
             base.Size +
             1;

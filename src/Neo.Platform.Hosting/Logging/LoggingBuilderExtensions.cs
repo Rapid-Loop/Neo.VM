@@ -28,8 +28,16 @@ using System;
 
 namespace Neo.Platform.Hosting.Logging
 {
+    /// <summary>
+    /// Extension methods for registering the Neo platform console logger.
+    /// </summary>
     public static class LoggingBuilderExtensions
     {
+        /// <summary>
+        /// Adds the Neo platform logger provider to the logging pipeline.
+        /// </summary>
+        /// <param name="builder">The logging builder.</param>
+        /// <returns>The same <paramref name="builder"/> for chaining.</returns>
         public static ILoggingBuilder AddNeoPlatform(this ILoggingBuilder builder)
         {
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, NeoPlatformLoggerProvider>());
@@ -39,6 +47,12 @@ namespace Neo.Platform.Hosting.Logging
             return builder;
         }
 
+        /// <summary>
+        /// Adds the Neo platform logger provider and configures its options.
+        /// </summary>
+        /// <param name="builder">The logging builder.</param>
+        /// <param name="configure">A callback that configures <see cref="NeoPlatformLoggerOptions"/>.</param>
+        /// <returns>The same <paramref name="builder"/> for chaining.</returns>
         public static ILoggingBuilder AddNeoPlatform(this ILoggingBuilder builder, Action<NeoPlatformLoggerOptions> configure)
         {
             builder.AddNeoPlatform();

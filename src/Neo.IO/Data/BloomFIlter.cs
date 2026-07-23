@@ -26,6 +26,9 @@ using System.Collections;
 
 namespace Neo.IO.Data
 {
+    /// <summary>
+    /// A probabilistic set that supports membership tests with a configurable false-positive rate.
+    /// </summary>
     public class BloomFilter
     {
         private readonly BitArray _bits;
@@ -33,10 +36,19 @@ namespace Neo.IO.Data
         private readonly int _hashCount;
         private readonly uint _tweak;
 
+        /// <summary>
+        /// Gets the number of hash functions used by this filter.
+        /// </summary>
         public int HashCount => _hashCount;
 
+        /// <summary>
+        /// Gets the size of the underlying bit array in bits.
+        /// </summary>
         public int BitSize => _bitSize;
 
+        /// <summary>
+        /// Gets the tweak value mixed into hash seeds for this filter.
+        /// </summary>
         public uint Tweak => _tweak;
 
         /// <summary>
@@ -62,6 +74,10 @@ namespace Neo.IO.Data
             _tweak = tweak;
         }
 
+        /// <summary>
+        /// Adds the specified data to the filter.
+        /// </summary>
+        /// <param name="data">The element data to insert.</param>
         public void Add(ReadOnlySpan<byte> data)
         {
             for (var i = 0; i < _hashCount; i++)
@@ -73,6 +89,14 @@ namespace Neo.IO.Data
             }
         }
 
+        /// <summary>
+        /// Tests whether the specified data may be present in the filter.
+        /// </summary>
+        /// <param name="data">The element data to test.</param>
+        /// <returns>
+        /// <see langword="false"/> if the element is definitely not present;
+        /// otherwise <see langword="true"/> if it is probably present.
+        /// </returns>
         public bool Contains(ReadOnlySpan<byte> data)
         {
             for (var i = 0; i < _hashCount; i++)
@@ -87,17 +111,38 @@ namespace Neo.IO.Data
             return true; // Probably present
         }
 
+        /// <summary>
+        /// Adds the specified data to the filter.
+        /// </summary>
+        /// <param name="data">The element data to insert.</param>
         public void Add(byte[] data) =>
             Add(data.AsSpan());
 
+        /// <summary>
+        /// Tests whether the specified data may be present in the filter.
+        /// </summary>
+        /// <param name="data">The element data to test.</param>
+        /// <returns>
+        /// <see langword="false"/> if the element is definitely not present;
+        /// otherwise <see langword="true"/> if it is probably present.
+        /// </returns>
         public bool Contains(byte[] data) =>
             Contains(data.AsSpan());
 
+        /// <summary>
+        /// Estimates the false-positive probability after the specified number of insertions.
+        /// </summary>
+        /// <param name="insertedCount">The number of elements that have been inserted.</param>
+        /// <returns>The approximate false-positive probability in the range [0, 1].</returns>
         public double GetFalsePositiveProbability(int insertedCount)
         {
             return Math.Pow(1 - Math.Exp(-_hashCount * insertedCount / (double)_bitSize), _hashCount);
         }
 
+        /// <summary>
+        /// Copies the underlying bit array into the provided buffer.
+        /// </summary>
+        /// <param name="bytes">The destination buffer that receives the bit array contents.</param>
         public void GetBits(byte[] bytes) =>
             _bits.CopyTo(bytes, 0);
     }

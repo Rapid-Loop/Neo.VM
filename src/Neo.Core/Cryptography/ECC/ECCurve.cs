@@ -26,20 +26,38 @@ using CECCurve = System.Security.Cryptography.ECCurve;
 
 namespace Neo.Core.Cryptography.ECC
 {
+    /// <summary>
+    /// Parameters and helpers for a named elliptic curve used by Neo.
+    /// </summary>
     public class ECCurve
     {
+        /// <summary>
+        /// The secp256r1 (NIST P-256) curve used by Neo.
+        /// </summary>
         public static readonly ECCurve SecP256r1 = new(
             BigInteger.Parse("115792089210356248762697446949407573530086143415290314195533631308867097853951"),
             BigInteger.Parse("41058363725152142129326129780047268409114441015993725554835256314039467401291"),
             ECCurveName.SecP256r1
         );
 
+        /// <summary>
+        /// Gets the name of this curve.
+        /// </summary>
         public ECCurveName Name => _curveName;
 
+        /// <summary>
+        /// Gets the corresponding <see cref="System.Security.Cryptography.ECCurve"/> for platform crypto APIs.
+        /// </summary>
         public CECCurve ECCurveType => _curve;
 
+        /// <summary>
+        /// Gets the prime field modulus of the curve.
+        /// </summary>
         public BigInteger P => _p;
 
+        /// <summary>
+        /// Gets the curve equation coefficient <c>b</c>.
+        /// </summary>
         public BigInteger B => _b;
 
         private readonly BigInteger _p;

@@ -24,10 +24,19 @@ using System;
 
 namespace Neo.Core.Storage
 {
+    /// <summary>
+    /// A transactional snapshot of an <see cref="IStore"/>.
+    /// </summary>
     public interface IStoreSnapshot : IStore, IDisposable
     {
+        /// <summary>
+        /// Gets the underlying store that produced this snapshot.
+        /// </summary>
         IStore Store { get; }
 
+        /// <summary>
+        /// Commits pending changes made on this snapshot to the underlying store.
+        /// </summary>
         void Commit();
     }
 }

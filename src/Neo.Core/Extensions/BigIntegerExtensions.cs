@@ -25,8 +25,17 @@ using System.Numerics;
 
 namespace Neo.Core.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for <see cref="BigInteger"/>.
+    /// </summary>
     public static class BigIntegerExtensions
     {
+        /// <summary>
+        /// Computes the integer square root of a non-negative value (floor of the true square root).
+        /// </summary>
+        /// <param name="value">The non-negative value whose square root is computed.</param>
+        /// <returns>The largest integer whose square is less than or equal to <paramref name="value"/>.</returns>
+        /// <exception cref="OverflowException">Thrown when <paramref name="value"/> is negative.</exception>
         public static BigInteger Sqrt(this BigInteger value)
         {
             if (value < 0)
@@ -57,9 +66,13 @@ namespace Neo.Core.Extensions
         }
 
         /// <summary>
-        /// Calculates the modular multiplicative inverse of 'a' modulo 'm'.
-        /// Throws ArithmeticException if the inverse does not exist.
+        /// Calculates the modular multiplicative inverse of <paramref name="a"/> modulo <paramref name="m"/>.
         /// </summary>
+        /// <param name="a">The value for which the modular inverse is computed.</param>
+        /// <param name="m">The positive modulus.</param>
+        /// <returns>The modular multiplicative inverse of <paramref name="a"/> modulo <paramref name="m"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="m"/> is not positive.</exception>
+        /// <exception cref="ArithmeticException">Thrown when the inverse does not exist because the values are not coprime.</exception>
         public static BigInteger ModInverse(this BigInteger a, BigInteger m)
         {
             if (m <= 0)

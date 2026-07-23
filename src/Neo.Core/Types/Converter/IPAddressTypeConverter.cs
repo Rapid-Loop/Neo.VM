@@ -27,11 +27,29 @@ using System.Net;
 
 namespace Neo.Core.Types.Converter
 {
+    /// <summary>
+    /// Converts string values to <see cref="IPAddress"/> instances.
+    /// </summary>
     public class IPAddressTypeConverter : TypeConverter
     {
+        /// <summary>
+        /// Returns whether this converter can convert an object of the given type to an <see cref="IPAddress"/>.
+        /// </summary>
+        /// <param name="context">An <see cref="ITypeDescriptorContext"/> that provides a format context.</param>
+        /// <param name="sourceType">A <see cref="Type"/> that represents the type to convert from.</param>
+        /// <returns>
+        /// <see langword="true"/> if conversion from <see cref="string"/> is supported; otherwise, the base result.
+        /// </returns>
         public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType) =>
             sourceType == typeof(string) && base.CanConvertFrom(context, sourceType);
 
+        /// <summary>
+        /// Converts the given object to an <see cref="IPAddress"/>.
+        /// </summary>
+        /// <param name="context">An <see cref="ITypeDescriptorContext"/> that provides a format context.</param>
+        /// <param name="culture">The <see cref="CultureInfo"/> to use as the current culture.</param>
+        /// <param name="value">The object to convert.</param>
+        /// <returns>An <see cref="IPAddress"/>, or the base conversion result.</returns>
         public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
         {
             if (value is string ipString)

@@ -28,8 +28,22 @@ using System.Threading.Tasks;
 
 namespace Neo.Platform.Hosting
 {
+    /// <summary>
+    /// Runs a System.CommandLine parse result against a configured <see cref="IHost"/>.
+    /// </summary>
+    /// <param name="parseResult">The parsed command-line result to invoke.</param>
+    /// <param name="host">The host that supplies services for the application lifetime.</param>
+    /// <param name="invocationConfiguration">Invocation settings for System.CommandLine.</param>
     public sealed class PlatformCommandLine(ParseResult parseResult, IHost host, InvocationConfiguration invocationConfiguration)
     {
+        /// <summary>
+        /// Starts the host, invokes the command-line action, then stops the host.
+        /// </summary>
+        /// <param name="cancellationToken">A token that can cancel host start, command invocation, or host stop.</param>
+        /// <returns>
+        /// The process exit code from the command invocation, or the exception
+        /// <see cref="Exception.HResult"/> if invocation fails.
+        /// </returns>
         public async Task<int> InvokeAsync(CancellationToken cancellationToken = default)
         {
             await host.StartAsync(cancellationToken);
