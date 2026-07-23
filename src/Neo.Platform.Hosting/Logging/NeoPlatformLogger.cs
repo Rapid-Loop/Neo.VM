@@ -26,21 +26,15 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Neo.Platform.Hosting.Logging
 {
-    internal sealed class NeoPlatformLogger : ILogger
+    internal sealed class NeoPlatformLogger(
+        string name,
+        Func<NeoPlatformLoggerOptions> config) : ILogger
     {
         private DateTime DateTimeNow => _getConfig().UseUtcTimestamp ? DateTime.UtcNow : DateTime.Now;
         private bool ShowExceptionStackTrace => _getConfig().ShowExceptionStackTrace;
 
-        private readonly string _name;
-        private readonly Func<NeoPlatformLoggerOptions> _getConfig;
-
-        public NeoPlatformLogger(
-            string name,
-            Func<NeoPlatformLoggerOptions> config)
-        {
-            _name = name;
-            _getConfig = config;
-        }
+        private readonly string _name = name;
+        private readonly Func<NeoPlatformLoggerOptions> _getConfig = config;
 
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull =>
             default!;

@@ -33,6 +33,8 @@ namespace Neo.Core.Tests.Net
     [DoNotParallelize]
     public class UT_NodeServerListener
     {
+        public TestContext TestContext { get; set; } = null!;
+
         [TestMethod]
         public async Task TestStartAndDispose()
         {
@@ -74,6 +76,7 @@ namespace Neo.Core.Tests.Net
         public async Task TestAcceptHandshakeAndClientRemovedOnDisconnect()
         {
             var settings = new ProtocolSettings { Network = 0x334F454E };
+            var ct = TestContext.CancellationToken;
 
             await using var listener = new NodeServerListener(
                 new IPEndPoint(IPAddress.Loopback, 0),
@@ -84,9 +87,10 @@ namespace Neo.Core.Tests.Net
                 listener.BoundEndPoint,
                 settings,
                 localNonce: listener.Nonce + 1,
-                localCapabilities: [new FullNodeCapabilityMessage(0)]);
+                localCapabilities: [new FullNodeCapabilityMessage(0)],
+                cancellationToken: ct);
 
-            await client.WaitForHandshakeAsync().WaitAsync(TimeSpan.FromSeconds(5));
+            await client.WaitForHandshakeAsync(ct).WaitAsync(TimeSpan.FromSeconds(5), ct);
 
             Assert.IsTrue(client.IsReady);
             Assert.IsTrue(await TestUtilities.WaitForAsync(() => listener.Clients.Length == 1, TimeSpan.FromSeconds(5)));
@@ -100,6 +104,7 @@ namespace Neo.Core.Tests.Net
         public async Task TestOutboundConnectAsync()
         {
             var settings = new ProtocolSettings { Network = 0x334F454E };
+            var ct = TestContext.CancellationToken;
 
             await using var server = new NodeServerListener(
                 new IPEndPoint(IPAddress.Loopback, 0),
@@ -111,10 +116,10 @@ namespace Neo.Core.Tests.Net
                 new IPEndPoint(IPAddress.Loopback, 0),
                 settings);
 
-            await using var outbound = await clientNode.ConnectAsync(server.BoundEndPoint)
-                .WaitAsync(TimeSpan.FromSeconds(5));
+            await using var outbound = await clientNode.ConnectAsync(server.BoundEndPoint, ct)
+                .WaitAsync(TimeSpan.FromSeconds(5), ct);
 
-            await outbound.WaitForHandshakeAsync().WaitAsync(TimeSpan.FromSeconds(5));
+            await outbound.WaitForHandshakeAsync(ct).WaitAsync(TimeSpan.FromSeconds(5), ct);
 
             Assert.IsTrue(outbound.IsReady);
             Assert.IsNotNull(outbound.RemoteVersion);
@@ -132,6 +137,7 @@ namespace Neo.Core.Tests.Net
         public async Task TestPingPongAfterHandshake()
         {
             var settings = new ProtocolSettings { Network = 0x334F454E };
+            var ct = TestContext.CancellationToken;
 
             await using var server = new NodeServerListener(
                 new IPEndPoint(IPAddress.Loopback, 0),
@@ -142,10 +148,11 @@ namespace Neo.Core.Tests.Net
                 server.BoundEndPoint,
                 settings,
                 localNonce: server.Nonce + 1,
-                localCapabilities: [new FullNodeCapabilityMessage(5)]);
+                localCapabilities: [new FullNodeCapabilityMessage(5)],
+                cancellationToken: ct);
 
             client.LocalBlockIndex = 5;
-            await client.WaitForHandshakeAsync().WaitAsync(TimeSpan.FromSeconds(5));
+            await client.WaitForHandshakeAsync(ct).WaitAsync(TimeSpan.FromSeconds(5), ct);
 
             Assert.IsTrue(await TestUtilities.WaitForAsync(() => server.Clients.Length == 1, TimeSpan.FromSeconds(5)));
             var serverPeer = server.Clients[0];
@@ -159,9 +166,9 @@ namespace Neo.Core.Tests.Net
             };
 
             var ping = PingMessage.Create(lastBlockIndex: 5, nonce: 0xABCD1234);
-            await client.SendAsync(ProtocolMessage.Create(ProtocolMessageCommand.Ping, ping));
+            await client.SendAsync(ProtocolMessage.Create(ProtocolMessageCommand.Ping, ping), cancellationToken: ct);
 
-            var pongPayload = await pongReceived.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            var pongPayload = await pongReceived.Task.WaitAsync(TimeSpan.FromSeconds(5), ct);
             Assert.AreEqual(0xABCD1234u, pongPayload.Nonce);
             Assert.AreEqual(10u, pongPayload.LastBlockIndex);
             Assert.AreEqual(5u, serverPeer.RemoteLastBlockIndex);

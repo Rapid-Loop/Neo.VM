@@ -59,7 +59,7 @@ namespace Neo.Core.Cryptography.ECC
             };
         }
 
-        internal byte[] CompressPoint(ReadOnlySpan<byte> span)
+        internal static byte[] CompressPoint(ReadOnlySpan<byte> span)
         {
             var prefix = span[^1] % 2 == 0 ?
                 (byte)0x02 : (byte)0x03;

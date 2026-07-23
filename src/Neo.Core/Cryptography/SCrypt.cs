@@ -46,10 +46,10 @@ namespace Neo.Core.Cryptography
         /// <summary>
         /// Convenience overload for string password.
         /// </summary>
-        public static byte[] Generate(string password, byte[] salt, int N = 16384, int r = 8, int p = 1, int keyLength = 32)
+        public static byte[] Generate(string password, byte[] salt, int n = 16384, int r = 8, int p = 1, int keyLength = 32)
         {
             var passBytes = CoreUtilities.StrictUtf8Encoding.GetBytes(password);
-            return Generate(passBytes, salt, N, r, p, keyLength);
+            return Generate(passBytes, salt, n, r, p, keyLength);
         }
 
         /// <summary>
@@ -77,12 +77,12 @@ namespace Neo.Core.Cryptography
             /* 1: (B_0 ... B_{p-1}) <-- PBKDF2(P, S, 1, p * 128 * r) */
             PBKDF2_SHA256(mac, password, salt, salt.Length, 1, ba, p * 128 * r);
 
-            fixed (byte* B = ba)
-            fixed (void* V = va)
-            fixed (void* XY = xYa)
+            fixed (byte* b = ba)
+            fixed (void* v = va)
+            fixed (void* xy = xYa)
             {
                 for (var i = 0; i < p; i++)
-                    SMix(&B[i * 128 * r], r, n, (uint*)V, (uint*)XY);
+                    SMix(&b[i * 128 * r], r, n, (uint*)v, (uint*)xy);
             }
 
             /* 5: DK <-- PBKDF2(P, B, 1, dkLen) */
@@ -96,8 +96,8 @@ namespace Neo.Core.Cryptography
             if (derivedKeyLength > (Math.Pow(2, 32) - 1) * 32)
                 throw new ArgumentException("Requested key length too long");
 
-            var U = new byte[32];
-            var T = new byte[32];
+            var u = new byte[32];
+            var t = new byte[32];
             var saltBuffer = new byte[saltLength + 4];
 
             var blockCount = (int)Math.Ceiling(derivedKeyLength / 32d);
@@ -114,20 +114,20 @@ namespace Neo.Core.Cryptography
 
                 mac.Initialize();
                 mac.TransformFinalBlock(saltBuffer, 0, saltBuffer.Length);
-                Buffer.BlockCopy(mac.Hash!, 0, U, 0, U.Length);
+                Buffer.BlockCopy(mac.Hash!, 0, u, 0, u.Length);
 
-                Buffer.BlockCopy(U, 0, T, 0, 32);
+                Buffer.BlockCopy(u, 0, t, 0, 32);
 
                 for (long j = 1; j < iterationCount; j++)
                 {
-                    mac.TransformFinalBlock(U, 0, U.Length);
-                    Buffer.BlockCopy(mac.Hash!, 0, U, 0, U.Length);
+                    mac.TransformFinalBlock(u, 0, u.Length);
+                    Buffer.BlockCopy(mac.Hash!, 0, u, 0, u.Length);
 
                     for (var k = 0; k < 32; k++)
-                        T[k] ^= U[k];
+                        t[k] ^= u[k];
                 }
 
-                Buffer.BlockCopy(T, 0, derivedKey, (i - 1) * 32, (i == blockCount ? r : 32));
+                Buffer.BlockCopy(t, 0, derivedKey, (i - 1) * 32, (i == blockCount ? r : 32));
             }
         }
 
@@ -164,12 +164,12 @@ namespace Neo.Core.Cryptography
             return p[0] | ((uint)p[1] << 8) | ((uint)p[2] << 16) | ((uint)p[3] << 24);
         }
 
-        private unsafe static void Salsa208(uint* B)
+        private unsafe static void Salsa208(uint* b)
         {
-            uint x0 = B[0], x1 = B[1], x2 = B[2], x3 = B[3],
-                 x4 = B[4], x5 = B[5], x6 = B[6], x7 = B[7],
-                 x8 = B[8], x9 = B[9], x10 = B[10], x11 = B[11],
-                 x12 = B[12], x13 = B[13], x14 = B[14], x15 = B[15];
+            uint x0 = b[0], x1 = b[1], x2 = b[2], x3 = b[3],
+                 x4 = b[4], x5 = b[5], x6 = b[6], x7 = b[7],
+                 x8 = b[8], x9 = b[9], x10 = b[10], x11 = b[11],
+                 x12 = b[12], x13 = b[13], x14 = b[14], x15 = b[15];
 
             for (var i = 0; i < 8; i += 2)
             {
@@ -184,10 +184,10 @@ namespace Neo.Core.Cryptography
                 x12 ^= R(x15 + x14, 7); x13 ^= R(x12 + x15, 9); x14 ^= R(x13 + x12, 13); x15 ^= R(x14 + x13, 18);
             }
 
-            B[0] += x0; B[1] += x1; B[2] += x2; B[3] += x3;
-            B[4] += x4; B[5] += x5; B[6] += x6; B[7] += x7;
-            B[8] += x8; B[9] += x9; B[10] += x10; B[11] += x11;
-            B[12] += x12; B[13] += x13; B[14] += x14; B[15] += x15;
+            b[0] += x0; b[1] += x1; b[2] += x2; b[3] += x3;
+            b[4] += x4; b[5] += x5; b[6] += x6; b[7] += x7;
+            b[8] += x8; b[9] += x9; b[10] += x10; b[11] += x11;
+            b[12] += x12; b[13] += x13; b[14] += x14; b[15] += x15;
         }
 
         private static uint R(uint a, int b) =>
@@ -209,9 +209,9 @@ namespace Neo.Core.Cryptography
             }
         }
 
-        private unsafe static long Integerify(uint* B, int r)
+        private unsafe static long Integerify(uint* b, int r)
         {
-            var x = (uint*)(((byte*)B) + (2 * r - 1) * 64);
+            var x = (uint*)(((byte*)b) + (2 * r - 1) * 64);
             return (((long)x[1] << 32) + x[0]);
         }
 

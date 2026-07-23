@@ -29,12 +29,9 @@ namespace Neo.VM.Extensions
     public static class DictionaryExtensions
     {
         public static VMMap ToStackItem<TKey, TValue>(this IDictionary<TKey, TValue> source) =>
-            new
-            (
-                (IList<VMObject>)source.Keys
-                    .Select(s => s.ToStackItem())
-                    .Zip(source.Values.Select(s => s.ToStackItem()))
-                    .ToList()
-            );
+            new(
+                source.Select(static kv => new KeyValuePair<VMObject, VMObject>(
+                    kv.Key.ToStackItem(),
+                    kv.Value.ToStackItem())));
     }
 }

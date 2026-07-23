@@ -28,16 +28,11 @@ using System.Numerics;
 
 namespace Neo.VM.Types
 {
-    public class VMBoolean : VMObject, IEquatable<VMBoolean>
+    public class VMBoolean(bool value) : VMObject, IEquatable<VMBoolean>
     {
         public override VMObjectType Type => VMObjectType.Boolean;
 
-        private readonly bool _value = false;
-
-        public VMBoolean(bool value)
-        {
-            _value = value;
-        }
+        private readonly bool _value = value;
 
         public bool Equals(VMBoolean? other)
         {

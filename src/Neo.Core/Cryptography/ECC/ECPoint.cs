@@ -196,7 +196,7 @@ namespace Neo.Core.Cryptography.ECC
         public byte[] Encode(bool shouldCompress = true)
         {
             return shouldCompress ?
-                _curve.CompressPoint(_uncompressed.AsSpan()) :
+                ECCurve.CompressPoint(_uncompressed.AsSpan()) :
                 _uncompressed;
         }
 

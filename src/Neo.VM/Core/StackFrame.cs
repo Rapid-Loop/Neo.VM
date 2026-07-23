@@ -26,7 +26,7 @@ using System.Collections.Generic;
 
 namespace Neo.VM.Core
 {
-    public class StackFrame : IDisposable
+    public class StackFrame(StackFrame? parent = default) : IDisposable
     {
         /// <summary>
         /// The evaluation stack for this frame
@@ -53,17 +53,12 @@ namespace Neo.VM.Core
         /// <summary>
         /// Parent frame (for nested calls)
         /// </summary>
-        public StackFrame? Parent { get; }
+        public StackFrame? Parent { get; } = parent;
 
         /// <summary>
         /// Whether this frame is currently executing
         /// </summary>
         public bool IsActive { get; private set; } = true;
-
-        public StackFrame(StackFrame? parent = default)
-        {
-            Parent = parent;
-        }
 
         public void Dispose()
         {

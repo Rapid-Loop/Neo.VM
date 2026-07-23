@@ -100,7 +100,7 @@ namespace Neo.IO.Hashing
                     var k = BitConverter.ToUInt32(_buffer, 0);
                     ProcessBlock(k);
                     _bufferLength = 0;
-                    source = source.Slice(needed);
+                    source = source[needed..];
                 }
             }
 
@@ -109,7 +109,7 @@ namespace Neo.IO.Hashing
             {
                 var k = BitConverter.ToUInt32(source);
                 ProcessBlock(k);
-                source = source.Slice(4);
+                source = source[4..];
             }
 
             // Save any remaining bytes for the next Append call or Finalize

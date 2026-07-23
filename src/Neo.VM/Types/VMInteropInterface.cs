@@ -30,12 +30,12 @@ using System.Runtime.InteropServices;
 
 namespace Neo.VM.Types
 {
-    public class VMInteropInterface : VMObject, IEquatable<VMInteropInterface>
+    public class VMInteropInterface(object obj, string name) : VMObject, IEquatable<VMInteropInterface>
     {
         public override VMObjectType Type => VMObjectType.Interop;
 
-        private readonly object _underlyingObject = new();
-        private readonly string _interfaceName = string.Empty;
+        private readonly object _underlyingObject = obj;
+        private readonly string _interfaceName = name;
 
         public object UnderlyingObject => _underlyingObject;
         public string InterfaceName => _interfaceName;
@@ -43,12 +43,6 @@ namespace Neo.VM.Types
         public VMInteropInterface() : this(new()) { }
 
         public VMInteropInterface(object obj) : this(obj, obj.GetType().Name) { }
-
-        public VMInteropInterface(object obj, string name)
-        {
-            _underlyingObject = obj;
-            _interfaceName = name;
-        }
 
         public bool Equals(VMInteropInterface? other)
         {
@@ -87,7 +81,7 @@ namespace Neo.VM.Types
         protected override ReadOnlySpan<byte> ComputeSpan(HashSet<VMObject> visited)
         {
             var ptr = nint.Zero;
-            byte[] bytes = [];
+            byte[] bytes;
             try
             {
                 var size = Marshal.SizeOf(_underlyingObject);

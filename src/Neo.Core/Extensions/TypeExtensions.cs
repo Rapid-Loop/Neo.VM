@@ -29,16 +29,14 @@ namespace Neo.Core.Extensions
     {
         public static object CreateInitializedObject(this Type source)
         {
-            // Try to get the private parameterless constructor
+            // Try to get the private/public parameterless constructor.
             var ctor = source.GetConstructor(
                 BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
                 null,
-                Type.EmptyTypes,   // No parameters
-                null);
-
-            if (ctor is null)
-                // Fallback: if no parameterless ctor exists at all
-                throw new InvalidOperationException($"Type {source.FullName} does not have a parameterless constructor (public or private).");
+                Type.EmptyTypes,
+                null)
+                ?? throw new InvalidOperationException(
+                    $"Type {source.FullName} does not have a parameterless constructor (public or private).");
 
             return ctor.Invoke(null);
         }

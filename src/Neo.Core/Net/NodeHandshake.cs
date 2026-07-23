@@ -30,16 +30,10 @@ namespace Neo.Core.Net
     /// Pure Neo N3 handshake state machine (no I/O).
     /// Local already sent Version; then: receive Version → send Verack → receive Verack → Ready.
     /// </summary>
-    public sealed class NodeHandshake
+    public sealed class NodeHandshake(uint network, uint localNonce)
     {
-        private readonly uint _network;
-        private readonly uint _localNonce;
-
-        public NodeHandshake(uint network, uint localNonce)
-        {
-            _network = network;
-            _localNonce = localNonce;
-        }
+        private readonly uint _network = network;
+        private readonly uint _localNonce = localNonce;
 
         public NodeHandshakeState State { get; private set; } = NodeHandshakeState.WaitingForVersion;
 

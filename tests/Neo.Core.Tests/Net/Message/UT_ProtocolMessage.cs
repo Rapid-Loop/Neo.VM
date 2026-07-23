@@ -234,12 +234,9 @@ namespace Neo.Core.Tests.Net.Message
         /// <summary>
         /// Test-only payload: writes raw bytes with no extra framing.
         /// </summary>
-        private sealed class RawBytesPayload : INeoSerializable
+        private sealed class RawBytesPayload(byte[] bytes) : INeoSerializable
         {
-            private readonly byte[] _bytes;
-
-            public RawBytesPayload(byte[] bytes) =>
-                _bytes = bytes;
+            private readonly byte[] _bytes = bytes;
 
             public int Size => _bytes.Length;
 

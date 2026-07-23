@@ -68,10 +68,10 @@ namespace Neo.Wallet.Tests.Json
             Assert.AreEqual(expectedTestWalletAccountModel.Lock, actualTestWalletAccountModel.Lock);
 
             Assert.IsNotNull(actualTestWalletAccountModel.Key);
-            CollectionAssert.AreEqual(expectedTestWalletAccountModel.Key!, actualTestWalletAccountModel.Key);
+            Assert.AreSequenceEqual(expectedTestWalletAccountModel.Key!, actualTestWalletAccountModel.Key);
 
             Assert.IsNotNull(actualTestWalletAccountModel.Contract);
-            CollectionAssert.AreEqual(expectedTestWalletAccountModel.Contract!.Script, actualTestWalletAccountModel.Contract.Script);
+            Assert.AreSequenceEqual(expectedTestWalletAccountModel.Contract!.Script, actualTestWalletAccountModel.Contract.Script);
 
             Assert.IsNotNull(actualTestWalletAccountModel.Contract.Parameters);
             Assert.HasCount(1, actualTestWalletAccountModel.Contract.Parameters);

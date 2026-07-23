@@ -40,7 +40,7 @@ namespace Neo.Core.Tests.Cryptography.ECC
             var expectedCompressedPublicKeyString = "036b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296";
             var expectedCompressedPublicKeyBytes = Convert.FromHexString(expectedCompressedPublicKeyString);
 
-            var actualCompressedPublicKeyBytes = ECCurve.SecP256r1.CompressPoint(expectedUncompressedPublicKeyBytes);
+            var actualCompressedPublicKeyBytes = ECCurve.CompressPoint(expectedUncompressedPublicKeyBytes);
             var actualCompressedPublicKeyString = Convert.ToHexStringLower(actualCompressedPublicKeyBytes);
 
             var actualUncompressedPublicKeyBytes = ECCurve.SecP256r1.DecompressPoint(expectedCompressedPublicKeyBytes);

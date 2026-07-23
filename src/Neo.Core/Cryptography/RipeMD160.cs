@@ -44,7 +44,10 @@ namespace Neo.Core.Cryptography
         public static byte[] HashData(byte[] data)
         {
             using var hasher = new RipeMD160();
+            // CA1850 wants HashData over ComputeHash, but this method *is* the static HashData entry point.
+#pragma warning disable CA1850
             return hasher.ComputeHash(data);
+#pragma warning restore CA1850
         }
 
         public override void Initialize()

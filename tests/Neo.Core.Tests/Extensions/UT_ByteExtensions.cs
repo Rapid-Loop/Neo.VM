@@ -54,7 +54,7 @@ namespace Neo.Core.Tests.Extensions
             Assert.HasCount(ushort.MaxValue, actualXorByte3);
             Assert.AreSequenceEqual(expectedBytes3, actualXorByte3);
 
-            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => new byte[0].Xor(new byte[ushort.MaxValue]));
+            Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Array.Empty<byte>().Xor(new byte[ushort.MaxValue]));
         }
 
         [TestMethod]

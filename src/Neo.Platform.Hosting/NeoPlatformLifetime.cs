@@ -30,33 +30,24 @@ using System.Threading.Tasks;
 
 namespace Neo.Platform.Hosting
 {
-    public class NeoPlatformLifetime : IHostLifetime, IDisposable
+    public class NeoPlatformLifetime(
+        IOptions<NeoPlatformLifetimeOptions> options,
+        IHostEnvironment environment,
+        IHostApplicationLifetime applicationLifetime,
+        ILoggerFactory? loggerFactory = default) : IHostLifetime, IDisposable
     {
-        public NeoPlatformLifetimeOptions Options { get; }
-        public IHostEnvironment Environment { get; }
-        public IHostApplicationLifetime ApplicationLifetime { get; }
+        public NeoPlatformLifetimeOptions Options { get; } = options?.Value ??
+                throw new ArgumentNullException(nameof(options));
+        public IHostEnvironment Environment { get; } = environment ??
+                throw new ArgumentNullException(nameof(environment));
+        public IHostApplicationLifetime ApplicationLifetime { get; } = applicationLifetime ??
+                throw new ArgumentNullException(nameof(applicationLifetime));
 
         private CancellationTokenRegistration _appStartedReg;
         private CancellationTokenRegistration _appStoppingReg;
 
-        private readonly ILogger _logger;
-
-        public NeoPlatformLifetime(
-            IOptions<NeoPlatformLifetimeOptions> options,
-            IHostEnvironment environment,
-            IHostApplicationLifetime applicationLifetime,
-            ILoggerFactory? loggerFactory = default)
-        {
-            Options = options?.Value ??
-                throw new ArgumentNullException(nameof(options));
-            Environment = environment ??
-                throw new ArgumentNullException(nameof(environment));
-            ApplicationLifetime = applicationLifetime ??
-                throw new ArgumentNullException(nameof(applicationLifetime));
-
-            _logger = (loggerFactory ?? NullLoggerFactory.Instance)
+        private readonly ILogger _logger = (loggerFactory ?? NullLoggerFactory.Instance)
                 .CreateLogger("Neo.Platform.Hosting.Lifetime");
-        }
 
         public void Dispose()
         {

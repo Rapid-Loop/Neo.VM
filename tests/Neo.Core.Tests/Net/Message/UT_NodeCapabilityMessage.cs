@@ -36,7 +36,7 @@ namespace Neo.Core.Tests.Net.Message
             var expected = new ServerCapabilityMessage(port: 10333);
             var bytes = expected.ToArray();
 
-            Assert.AreEqual(expected.Size, bytes.Length);
+            Assert.HasCount(expected.Size, bytes);
 
             using var ms = new MemoryStream(bytes);
             var actual = NodeCapabilityMessage.DeserializeFrom(ms);
@@ -53,7 +53,7 @@ namespace Neo.Core.Tests.Net.Message
             var expected = new FullNodeCapabilityMessage(startHeight: 1_000_000u);
             var bytes = expected.ToArray();
 
-            Assert.AreEqual(expected.Size, bytes.Length);
+            Assert.HasCount(expected.Size, bytes);
 
             using var ms = new MemoryStream(bytes);
             var actual = NodeCapabilityMessage.DeserializeFrom(ms);

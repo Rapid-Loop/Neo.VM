@@ -108,8 +108,7 @@ namespace Neo.Core.Factory
 
         public static int NextInt32(int maxValue)
         {
-            if (maxValue < 0)
-                throw new ArgumentOutOfRangeException(nameof(maxValue));
+            ArgumentOutOfRangeException.ThrowIfNegative(maxValue);
 
             return NextInt32(0, maxValue);
         }
@@ -118,8 +117,7 @@ namespace Neo.Core.Factory
         {
             if (minValue == maxValue) return maxValue;
 
-            if (minValue > maxValue)
-                throw new ArgumentOutOfRangeException(nameof(minValue));
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(minValue, maxValue);
 
             return (int)NextUInt32((uint)(maxValue - minValue)) + minValue;
         }
@@ -150,8 +148,7 @@ namespace Neo.Core.Factory
         {
             if (minValue == maxValue) return maxValue;
 
-            if (minValue > maxValue)
-                throw new ArgumentOutOfRangeException(nameof(minValue));
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(minValue, maxValue);
 
             return NextUInt32(maxValue - minValue) + minValue;
         }
@@ -168,8 +165,7 @@ namespace Neo.Core.Factory
         {
             if (minValue == maxValue) return maxValue;
 
-            if (minValue > maxValue)
-                throw new ArgumentOutOfRangeException(nameof(minValue));
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(minValue, maxValue);
 
             return (long)NextUInt64((ulong)(maxValue - minValue)) + minValue;
         }
@@ -198,8 +194,7 @@ namespace Neo.Core.Factory
         {
             if (minValue == maxValue) return maxValue;
 
-            if (minValue > maxValue)
-                throw new ArgumentOutOfRangeException(nameof(minValue));
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(minValue, maxValue);
 
             return NextUInt64(maxValue - minValue) + minValue;
         }
@@ -208,8 +203,7 @@ namespace Neo.Core.Factory
         {
             if (minValue == maxValue) return maxValue;
 
-            if (minValue > maxValue)
-                throw new ArgumentOutOfRangeException(nameof(minValue));
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(minValue, maxValue);
 
             return NextBigInteger(maxValue - minValue) + minValue;
         }

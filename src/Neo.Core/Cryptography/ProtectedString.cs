@@ -130,8 +130,8 @@ namespace Neo.Core.Cryptography
 
             using var aes = new AesGcm(s_entropy, TagSize);
 
-            var nonceBytes = protectedData.Slice(0, NonceSize);
-            var tagBytes = protectedData.Slice(protectedData.Length - TagSize);
+            var nonceBytes = protectedData[..NonceSize];
+            var tagBytes = protectedData[^TagSize..];
             var ciphertext = protectedData.Slice(NonceSize, protectedData.Length - NonceSize - TagSize);
 
             Span<byte> plaintext = stackalloc byte[ciphertext.Length];

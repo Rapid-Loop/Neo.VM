@@ -34,10 +34,13 @@ namespace Neo.Core.Tests.Net
     [DoNotParallelize]
     public class UT_NodeConnectionConnect
     {
+        public TestContext TestContext { get; set; } = null!;
+
         [TestMethod]
         public async Task TestConnectAsyncHandshake()
         {
             var settings = new ProtocolSettings { Network = 0x334F454E };
+            var ct = TestContext.CancellationToken;
 
             await using var server = new NodeServerListener(
                 new IPEndPoint(IPAddress.Loopback, 0),
@@ -52,9 +55,10 @@ namespace Neo.Core.Tests.Net
                 [
                     new FullNodeCapabilityMessage(10),
                     new ServerCapabilityMessage(20333),
-                ]);
+                ],
+                cancellationToken: ct);
 
-            await client.WaitForHandshakeAsync().WaitAsync(TimeSpan.FromSeconds(5));
+            await client.WaitForHandshakeAsync(ct).WaitAsync(TimeSpan.FromSeconds(5), ct);
 
             Assert.IsTrue(client.IsReady);
             Assert.IsNotNull(client.RemoteVersion);
@@ -68,11 +72,12 @@ namespace Neo.Core.Tests.Net
             var settings = new ProtocolSettings { Network = 1 };
             // Port with nothing listening (best-effort; OS may refuse quickly).
             var endPoint = new IPEndPoint(IPAddress.Loopback, TestUtilities.GetFreeTcpPort());
+            var ct = TestContext.CancellationToken;
 
             await Assert.ThrowsExactlyAsync<SocketException>(async () =>
             {
-                await NodeConnection.ConnectAsync(endPoint, settings, localNonce: 1)
-                    .WaitAsync(TimeSpan.FromSeconds(5));
+                await NodeConnection.ConnectAsync(endPoint, settings, localNonce: 1, cancellationToken: ct)
+                    .WaitAsync(TimeSpan.FromSeconds(5), ct);
             });
         }
     }

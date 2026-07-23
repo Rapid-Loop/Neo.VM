@@ -30,7 +30,7 @@ using System.Numerics;
 
 namespace Neo.VM.Types
 {
-    public class VMArray : VMObject, IEquatable<VMArray>, IEnumerable<VMObject>, IEnumerable, ICollection<VMObject>, IReadOnlyCollection<VMObject>, IList<VMObject>, IReadOnlyList<VMObject>
+    public class VMArray(IEnumerable<VMObject> items, bool isReadonly) : VMObject, IEquatable<VMArray>, IEnumerable<VMObject>, IEnumerable, ICollection<VMObject>, IReadOnlyCollection<VMObject>, IList<VMObject>, IReadOnlyList<VMObject>
     {
         public override VMObjectType Type => VMObjectType.Array;
 
@@ -38,21 +38,15 @@ namespace Neo.VM.Types
 
         public bool IsReadOnly => _isReadOnly;
 
-        private bool _isReadOnly = false;
+        private bool _isReadOnly = isReadonly;
 
-        protected readonly List<VMObject> Array;
+        protected readonly List<VMObject> Array = [.. items];
 
         public VMArray() : this(false) { }
 
         public VMArray(bool isReadonly) : this([], isReadonly) { }
 
         public VMArray(IEnumerable<VMObject> items) : this(items, false) { }
-
-        public VMArray(IEnumerable<VMObject> items, bool isReadonly)
-        {
-            Array = [.. items];
-            _isReadOnly = isReadonly;
-        }
 
         public VMObject this[int index]
         {
